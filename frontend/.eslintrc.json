@@ -74,6 +74,10 @@
         ],
         "import/no-cycle": "off",
         "no-plusplus": "off",
-        "react/no-array-index-key": "off"
+        "react/no-array-index-key": "off",
+        "linebreak-style": [
+          "error",
+          "windows"
+        ]
     }
 }
