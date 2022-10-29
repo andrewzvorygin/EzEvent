@@ -1,8 +1,8 @@
 import React from 'react';
-import './App.css';
+import styles from './App.scss';
 
 const App = () => (
-  <div className="App">
+  <div className={styles.App}>
     <header className="App-header" />
   </div>
 );
