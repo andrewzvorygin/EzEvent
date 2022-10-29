@@ -1,13 +1,28 @@
-from pydantic import BaseModel
+import uuid
+
+from pydantic import BaseModel, EmailStr
 
 
 class User(BaseModel):
-    email: str
+    email: EmailStr
+    name: str
+    surname: str
+    patronymic: str = None
+
+
+class UserPassword(User):
     password: str
-    first_name: str
-    last_name: str
+
+
+class UserRead(User):
+    uuid: uuid.UUID
     is_admin: bool = False
     disabled: bool = False
+
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
 
 
 class Token(BaseModel):
