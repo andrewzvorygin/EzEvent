@@ -3,10 +3,12 @@ from fastapi import FastAPI
 
 from core.database import database
 
-from users.endpoints import users_router
+from auth.endpoints import auth_router
+from profile.endpoints import profile_router
 
 app = FastAPI()
-app.include_router(users_router)
+app.include_router(auth_router)
+app.include_router(profile_router)
 
 
 @app.on_event("startup")
