@@ -2,7 +2,6 @@ from datetime import timedelta, datetime
 
 from fastapi import Depends, HTTPException, Header
 from jose import jwt, JWTError
-from passlib.context import CryptContext
 from starlette import status
 
 from core.database import database
@@ -10,18 +9,14 @@ from core.settgings import SECRET_KEY
 
 from .models import users, black_list_token
 from .schemes import UserRead, TokenData, UserPassword
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7   # Действие токена - 1 неделя
+from .config import pwd_context, ALGORITHM
 
 
 async def get_user(email):
     """Получить пользователя по email"""
     smtp = users.select().where(users.c.email == email)
     user = await database.fetch_one(smtp)
-    return UserPassword(**dict(user)) if user else None
+    return dict(user) if user else None
 
 
 def verify_password(plain_password, hashed_password):
@@ -36,7 +31,8 @@ def get_password_hash(password):
 
 async def authenticate_user(email: str, password: str):
     """Аутентификация пользователя"""
-    user = await get_user(email)
+    user_dict = await get_user(email)
+    user = UserPassword(**user_dict)
     if not user:
         return False
     if not verify_password(password, user.password):
@@ -72,7 +68,8 @@ async def get_current_user(token: str = Header()):
     except JWTError:
         raise credentials_exception
 
-    user = await get_user(token_data.username)
+    user_dict = await get_user(token_data.username)
+    user = UserRead(**user_dict)
     if user is None:
         raise credentials_exception
     return user
