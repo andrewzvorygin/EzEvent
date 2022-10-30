@@ -12,12 +12,12 @@ from .service import block_token
 auth_router = APIRouter(prefix='/auth')
 
 
-@auth_router.post('/registration')
+@auth_router.post('/registration', tags=['auth'])
 async def registration(user: UserPassword):
     return await create_user(user)
 
 
-@auth_router.post("/login", response_model=Token)
+@auth_router.post("/login", response_model=Token, tags=['auth'])
 async def login(user_login: UserLogin):
     user = await authenticate_user(user_login.email, user_login.password)
     if not user:
@@ -33,11 +33,11 @@ async def login(user_login: UserLogin):
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@auth_router.get("/isAuth/")
+@auth_router.get("/isAuth/", tags=['auth'])
 async def read_me(current_user: UserRead = Depends(get_current_active_user)):
     return {'user_id': current_user.uuid}
 
 
-@auth_router.delete('/logout')
+@auth_router.delete('/logout', tags=['auth'])
 async def logout(token: str = Header()):
     await block_token(token)
