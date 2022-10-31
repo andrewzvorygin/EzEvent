@@ -1,10 +1,9 @@
-from pathlib import Path
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, UploadFile, status
 
 from auth.service import get_current_active_user
 from auth.schemes import User, UserRead
 
-from .service import update_profile
+from .service import update_profile, save_photo_profile
 
 profile_router = APIRouter(prefix='/profile')
 
@@ -23,6 +22,6 @@ async def put_profile(
 
 
 @profile_router.put('/uploadPhoto', tags=['profile'])
-async def upload_photo_profile():
-    p = Path('.')
-    print(p)
+async def upload_photo_profile(photo: UploadFile):
+    await save_photo_profile(photo)
+    return {'status': status.HTTP_200_OK}

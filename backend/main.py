@@ -1,14 +1,17 @@
 import uvicorn
 from fastapi import FastAPI
 
-from core.database import database
+from core import database
 
-from auth.endpoints import auth_router
-from profile.endpoints import profile_router
+from auth import auth_router
+from profile import profile_router
+from cities import cities_router
 
 app = FastAPI()
+
 app.include_router(auth_router)
 app.include_router(profile_router)
+app.include_router(cities_router)
 
 
 @app.on_event("startup")

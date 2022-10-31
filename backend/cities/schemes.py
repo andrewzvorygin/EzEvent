@@ -3,8 +3,8 @@ from pydantic import BaseModel, validator
 
 class City(BaseModel):
     id: int | None = None
-    city: str
+    name: str
 
-    @validator('city')
-    def upper_city(self, value: str):
+    @validator('name')
+    def upper_city(cls, value: str):
         return value.upper()
