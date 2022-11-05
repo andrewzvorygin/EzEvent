@@ -4,6 +4,7 @@ from fastapi import Depends, HTTPException, Header
 from jose import jwt, JWTError
 from starlette import status
 
+from core import DEFAULT_PROFILE_PHOTO
 from core.database import database
 from core.settgings import SECRET_KEY
 
@@ -85,7 +86,7 @@ async def get_current_active_user(current_user: UserRead = Depends(get_current_u
 async def create_user(user: UserPassword):
     """Создать пользователя"""
     user.password = get_password_hash(user.password)
-    new_user = users.insert().values(**user.dict())
+    new_user = users.insert().values(**user.dict(), photo=DEFAULT_PROFILE_PHOTO)
     pk = await database.execute(new_user)
     return pk
 
