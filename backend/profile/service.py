@@ -9,6 +9,7 @@ from auth.schemes import User, UserRead
 from auth.models import users
 from auth.service import get_current_active_user
 
+from core import ROOT_PATH
 from core.database import database
 
 
@@ -23,7 +24,7 @@ async def update_profile(update_data: User, id_: UUID):
     await database.execute(smtp)
 
 
-async def save_photo_profile(photo: UploadFile, current_user: UserRead = Depends(get_current_active_user)):
+async def save_photo_profile(photo: UploadFile, current_user: UserRead):
     """Сохранить фото профиля"""
     extension = get_extension(photo.filename)
 
@@ -31,7 +32,7 @@ async def save_photo_profile(photo: UploadFile, current_user: UserRead = Depends
         raise ValueError('Невалидный файл')
 
     file_id = uuid1()
-    path_to_photo = os.path.join(os.getcwd(), 'profile_photo', f'{file_id}.{extension}')
+    path_to_photo = os.path.join(ROOT_PATH, 'profile_photo', f'{file_id}.{extension}')
 
     async with aiofiles.open(path_to_photo, 'wb') as file:
         data = await photo.read()
