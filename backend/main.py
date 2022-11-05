@@ -7,12 +7,14 @@ from core.events import set_city_in_db
 from auth import auth_router
 from profile import profile_router
 from city import cities_router
+from event import event_router
 
 app = FastAPI()
 
 app.include_router(auth_router)
 app.include_router(profile_router)
 app.include_router(cities_router)
+app.include_router(event_router)
 
 
 @app.on_event("startup")

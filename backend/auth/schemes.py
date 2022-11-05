@@ -29,6 +29,7 @@ class UserPassword(User):
 
 
 class UserRead(UserUpdate):
+    user_id: int
     uuid: uuid.UUID
     is_admin: bool = False
     disabled: bool = False

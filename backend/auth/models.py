@@ -7,7 +7,7 @@ from core.database import Base
 
 class User(Base):
     __tablename__ = 'User'
-    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, primary_key=True, index=True)
     uuid = Column(
         UUID(), server_default=text("gen_random_uuid()"),
         nullable=False, unique=True, index=True
