@@ -8,7 +8,7 @@ from fastapi import UploadFile
 from auth.schemes import User, UserRead
 from auth.models import users
 
-from core import STATIC_FILE
+from core import PHOTO_PROFILE_PATH
 from core.database import database
 
 
@@ -31,7 +31,7 @@ async def save_photo_profile(photo: UploadFile, current_user: UserRead):
         raise ValueError('Невалидный файл')
 
     file_id = uuid1()
-    path_to_photo = os.path.join(STATIC_FILE, 'profile_photo', f'{file_id}.{extension}')
+    path_to_photo = os.path.join(PHOTO_PROFILE_PATH, f'{file_id}.{extension}')
 
     async with aiofiles.open(path_to_photo, 'wb') as file:
         data = await photo.read()
