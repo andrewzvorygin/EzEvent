@@ -8,7 +8,7 @@ from core.database import Base
 
 class Event(Base):
     __tablename__ = 'Event'
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    event_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     uuid = Column(
         UUID(), server_default=text("gen_random_uuid()"),
         nullable=False, unique=True, index=True

@@ -1,9 +1,6 @@
-from fastapi import Depends
-
 from core.database import database
 
 from auth.schemes import UserRead
-from auth.service import get_current_active_user
 from .models import event
 
 

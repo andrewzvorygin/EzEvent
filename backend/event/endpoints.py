@@ -5,7 +5,7 @@ from auth.service import get_current_active_user
 
 from .service import create_empty_event
 
-event_router = APIRouter(prefix='/event')
+event_router = APIRouter(prefix='/event', tags=['event'])
 
 
 @event_router.post('')
