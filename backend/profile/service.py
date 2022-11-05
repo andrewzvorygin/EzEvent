@@ -3,13 +3,12 @@ from uuid import UUID, uuid1
 
 import aiofiles
 
-from fastapi import UploadFile, Depends
+from fastapi import UploadFile
 
 from auth.schemes import User, UserRead
 from auth.models import users
-from auth.service import get_current_active_user
 
-from core import ROOT_PATH
+from core import STATIC_FILE
 from core.database import database
 
 
@@ -32,7 +31,7 @@ async def save_photo_profile(photo: UploadFile, current_user: UserRead):
         raise ValueError('Невалидный файл')
 
     file_id = uuid1()
-    path_to_photo = os.path.join(ROOT_PATH, 'profile_photo', f'{file_id}.{extension}')
+    path_to_photo = os.path.join(STATIC_FILE, 'profile_photo', f'{file_id}.{extension}')
 
     async with aiofiles.open(path_to_photo, 'wb') as file:
         data = await photo.read()
@@ -58,6 +57,6 @@ async def save_photo_profile_db(path_to_photo, current_user_id):
 def get_extension(filename: str):
     index = filename.find('.')
     extension = filename[index + 1:].lower()
-    if extension in {'jpg', 'jpeg', 'bmp', 'png', 'gif'}:
+    if extension in {'jpg', 'jpeg', 'bmp', 'png'}:
         return extension
     return None

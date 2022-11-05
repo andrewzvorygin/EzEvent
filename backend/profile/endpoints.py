@@ -1,4 +1,7 @@
+import os
+
 from fastapi import APIRouter, Depends, UploadFile, status
+from fastapi.responses import FileResponse
 
 from auth.service import get_current_active_user
 from auth.schemes import UserRead, UserUpdate
@@ -25,3 +28,10 @@ async def put_profile(
 async def upload_photo_profile(photo: UploadFile, current_user: UserRead = Depends(get_current_active_user)):
     await save_photo_profile(photo, current_user)
     return {'status': status.HTTP_200_OK}
+
+
+@profile_router.get('/getPhoto', tags=['profile'], response_class=FileResponse)
+async def get_photo_profile(path: str):
+    if os.path.exists(path):
+        return FileResponse(path)
+    return {'status': status.HTTP_404_NOT_FOUND}

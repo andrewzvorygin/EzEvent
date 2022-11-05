@@ -19,3 +19,5 @@ PORT = int(_port)
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 ROOT_PATH = os.getcwd()
+
+STATIC_FILE = os.path.join(ROOT_PATH, 'static')
