@@ -1,3 +1,3 @@
 from .models import city
-from .schemes import City
+from .schemes import CityModel
 from .endpoints import cities_router
