@@ -39,3 +39,9 @@ DEFAULT_PROFILE_PHOTO = None
 
 if os.path.exists(_default_photo_path):
     DEFAULT_PROFILE_PHOTO = _default_photo_path
+
+PHOTO_COMPANY = 'company_photo'
+PHOTO_COMPANY_PATH = os.path.join(STATIC_FILE_PATH, PHOTO_COMPANY)
+
+if not os.path.exists(PHOTO_COMPANY_PATH):
+    os.mkdir(PHOTO_COMPANY_PATH)

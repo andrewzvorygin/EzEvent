@@ -22,6 +22,7 @@ company = Company.__table__
 
 class Editor(Base):
     __tablename__ = 'Editor'
+    editor_id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('User.user_id'))
     company_id = Column(Integer, ForeignKey('Company.company_id'))
 
