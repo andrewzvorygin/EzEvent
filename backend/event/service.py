@@ -6,7 +6,7 @@ from fastapi import WebSocket, WebSocketDisconnect
 from core.database import database
 from auth.schemes import UserRead
 
-from .models import event
+from .models import event, editor
 from .schemes import EventRead
 
 
@@ -37,7 +37,7 @@ async def create_empty_event(current_user: UserRead):
     return uuid_edit
 
 
-async def get_event(event_uuid: UUID):
+async def get_event_by_uuid(event_uuid: UUID):
     smtp = event.select().where(event.c.uuid == event_uuid)
     event_ = await database.fetch_one(smtp)
     return EventRead(**dict(event_))
@@ -51,3 +51,9 @@ async def websocket_(websocket: WebSocket, event_id: UUID):
             await manager.broadcast(data, event_id)
     except WebSocketDisconnect:
         manager.disconnect(websocket, event_id)
+
+
+async def get_editors(event_uuid: UUID):
+    smtp = editor.select().where(event.c.uuid == event_uuid)
+    editors = await database.fetch_all(smtp)
+    return editors

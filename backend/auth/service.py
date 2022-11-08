@@ -13,6 +13,13 @@ from .schemes import UserRead, TokenData, UserPassword
 from .config import pwd_context, ALGORITHM
 
 
+CREDENTIALS_EXCEPTION = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+
 async def get_user(email):
     """Получить пользователя по email"""
     smtp = users.select().where(users.c.email == email)
@@ -52,27 +59,22 @@ def create_access_token(data: dict, expires_delta: timedelta):
 
 async def get_current_user(token: str = Header()):
     """Получить текущего пользователя"""
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
     if await is_token_blacklisted(token):
-        raise credentials_exception
+        raise CREDENTIALS_EXCEPTION
 
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
-            raise credentials_exception
+            raise CREDENTIALS_EXCEPTION
         token_data = TokenData(username=username)
     except JWTError:
-        raise credentials_exception
+        raise CREDENTIALS_EXCEPTION
 
     user_dict = await get_user(token_data.username)
     user = UserRead(**user_dict)
     if user is None:
-        raise credentials_exception
+        raise CREDENTIALS_EXCEPTION
     return user
 
 

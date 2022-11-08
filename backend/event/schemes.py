@@ -18,3 +18,8 @@ class EventRead(Event):
     event_uuid_edit: UUID
     photo_cover: str | None
     responsible_id: int
+
+
+class Editor(BaseModel):
+    user_id: int
+    event_id: int
