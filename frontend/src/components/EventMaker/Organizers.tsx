@@ -1,28 +1,30 @@
 import React from 'react';
 import {
-  Box, Button, IconButton, Stack, Typography,
+  Box, Stack, Typography,
 } from '@mui/material';
+import { ControlPointOutlined } from '@mui/icons-material';
+import { StyledButton, StyledIconButton } from '../StyledControls/StyledControls';
 
 const Organizers = () => (
   <Box>
-    <Box sx={{ display: 'flex', gap: '1em' }} mb={3}>
-      <Typography variant="h4" gutterBottom={false}>
+    <Box sx={{ display: 'flex', gap: '1em', alignItems: 'center' }} mb={3}>
+      <Typography variant="h3">
         Добавить организатора
       </Typography>
-      <IconButton color="secondary">
-        +
-      </IconButton>
+      <StyledIconButton>
+        <ControlPointOutlined fontSize="large" />
+      </StyledIconButton>
     </Box>
     <Stack mb={3} gap={1.5} alignItems="start">
-      <Typography paragraph={false}>Главный организатор</Typography>
-      <Button variant="outlined">Сергей Камбала</Button>
+      <Typography>Главный организатор</Typography>
+      <StyledButton variant="outlined">Сергей Камбала</StyledButton>
     </Stack>
     <Stack alignItems="start" gap={1.5}>
-      <Typography paragraph={false}>Список организаторов:</Typography>
-      <Button variant="outlined">Сергей Камбала</Button>
-      <Button variant="outlined">Сергей Камбала</Button>
-      <Button variant="outlined">Сергей Камбала</Button>
-      <Button variant="outlined">Сергей Камбала</Button>
+      <Typography>Список организаторов:</Typography>
+      <StyledButton variant="outlined">Сергей Камбала</StyledButton>
+      <StyledButton variant="outlined">Сергей Камбала</StyledButton>
+      <StyledButton variant="outlined">Сергей Камбала</StyledButton>
+      <StyledButton variant="outlined">Сергей Камбала</StyledButton>
     </Stack>
   </Box>
 );

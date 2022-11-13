@@ -4,19 +4,19 @@ import MainForm from './MainForm';
 import Organizers from './Organizers';
 
 const EventMaker = () => (
-  <div>
-    <Typography variant="h3" gutterBottom mb={10}>
+  <>
+    <Typography variant="h1" component="h1" mb={5}>
       Создание мероприятия
     </Typography>
-    <Grid container>
-      <Grid item xs={8}>
+    <Grid container spacing={2.5}>
+      <Grid item xs={7}>
         <MainForm />
       </Grid>
-      <Grid item xs={4}>
+      <Grid item xs={5}>
         <Organizers />
       </Grid>
     </Grid>
-  </div>
+  </>
 );
 
 export default EventMaker;
