@@ -1,7 +1,7 @@
 from pydantic import BaseModel, validator
 
 
-class City(BaseModel):
+class CityModel(BaseModel):
     id: int | None = None
     name: str
 

@@ -9,8 +9,10 @@ class User(BaseModel):
     name: str
     surname: str
     patronymic: str = None
+
+
+class UserUpdate(User):
     phone: str | None = None
-    photo: str | None = None
 
     @validator('phone')
     def is_valid_phone_number(cls, value):
@@ -26,10 +28,12 @@ class UserPassword(User):
     password: str
 
 
-class UserRead(User):
+class UserRead(UserUpdate):
+    user_id: int
     uuid: uuid.UUID
     is_admin: bool = False
     disabled: bool = False
+    photo: str | None = None
 
 
 class UserLogin(BaseModel):
