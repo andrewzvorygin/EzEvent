@@ -4,13 +4,13 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-from .settgings import DB_HOST, DB_PORT, DB_USER, DB_NAME, DB_PASSWORD
+from .settgings import DB_HOST, DB_PORT, DB_USER, DB_NAME, DB_PASS
 
 DB_DRIVER_PSYCOPG = 'psycopg2'
 DB_DRIVER_ASYNC = 'asyncpg'
 
-DATABASE_URL_ALEMBIC = f'postgresql+{DB_DRIVER_PSYCOPG}://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
-DATABASE_URL = f'postgresql+{DB_DRIVER_ASYNC}://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
+DATABASE_URL_ALEMBIC = f'postgresql+{DB_DRIVER_PSYCOPG}://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
+DATABASE_URL = f'postgresql+{DB_DRIVER_ASYNC}://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
 
 database = databases.Database(DATABASE_URL_ALEMBIC)
 
