@@ -29,13 +29,3 @@ class Event(Base):
 
 
 event = Event.__table__
-
-
-class Editor(Base):
-    __tablename__ = 'Editor'
-    editor_id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('User.user_id'))
-    event_id = Column(Integer, ForeignKey('Event.event_id'))
-
-
-editor = Editor.__table__

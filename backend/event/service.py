@@ -6,7 +6,7 @@ from fastapi import WebSocket, WebSocketDisconnect
 from core.database import database
 from auth.schemes import UserRead
 
-from .models import event, editor
+from .models import event
 from .schemes import EventRead
 
 
@@ -51,9 +51,3 @@ async def websocket_(websocket: WebSocket, event_id: UUID):
             await manager.broadcast(data, event_id)
     except WebSocketDisconnect:
         manager.disconnect(websocket, event_id)
-
-
-async def get_editors(event_uuid: UUID):
-    smtp = editor.select().where(event.c.uuid == event_uuid)
-    editors = await database.fetch_all(smtp)
-    return editors

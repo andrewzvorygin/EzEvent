@@ -35,7 +35,7 @@ if not os.path.exists(PHOTO_PROFILE_PATH):
 
 _default = 'default.png'
 _default_photo_path = os.path.join(PHOTO_PROFILE_PATH, _default)
-DEFAULT_PROFILE_PHOTO = None
+DEFAULT_PROFILE_PHOTO = 'None'
 
 if os.path.exists(_default_photo_path):
     DEFAULT_PROFILE_PHOTO = _default_photo_path
