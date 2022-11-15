@@ -152,6 +152,4 @@ dmypy.json
 
 
 .idea
-backend/alembic.ini
-backend/script.py
 
