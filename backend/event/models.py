@@ -28,4 +28,4 @@ class Event(Base):
     time_updated = Column(DateTime(timezone=True), onupdate=func.now())
 
 
-event = Event.__table__
+event_table = Event.__table__

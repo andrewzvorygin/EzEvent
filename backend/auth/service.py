@@ -1,24 +1,18 @@
 from datetime import timedelta, datetime
 
-from fastapi import HTTPException
+from fastapi import Header
 from jose import jwt, JWTError
+from pydantic import ValidationError
 
-from sqlalchemy import select
-from sqlalchemy.engine import CursorResult
-from sqlalchemy.ext.asyncio import AsyncSession
-from starlette import status
+from sqlalchemy import select, insert
 
-from core import DEFAULT_PROFILE_PHOTO
+from core import DEFAULT_PROFILE_PHOTO, database
 from core.settgings import SECRET_KEY
 
-from .models import users, black_list_token, BlackListToken
-from .schemes import UserRead, UserPassword
+from .models import user_table, black_list_token
+from .schemes import UserRead, UserPassword, UserLogin, Token
 from .config import pwd_context, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
-
-CREDENTIALS_EXCEPTION = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Невалидный токен",
-    )
+from .exception import CREDENTIALS_EXCEPTION, INCORRECT_LOGIN_OR_PASSWORD_EXCEPTION, EMAIL_ALREADY_REGISTERED_EXCEPTION
 
 
 def verify_password(plain_password, hashed_password):
@@ -31,32 +25,31 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-async def get_user(email, session: AsyncSession):
+async def get_user(email: str):
     """Получить пользователя по email"""
     smtp = get_user_template(email)
-    result: CursorResult = await session.execute(smtp)
-    user = result.first()
-    return dict(user) if user else None
+    return await database.fetch_one(smtp)
 
 
 def get_user_template(email):
-    return users.select().where(users.c.email == email)
+    return user_table.select().where(user_table.c.email == email)
 
 
-async def authenticate_user(email: str, password: str, session: AsyncSession):
+async def authenticate_user(user_login: UserLogin):
     """Аутентификация пользователя"""
-    user_dict = await get_user(email, session)
-    if not user_dict:
-        return False
-    user = UserPassword(**user_dict)
-    if not verify_password(password, user.password):
-        return False
+    user_orm = await get_user(user_login.email)
+    try:
+        user = UserPassword.from_orm(user_orm)
+    except ValidationError:
+        raise INCORRECT_LOGIN_OR_PASSWORD_EXCEPTION
+    if not verify_password(user_login.password, user.password):
+        raise INCORRECT_LOGIN_OR_PASSWORD_EXCEPTION
     return user
 
 
-async def get_current_user(token: str, session: AsyncSession):
+async def get_current_user(token: str = Header()):
     """Получить текущего пользователя"""
-    if await is_token_blacklisted(token, session):
+    if await is_token_blacklisted(token):
         raise CREDENTIALS_EXCEPTION
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -66,35 +59,33 @@ async def get_current_user(token: str, session: AsyncSession):
     except JWTError:
         raise CREDENTIALS_EXCEPTION
 
-    user_dict = await get_user(email, session=session)
-    user = UserRead(**user_dict)
-    if user is None:
+    user_orm = await get_user(email)
+    try:
+        user = UserRead.from_orm(user_orm)
+    except ValidationError:
         raise CREDENTIALS_EXCEPTION
     return user
 
 
-async def create_user(user: UserPassword, session: AsyncSession):
+async def create_user(user: UserPassword):
     """Создать пользователя"""
     user.password = get_password_hash(user.password)
-    return await _create_user(user, session)
+    return await _create_user(user)
 
 
-async def _create_user(user: UserPassword, session: AsyncSession):
+async def _create_user(user: UserPassword):
     """Создать пользователя"""
     template = create_user_template(user)
     try:
-        result = await session.execute(template)
+        result = await database.execute(template)
     except Exception:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='Такой пользователь уже существует'
-        )
-    return result.inserted_primary_key[0]
+        raise EMAIL_ALREADY_REGISTERED_EXCEPTION
+    return result
 
 
 def create_user_template(user: UserPassword):
     """Создать пользователя в базе данных"""
-    return users.insert().values(**user.dict(), photo=DEFAULT_PROFILE_PHOTO)
+    return user_table.insert().values(**user.dict(), photo=DEFAULT_PROFILE_PHOTO)
 
 
 def create_access_token(data: dict, expires_delta: timedelta):
@@ -112,28 +103,31 @@ def get_access_token(user: UserPassword):
     access_token = create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires
     )
-    return access_token
+    return Token(access_token=access_token)
 
 
-async def is_token_blacklisted(token: str, session: AsyncSession):
+async def is_token_blacklisted(token: str = Header()):
     """Занесён ли токен в чёрный список"""
     smtp = get_token_template(token)
-    result = await session.execute(smtp)
-    inactive_token = result.scalars().first()
-    return bool(inactive_token)
+    result = await database.fetch_one(smtp)
+    return bool(result)
 
 
 def get_token_template(token: str):
     return select(black_list_token).where(black_list_token.c.token == token)
 
 
-async def block_token(token: str, session: AsyncSession):
+async def block_token(token: str):
     """Заблокировать токен"""
-    await get_current_user(token, session)
+    await get_current_user(token)
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         time_token = datetime.fromtimestamp(payload.get('exp'))
     except JWTError:
         raise CREDENTIALS_EXCEPTION
-    bad_token = BlackListToken(token=token, lifetime=time_token)
-    session.add(bad_token)
+    block_token_template = write_token_in_black_list_template(token, time_token)
+    await database.execute(block_token_template)
+
+
+def write_token_in_black_list_template(token, time_token):
+    return insert(black_list_token).values(token=token, lifetime=time_token)

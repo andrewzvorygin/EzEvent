@@ -12,4 +12,4 @@ class City(Base):
     name = Column(String, nullable=False, index=True)
 
 
-city = City.__table__
+city_table = City.__table__

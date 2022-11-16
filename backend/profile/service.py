@@ -4,60 +4,74 @@ from uuid import UUID, uuid1
 import aiofiles
 
 from fastapi import UploadFile, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from auth.schemes import User, UserRead, UserUpdate
-from auth.models import users
+from auth.models import user_table
 
-from core import PHOTO_PROFILE_PATH
+from core import PHOTO_PROFILE_PATH, database
 
 
-PHOTO_NOT_FOUND_EXCEPTION = HTTPException(
+PHOTO_NOT_FOUND = HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail="Фотография не найдена",
     )
 
+INVALID_FILE = HTTPException(
+    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+    detail='Невалидный файл'
+)
+
 
 async def update_profile_template(update_data: User, id_: UUID):
-    return users.update().where(users.c.uuid == str(id_)).values(**update_data.dict())
+    return user_table.update().where(user_table.c.uuid == str(id_)).values(**update_data.dict())
 
 
-async def update_profile(update_data: UserUpdate, id_: UUID, session: AsyncSession):
+async def update_profile(update_data: UserUpdate, id_: UUID):
     """Обновить данные профиля"""
     smtp = await update_profile_template(update_data=update_data, id_=id_)
-    await session.execute(smtp)
-    await session.commit()
+    await database.execute(smtp)
 
 
-async def save_photo_profile(photo: UploadFile, current_user: UserRead, session: AsyncSession):
+async def save_photo_profile(photo: UploadFile, current_user: UserRead):
     """Сохранить фото профиля"""
     extension = get_extension(photo.filename)
-
     if not extension:
-        raise ValueError('Невалидный файл')
+        raise INVALID_FILE
+    path_to_photo = await get_path_to_file(extension)
+    await save_file(path_to_photo, photo)
+    await save_photo_profile_db(path_to_photo, current_user.uuid)
+    await delete_last_photo(current_user)
 
-    file_id = uuid1()
-    path_to_photo = os.path.join(PHOTO_PROFILE_PATH, f'{file_id}.{extension}')
 
-    async with aiofiles.open(path_to_photo, 'wb') as file:
-        data = await photo.read()
-        await file.write(data)
-
-    await save_photo_profile_db(path_to_photo, current_user.uuid, session)
-
+async def delete_last_photo(current_user):
+    """Удалить последнее загруженное фото, чтобы не хранить неиспользуемые фото"""
     if current_user.photo and os.path.isfile(current_user.photo):
         os.remove(current_user.photo)
 
 
-async def save_photo_profile_db(path_to_photo, current_user_id, session: AsyncSession):
+async def save_file(path_to_photo, photo):
+    """Сохранить файл в системе"""
+    async with aiofiles.open(path_to_photo, 'wb') as file:
+        data = await photo.read()
+        await file.write(data)
+
+
+async def get_path_to_file(extension):
+    """Получить сгенерированный путь до файла"""
+    file_id = uuid1()
+    path_to_photo = os.path.join(PHOTO_PROFILE_PATH, f'{file_id}.{extension}')
+    return path_to_photo
+
+
+async def save_photo_profile_db(path_to_photo, current_user_id):
     """Обновить фото пользователя в базе"""
     smtp = save_photo_profile_template(current_user_id, path_to_photo)
-    await session.execute(smtp)
+    await database.execute(smtp)
 
 
 def save_photo_profile_template(current_user_id, path_to_photo):
-    return users.update().where(users.c.uuid == current_user_id).values(photo=path_to_photo)
+    return user_table.update().where(user_table.c.uuid == current_user_id).values(photo=path_to_photo)
 
 
 def get_extension(filename: str):

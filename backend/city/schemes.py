@@ -8,3 +8,6 @@ class CityModel(BaseModel):
     @validator('name')
     def upper_city(cls, value: str):
         return value.upper()
+
+    class Config:
+        orm_mode = True

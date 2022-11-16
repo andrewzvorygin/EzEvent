@@ -1,20 +1,17 @@
-from uuid import UUID
-
-from fastapi import APIRouter, Depends, WebSocket, Header, status
+from fastapi import APIRouter, Depends, WebSocket
 
 from auth.schemes import UserRead
-# from auth.service import get_current_user, get_current_active_user
+from auth.service import get_current_user
 
-from .service import create_empty_event, get_event_by_uuid
-from .service import EventRead
+from .service import create_empty_event
 
 event_router = APIRouter(prefix='/event', tags=['event'])
 
 
-# @event_router.post('')
-# async def create_empty(current_user: UserRead = Depends(get_current_active_user)):
-#     uuid_edit = await create_empty_event(current_user)
-#     return uuid_edit
+@event_router.post('')
+async def create_empty(current_user: UserRead = Depends(get_current_user)):
+    uuid_edit = await create_empty_event(current_user)
+    return uuid_edit
 
 
 @event_router.websocket("/ws")

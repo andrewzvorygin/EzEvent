@@ -10,6 +10,9 @@ class User(BaseModel):
     surname: str
     patronymic: str = None
 
+    class Config:
+        orm_mode = True
+
 
 class UserUpdate(User):
     phone: str | None = None
@@ -39,6 +42,12 @@ class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
+    class Config:
+        orm_mode = True
+
 
 class Token(BaseModel):
     access_token: str
+
+    class Config:
+        orm_mode = True

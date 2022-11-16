@@ -24,7 +24,7 @@ class User(Base):
     photo = Column(String)
 
 
-users = User.__table__
+user_table = User.__table__
 
 
 class BlackListToken(Base):
