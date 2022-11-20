@@ -1,56 +1,102 @@
+import string
+import secrets
 from uuid import UUID
-from collections import defaultdict
 
-from fastapi import WebSocket, WebSocketDisconnect
+from fastapi import HTTPException
+from sqlalchemy import select, update, insert
+from starlette import status
 
 from core.database import database
 from auth.schemes import UserRead
 
-from .models import event_table
-from .schemes import EventRead
+from .models import event_orm, editor_orm
+from .schemes import Editor
 
 
-class ConnectionManager:
-    def __init__(self):
-        self.active_connections: dict[UUID, [WebSocket]] = defaultdict(list)
-
-    async def connect(self, websocket: WebSocket, event_id: UUID):
-        await websocket.accept()
-        self.active_connections[event_id].append(websocket)
-
-    def disconnect(self, websocket: WebSocket, event_id: UUID):
-        self.active_connections[event_id].remove(websocket)
-        if not self.active_connections[event_id]:
-            self.active_connections.pop(event_id)
-
-    async def broadcast(self, message: str, event_id: UUID):
-        for connection in self.active_connections[event_id]:
-            await connection.send_text(message)
-
-
-manager = ConnectionManager()
+async def check_responsible(event_uuid: UUID, current_user: UserRead):
+    responsible = await get_responsible(event_uuid)
+    if responsible != current_user.user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail='Действие доступно только ответственному за мероприятие'
+        )
 
 
 async def create_empty_event(current_user: UserRead):
-    smtp = await create_empty_event_template(current_user)
-    return await database.execute(smtp)
+    smtp_create_empty = create_empty_event_template(current_user)
+    event_identifier = await database.fetch_one(smtp_create_empty)
+    editor = Editor(user_id=current_user.user_id, event_id=event_identifier['event_id'])
+    await add_editor_db(editor)
+    return event_identifier['uuid_edit']
 
 
-async def create_empty_event_template(current_user):
-    return event_table.insert().values(responsible_id=current_user.user_id).returning(event_table.c.uuid_edit)
+def create_empty_event_template(current_user):
+    return (
+        insert(event_orm)
+        .values(responsible_id=current_user.user_id)
+        .returning(event_orm.c.uuid_edit, event_orm.c.event_id)
+    )
 
 
-async def get_event_by_uuid(event_uuid: UUID):
-    smtp = event_table.select().where(event_table.c.uuid == event_uuid)
-    event_ = await database.fetch_one(smtp)
-    return EventRead(**dict(event_))
+async def get_key_invite(event_uuid):
+    """Получить ключ-приглашение или сгенерировать новый, если его нет"""
+    smtp = get_key_invite_template(event_uuid)
+    key = await database.fetch_val(smtp)
+    if key:
+        return key
+    new_key = await update_key_invite(event_uuid=event_uuid)
+    return new_key
 
 
-async def websocket_(websocket: WebSocket, event_id: UUID):
-    await manager.connect(websocket, event_id)
-    try:
-        while True:
-            data = await websocket.receive_text()
-            await manager.broadcast(data, event_id)
-    except WebSocketDisconnect:
-        manager.disconnect(websocket, event_id)
+async def update_key_invite(event_uuid):
+    """Получить новый ключ и обновить его в бд"""
+    new_key = generate_key_invite()
+    smtp_update_key_invite = update_key_invite_template(event_uuid, new_key)
+    await database.execute(smtp_update_key_invite)
+    return new_key
+
+
+async def update_key_invite_db(event_uuid, new_key):
+    smtp_update_key_invite = update_key_invite_template(event_uuid, new_key)
+    await database.execute(smtp_update_key_invite)
+
+
+def get_key_invite_template(event_uuid):
+    return select(event_orm.c.key_invite).where(event_orm.c.uuid_edit == event_uuid)
+
+
+def update_key_invite_template(event_uuid, new_key):
+    """Запрос на обновления ключа-приглашения"""
+    return (
+        update(event_orm)
+            .where(event_orm.c.uuid_edit == event_uuid)
+            .values(key_invite=new_key)
+    )
+
+
+def generate_key_invite():
+    """Сгенерировать ключ-приглашение"""
+    alphabet = string.ascii_letters + string.digits
+    password = ''.join(secrets.choice(alphabet) for _ in range(8))
+    return password
+
+
+async def get_responsible(event_uuid):
+    smtp = get_responsible_template(event_uuid)
+    return await database.fetch_val(smtp)
+
+
+def get_responsible_template(event_uuid):
+    return (
+        select(event_orm.c.responsible_id)
+        .where(event_orm.c.uuid_edit == event_uuid)
+    )
+
+
+async def add_editor_db(editor: Editor):
+    smtp = add_editor_template(editor)
+    await database.execute(smtp)
+
+
+def add_editor_template(editor: Editor):
+    return insert(editor_orm).values(event_id=editor.event_id, user_id=editor.user_id)
