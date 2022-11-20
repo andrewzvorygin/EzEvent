@@ -10,8 +10,7 @@
         "plugin:import/errors",
         "plugin:import/warnings",
         "plugin:import/typescript",
-        "prettier",
-        "airbnb"
+        "prettier"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -23,8 +22,8 @@
     },
     "plugins": [
         "prettier",
-        "react",
-        "@typescript-eslint"
+        "@typescript-eslint",
+        "react"
     ],
     "settings": {
         "import/resolver": {
