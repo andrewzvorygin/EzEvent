@@ -1,82 +1,148 @@
-{
-    "env": {
-        "browser": true,
-        "es2021": true
+module.exports = {
+  env: {
+    browser: true,
+    es6: true,
+  },
+  extends: [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:promise/recommended",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/typescript",
+    "prettier",
+    "plugin:jest/recommended",
+    "plugin:jest/style",
+  ],
+  parser: "@typescript-eslint/parser",
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: true,
     },
-    "extends": [
-        "plugin:@typescript-eslint/recommended",
-        "plugin:react-hooks/recommended",
-        "plugin:react/recommended",
-        "plugin:import/errors",
-        "plugin:import/warnings",
-        "plugin:import/typescript",
-        "prettier"
+    ecmaVersion: 2019,
+    sourceType: "module",
+  },
+  plugins: [
+    "prettier",
+    "react",
+    "react-hooks",
+    "@typescript-eslint",
+    "promise",
+    "import",
+    "jest",
+  ],
+  settings: {
+    react: {
+      version: "detect",
+    },
+    "import/resolver": {
+      node: {
+        extensions: [".js", ".jsx", ".ts", ".tsx"],
+        moduleDirectory: ["node_modules", "src/"],
+      },
+    },
+  },
+  rules: {
+    "import/order": [
+      "warn",
+      {
+        groups: [
+          "external",
+          "internal",
+          "unknown",
+          "builtin",
+          "parent",
+          "sibling",
+          "index",
+        ],
+        "newlines-between": "always",
+      },
     ],
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-        "ecmaFeatures": {
-            "jsx": true
+    "import/first": "warn",
+    "import/default": "off",
+    "import/no-named-as-default-member": "off",
+    "prettier/prettier": "warn",
+    "react/prop-types": "off",
+    "react-hooks/rules-of-hooks": "warn",
+    "react-hooks/exhaustive-deps": "warn",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/array-type": "warn",
+    "@typescript-eslint/explicit-member-accessibility": [
+      "warn",
+      {
+        overrides: {
+          constructors: "off",
         },
-        "ecmaVersion": "latest",
-        "sourceType": "module"
-    },
-    "plugins": [
-        "prettier",
-        "@typescript-eslint",
-        "react"
+      },
     ],
-    "settings": {
-        "import/resolver": {
-            "node": {
-                "extensions": [
-                    ".js",
-                    ".jsx",
-                    ".ts",
-                    ".tsx"
-                ]
-            }
-        }
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        selector: "default",
+        format: ["camelCase", "PascalCase"],
+        leadingUnderscore: "allow",
+        trailingUnderscore: "allow",
+      },
+      {
+        selector: ["variable", "objectLiteralProperty"],
+        format: ["camelCase", "UPPER_CASE", "PascalCase"],
+        leadingUnderscore: "allow",
+        trailingUnderscore: "allow",
+      },
+      {
+        selector: "typeLike",
+        format: ["PascalCase"],
+      },
+      {
+        selector: "objectLiteralProperty",
+        modifiers: ["requiresQuotes"],
+        format: null,
+      },
+    ],
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/prefer-for-of": "warn",
+    "@typescript-eslint/prefer-function-type": "warn",
+    "@typescript-eslint/no-this-alias": "warn",
+    "@typescript-eslint/no-empty-function": "warn",
+    "no-trailing-spaces": "warn",
+    "prefer-const": "warn",
+    "comma-dangle": ["warn", "always-multiline"],
+    curly: "warn",
+    "dot-notation": "warn",
+    "no-var": "warn",
+    "prefer-object-spread": "warn",
+    "prefer-template": "warn",
+    "promise/catch-or-return": "warn",
+    "promise/always-return": "off",
+    "max-params": "warn",
+    radix: "warn",
+    yoda: "warn",
+    "jest/no-alias-methods": "off",
+    "jest/no-standalone-expect": [
+      "error",
+      {
+        additionalTestBlockFunctions: ["afterEach"],
+      },
+    ],
+  },
+  overrides: [
+    {
+      files: ["*.js"],
+      env: {
+        node: true,
+      },
+      rules: {
+        "import/order": "off",
+        "@typescript-eslint/no-var-requires": "off",
+      },
     },
-    "rules": {
-        "require-jsdoc": "off",
-        "@typescript-eslint/ban-ts-commnet": "off",
-        "@typescript-eslint/ban-types": "off",
-        "react/jsx-filename-extension": [
-            2,
-            {
-                "extensions": [
-                    ".js",
-                    ".jsx",
-                    ",.ts",
-                    ".tsx"
-                ]
-            }
-        ],
-        "import/extensions": [
-            "error",
-            "ignorePackages",
-            {
-                "js": "never",
-                "jsx": "never",
-                "ts": "never",
-                "tsx": "never"
-            }
-        ],
-        "import/prefer-default-export": "off",
-        "no-use-before-define": "off",
-        "react/function-component-definition": [
-            2,
-            {
-                "namedComponents": "arrow-function",
-                "unnamedComponents": "arrow-function"
-            }
-        ],
-        "import/no-cycle": "off",
-        "no-plusplus": "off",
-        "react/no-array-index-key": "off",
-        "linebreak-style": [
-          "error",
-          "windows"
-        ]
-    }
-}
+    {
+      files: ["*.test.tsx", "*.test.ts"],
+      rules: {
+        "import/first": "off",
+      },
+    },
+  ],
+};
