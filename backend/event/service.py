@@ -10,7 +10,7 @@ from core.database import database
 from auth.schemes import UserRead
 
 from .models import event_orm, editor_orm
-from .schemes import Editor
+from .schemes import Editor, EventRead
 
 
 async def check_responsible(event_uuid: UUID, current_user: UserRead):
@@ -82,15 +82,14 @@ def generate_key_invite():
 
 
 async def get_responsible(event_uuid):
-    smtp = get_responsible_template(event_uuid)
-    return await database.fetch_val(smtp)
+    event = await get_event_by_uuid(event_uuid)
+    return event.responsible_id
 
 
-def get_responsible_template(event_uuid):
-    return (
-        select(event_orm.c.responsible_id)
-        .where(event_orm.c.uuid_edit == event_uuid)
-    )
+async def add_editor(event_uuid, user_id):
+    event = await get_event_by_uuid(event_uuid)
+    editor = Editor(user_id=user_id, event_id=event.event_id)
+    await add_editor_db(editor)
 
 
 async def add_editor_db(editor: Editor):
@@ -100,3 +99,21 @@ async def add_editor_db(editor: Editor):
 
 def add_editor_template(editor: Editor):
     return insert(editor_orm).values(event_id=editor.event_id, user_id=editor.user_id)
+
+
+async def get_event_by_uuid(event_uuid) -> EventRead:
+    smtp = get_event_by_uuid_template(event_uuid)
+    result = await database.fetch_one(smtp)
+    return EventRead.from_orm(result)
+
+
+def get_event_by_uuid_template(event_uuid):
+    return select(event_orm).where(event_orm.c.uuid_edit == event_uuid)
+
+
+async def add_editor_by_key(event_uuid: UUID, key: str, current_user: UserRead):
+    event = await get_event_by_uuid(event_uuid=event_uuid)
+    if event.key_invite == key:
+        await add_editor(user_id=current_user.user_id, event_uuid=event_uuid)
+    else:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Не верный ключ')

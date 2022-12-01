@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends
 from auth.schemes import UserRead
 from auth.service import get_current_user
 
-from .service import create_empty_event, get_key_invite, check_responsible, update_key_invite
+from .service import create_empty_event, get_key_invite, check_responsible, update_key_invite, add_editor_by_key
 
 event_router = APIRouter(prefix='/event', tags=['event'])
 
@@ -32,7 +32,7 @@ async def update_key_event(event: UUID, current_user: UserRead = Depends(get_cur
     return {'key': key}
 
 
-# @event_router.post('/organizers/{event}')
-# async def add_editor(event: UUID, current_user: UserRead = Depends(get_current_user)):
-#     """Добавить редактора"""
-#     pass
+@event_router.post('/organizers/{event}')
+async def add_organizer(event: UUID, key: str, current_user: UserRead = Depends(get_current_user)):
+    """Добавить редактора"""
+    await add_editor_by_key(event, key, current_user)
