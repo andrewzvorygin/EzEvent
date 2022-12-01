@@ -27,3 +27,7 @@ class EventRead(Event):
 class Editor(BaseModel):
     user_id: int
     event_id: int
+
+
+class Key(BaseModel):
+    key: str
