@@ -3,6 +3,13 @@ from uuid import UUID
 
 from fastapi import WebSocket, WebSocketDisconnect
 
+from main import app
+
+from core import database
+
+from .schemes import Event
+from .models import event_orm
+
 
 class ConnectionManager:
     def __init__(self):
@@ -25,11 +32,23 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 
+@app.websocket('/ws')
 async def update_event_websocket(websocket: WebSocket, event_id: UUID):
     await manager.connect(websocket, event_id)
     try:
         while True:
-            data = await websocket.receive_text()
+            data: str = await websocket.receive_text()
+            event = Event.parse_raw(data)
+            await update_event(event_uuid=event_id, event=event)
             await manager.broadcast(data, event_id)
     except WebSocketDisconnect:
         manager.disconnect(websocket, event_id)
+
+
+async def update_event(event_uuid, event: Event):
+    smtp = (
+        event_orm.update()
+        .where(event_orm.c.uuid_edit == event_uuid)
+        .values(**event.dict())
+    )
+    await database.execute(smtp)

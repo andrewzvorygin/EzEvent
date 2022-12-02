@@ -69,8 +69,8 @@ def update_key_invite_template(event_uuid, new_key):
     """Запрос на обновления ключа-приглашения"""
     return (
         update(event_orm)
-            .where(event_orm.c.uuid_edit == event_uuid)
-            .values(key_invite=new_key)
+        .where(event_orm.c.uuid_edit == event_uuid)
+        .values(key_invite=new_key)
     )
 
 
@@ -102,13 +102,9 @@ def add_editor_template(editor: Editor):
 
 
 async def get_event_by_uuid(event_uuid) -> EventRead:
-    smtp = get_event_by_uuid_template(event_uuid)
+    smtp = select(event_orm).where(event_orm.c.uuid_edit == event_uuid)
     result = await database.fetch_one(smtp)
     return EventRead.from_orm(result)
-
-
-def get_event_by_uuid_template(event_uuid):
-    return select(event_orm).where(event_orm.c.uuid_edit == event_uuid)
 
 
 async def add_editor_by_key(event_uuid: UUID, key: str, current_user: UserRead):
