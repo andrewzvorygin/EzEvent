@@ -40,7 +40,7 @@ def create_empty_event_template(current_user):
 
 async def get_key_invite(event_uuid):
     """Получить ключ-приглашение или сгенерировать новый, если его нет"""
-    smtp = get_key_invite_template(event_uuid)
+    smtp = select(event_orm.c.key_invite).where(event_orm.c.uuid_edit == event_uuid)
     key = await database.fetch_val(smtp)
     if key:
         return key
@@ -59,10 +59,6 @@ async def update_key_invite(event_uuid):
 async def update_key_invite_db(event_uuid, new_key):
     smtp_update_key_invite = update_key_invite_template(event_uuid, new_key)
     await database.execute(smtp_update_key_invite)
-
-
-def get_key_invite_template(event_uuid):
-    return select(event_orm.c.key_invite).where(event_orm.c.uuid_edit == event_uuid)
 
 
 def update_key_invite_template(event_uuid, new_key):
@@ -93,12 +89,8 @@ async def add_editor(event_uuid, user_id):
 
 
 async def add_editor_db(editor: Editor):
-    smtp = add_editor_template(editor)
+    smtp = insert(editor_orm).values(event_id=editor.event_id, user_id=editor.user_id)
     await database.execute(smtp)
-
-
-def add_editor_template(editor: Editor):
-    return insert(editor_orm).values(event_id=editor.event_id, user_id=editor.user_id)
 
 
 async def get_event_by_uuid(event_uuid) -> EventRead:
