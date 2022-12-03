@@ -1,5 +1,6 @@
 import uvicorn
 from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
 
 from core import database, HOST, PORT
 from core.events import set_city_in_db
@@ -16,6 +17,18 @@ app.include_router(auth_router)
 app.include_router(profile_router)
 app.include_router(cities_router)
 app.include_router(event_router)
+
+origins = [
+    "http://localhost",
+    "http://localhost:3000",
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.on_event("startup")
