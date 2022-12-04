@@ -9,6 +9,7 @@ import EventMaker from "./components/EventMaker/EventMaker";
 import EventMap from "./components/EventsMap/EventMap";
 import Auth from "./components/Auth/Auth";
 import styles from "./App.module.scss";
+import EventPage from "./components/Event/EventPage";
 
 const AppWrapper = () => (
   <ThemeProvider theme={theme}>
@@ -31,6 +32,7 @@ const App = () => {
           <Route path=":profileId/edit" element={<EventMaker />} />
           <Route index element={<EventList />} />
         </Route>
+        <Route path="event" element={<EventPage />} />
       </Route>
       <Route path="auth" element={<Auth />} />
     </Routes>
