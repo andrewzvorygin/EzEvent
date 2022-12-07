@@ -5,10 +5,10 @@ from starlette.middleware.cors import CORSMiddleware
 from core import database, HOST, PORT
 from core.events import set_city_in_db
 
-from auth import auth_router
-from profile import profile_router
-from city import cities_router
-from event import event_router
+from api.auth import auth_router
+from api.profile import profile_router
+from api.city import cities_router
+from api.event import event_router
 
 
 app = FastAPI()

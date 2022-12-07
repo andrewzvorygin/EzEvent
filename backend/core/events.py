@@ -2,7 +2,7 @@ import os
 
 from core import ROOT_PATH
 from core.database import database
-from city import city_table as city_model
+from api.city import city_table as city_model
 
 
 def get_cities():

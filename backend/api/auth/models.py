@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
 from sqlalchemy import func, text
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -24,14 +24,13 @@ class User(Base):
     photo = Column(String)
 
 
-user_table = User.__table__
+user_orm = User.__table__
 
 
-class BlackListToken(Base):
-    __tablename__ = 'BlackLisToken'
-    id = Column(Integer, primary_key=True, index=True)
-    token = Column(String, nullable=False, index=True)
-    lifetime = Column(DateTime)
+class AuthorizationToken(Base):
+    __tablename__ = 'AuthorizationToken'
+    user_id = Column(Integer, ForeignKey('User.user_id'), primary_key=True)
+    token = Column(String)
 
 
-black_list_token = BlackListToken.__table__
+authorization_token_orm = AuthorizationToken.__table__

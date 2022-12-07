@@ -8,17 +8,15 @@ class User(BaseModel):
     email: EmailStr
     name: str
     surname: str
-    patronymic: str = None
+    patronymic: str | None = None
+    phone: str | None = None
 
     class Config:
         orm_mode = True
 
-
-class UserUpdate(User):
-    phone: str | None = None
-
+    @staticmethod
     @validator('phone')
-    def is_valid_phone_number(cls, value):
+    def is_valid_phone_number(value):
         if value is None:
             return None
         phone_regular = re.fullmatch(r'(\+7|8)\d{10}', value)
@@ -31,7 +29,7 @@ class UserPassword(User):
     password: str
 
 
-class UserRead(UserUpdate):
+class UserRead(UserPassword):
     user_id: int
     uuid: uuid.UUID
     is_admin: bool = False
@@ -46,8 +44,9 @@ class UserLogin(BaseModel):
         orm_mode = True
 
 
-class Token(BaseModel):
-    access_token: str
+class AuthorizationToken(BaseModel):
+    user_id: int
+    token: str
 
     class Config:
         orm_mode = True
