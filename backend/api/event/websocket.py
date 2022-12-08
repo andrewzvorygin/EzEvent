@@ -14,19 +14,17 @@ from .models import event_orm
 
 class ConnectionManager:
     def __init__(self):
-        self.active_connections: dict[UUID, [WebSocket]] = defaultdict(list)
+        self.active_connections: list = []
 
-    async def connect(self, websocket: WebSocket, event_id: UUID):
+    async def connect(self, websocket: WebSocket):
         await websocket.accept()
-        self.active_connections[event_id].append(websocket)
+        self.active_connections.append(websocket)
 
-    def disconnect(self, websocket: WebSocket, event_id: UUID):
-        self.active_connections[event_id].remove(websocket)
-        if not self.active_connections[event_id]:
-            self.active_connections.pop(event_id)
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
 
-    async def broadcast(self, message: str, event_id: UUID):
-        for connection in self.active_connections[event_id]:
+    async def broadcast(self, message: str):
+        for connection in self.active_connections:
             await connection.send_text(message)
 
 

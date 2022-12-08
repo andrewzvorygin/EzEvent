@@ -45,14 +45,14 @@ async def shutdown():
 
 
 @app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket, event_id: UUID):
-    await manager.connect(websocket, event_id)
+async def websocket_endpoint(websocket: WebSocket):
+    await manager.connect(websocket)
     try:
         while True:
             data: str = await websocket.receive_text()
-            await manager.broadcast(data, event_id)
+            await manager.broadcast(data)
     except WebSocketDisconnect:
-        manager.disconnect(websocket, event_id)
+        manager.disconnect(websocket)
 
 
 if __name__ == "__main__":
