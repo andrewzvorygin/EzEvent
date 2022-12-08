@@ -1,5 +1,7 @@
+from uuid import UUID
+
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from starlette.middleware.cors import CORSMiddleware
 
 from core import database, HOST, PORT
@@ -10,7 +12,7 @@ from api.profile import profile_router
 from api.city import cities_router
 from api.event import event_router
 
-
+from api.event.websocket import manager
 app = FastAPI()
 
 app.include_router(auth_router)
@@ -40,6 +42,18 @@ async def startup():
 @app.on_event("shutdown")
 async def shutdown():
     await database.disconnect()
+
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket, event_id: UUID):
+    await manager.connect(websocket, event_id)
+    try:
+        while True:
+            data: str = await websocket.receive_text()
+            await manager.broadcast(data, event_id)
+    except WebSocketDisconnect:
+        manager.disconnect(websocket, event_id)
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host=HOST, log_level="info", port=PORT)

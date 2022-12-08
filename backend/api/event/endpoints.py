@@ -1,6 +1,7 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, WebSocket
+from starlette.responses import HTMLResponse
 
 from api.auth.schemes import UserRead
 from api.auth.service import get_current_user
@@ -37,3 +38,45 @@ async def update_key_event(event: UUID, current_user: UserRead = Depends(get_cur
 async def add_organizer(key: Key, event: UUID, current_user: UserRead = Depends(get_current_user)):
     """Добавить редактора"""
     await service.add_editor_by_key(event, key.key, current_user)
+
+
+html = """
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Chat</title>
+    </head>
+    <body>
+        <h1>WebSocket Chat</h1>
+        <form action="" onsubmit="sendMessage(event)">
+            <input type="text" id="messageText" autocomplete="off"/>
+            <button>Send</button>
+        </form>
+        <ul id='messages'>
+        </ul>
+        <script>
+            var ws = new WebSocket("ws://localhost:8000/ws");
+            ws.onmessage = function(event) {
+                var messages = document.getElementById('messages')
+                var message = document.createElement('li')
+                var content = document.createTextNode(event.data)
+                message.appendChild(content)
+                messages.appendChild(message)
+            };
+            function sendMessage(event) {
+                var input = document.getElementById("messageText")
+                ws.send(input.value)
+                input.value = ''
+                event.preventDefault()
+            }
+        </script>
+    </body>
+</html>
+"""
+
+
+@event_router.get("/")
+async def get():
+    return HTMLResponse(html)
+
+
