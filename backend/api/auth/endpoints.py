@@ -22,7 +22,7 @@ async def registration(user: UserPassword, response: Response):
 async def login(user_login: UserLogin, response: Response):
     user = await service.authenticate_user(user_login)
     authorization_token = await service.get_authorization_token(user)
-    response.set_cookie(key='access_token', value=authorization_token.token)
+    response.set_cookie(key='access_token', value=authorization_token.token, httponly=True)
     response.status_code = status.HTTP_200_OK
 
 
