@@ -1,6 +1,5 @@
 """Модуль бл для работы с пользователями"""
 from fastapi import APIRouter, Response, Depends, Cookie
-from fastapi_csrf_protect import CsrfProtect
 
 from starlette import status
 
@@ -31,12 +30,11 @@ async def read_me(
         access_token: str | None = Cookie(default=None),
         response: Response = None
 ):
-    csrf_protect = CsrfProtect()
-    csrf_token = csrf_protect.generate_csrf()
-    response.headers['X-CSRF-Token'] = csrf_token
-    response.set_cookie(key='X-CSRF-Token', value=csrf_token)
+    await service.set_csrf_token_into_cookie_response(response)
+    if access_token is None:
+        return {'user_id': None}
     current_user: UserRead = await service.get_current_user(access_token)
-    return {'user_id': current_user.uuid}
+    return {'user_id': current_user.user_id}
 
 
 @auth_router.delete('/logout', tags=['auth'])
