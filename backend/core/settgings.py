@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY_CSRF = os.getenv('SECRET_KEY_CSRF')
 
 # Настройки подключения к базе данных
 DB_PASS = os.getenv('DB_PASS')
