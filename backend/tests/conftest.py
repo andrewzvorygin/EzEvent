@@ -2,16 +2,17 @@ import os
 
 # Устанавливаем `os.environ`, чтобы использовать тестовую БД
 os.environ['TESTING'] = 'True'
-
+from dotenv import load_dotenv
 
 from alembic import command
 from alembic.config import Config
-from core.database import SQLALCHEMY_DATABASE_URL, DB_NAME
+from core.database import SQLALCHEMY_DATABASE_URL
 
 from sqlalchemy_utils import create_database, drop_database, database_exists
 
 
-os.environ['DB_NAME'] = DB_NAME
+load_dotenv()
+os.environ['DB_NAME'] = os.getenv('DB_NAME') + 'Test'
 
 
 if database_exists(SQLALCHEMY_DATABASE_URL):

@@ -4,7 +4,6 @@ from starlette.middleware.cors import CORSMiddleware
 
 from core import database, settings
 from core.events import set_city_in_db
-from core.middleware import CheckingCsrfToken
 
 from api.auth import auth_router
 from api.profile import profile_router
@@ -30,8 +29,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-app.add_middleware(CheckingCsrfToken)
 
 
 @app.on_event("startup")
