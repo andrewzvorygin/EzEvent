@@ -29,7 +29,8 @@ user_orm = User.__table__
 
 class AuthorizationToken(Base):
     __tablename__ = 'AuthorizationToken'
-    user_id = Column(Integer, ForeignKey('User.user_id'), primary_key=True)
+    token_id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('User.user_id'))
     token = Column(String)
 
 

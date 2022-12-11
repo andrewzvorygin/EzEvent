@@ -8,11 +8,11 @@ from starlette import status
 from api.auth.schemes import UserRead
 from . import storage as st
 
-from .schemes import Editor
+from .schemes import Participant
 
 
 async def check_responsible(event_uuid: UUID, current_user: UserRead):
-    event = await st.get_event(event_uuid)
+    event = await st.get_event_for_editor(event_uuid)
     if event.responsible_id != current_user.user_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -22,8 +22,8 @@ async def check_responsible(event_uuid: UUID, current_user: UserRead):
 
 async def create_empty_event(current_user: UserRead) -> UUID:
     event_identifier = await st.create_event(current_user)
-    editor = Editor(user_id=current_user.user_id, event_id=event_identifier['event_id'])
-    await st.add_editor(editor)
+    editor = Participant(user_id=current_user.user_id, event_id=event_identifier['event_id'])
+    await st.add_participant(editor)
     return event_identifier['uuid_edit']
 
 
@@ -47,15 +47,40 @@ def generate_key_invite() -> str:
     return key_invite
 
 
-async def add_editor(event_uuid, user_id):
-    event = await st.get_event(event_uuid)
-    editor = Editor(user_id=user_id, event_id=event.event_id)
-    await st.add_editor(editor)
+async def add_editor(event_uuid: UUID, user_id: int):
+    await add_participant(event_uuid, user_id, True)
 
 
 async def add_editor_by_key(event_uuid: UUID, key: str, current_user: UserRead):
-    event = await st.get_event(event_uuid=event_uuid)
+    event = await st.get_event_for_editor(event_uuid=event_uuid)
     if event.key_invite == key:
         await add_editor(user_id=current_user.user_id, event_uuid=event_uuid)
     else:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Не верный ключ')
+
+
+async def search_users_by_email(email_prefix: str) -> list[UserRead]:
+    return await st.get_users_by_email(email_prefix)
+
+
+async def add_visitor(event_uuid: UUID, current_user: UserRead):
+    await add_participant(event_uuid, current_user.user_id, False)
+
+
+async def add_participant(event_uuid: UUID, user_id: int, is_editor: bool):
+    if is_editor:
+        event = await st.get_event_for_editor(event_uuid)
+    else:
+        event = await st.get_event_for_visitor(event_uuid)
+    participant = Participant(user_id=user_id, event_id=event.event_id, is_editor=is_editor)
+    try:
+        await st.add_participant(participant)
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Пользователь уже является участником мероприятия'
+        )
+
+
+async def get_event(event_uuid: UUID):
+    return await st.get_event_for_visitor(event_uuid)

@@ -15,7 +15,7 @@ async def get_user_by_email(email: str) -> Record:
     return await database.fetch_one(smtp)
 
 
-async def create_user(user: sh.UserPassword) -> int:
+async def create_user(user: sh.UserCreate) -> int:
     """Создать пользователя"""
     template = user_orm.insert().values(**user.dict(), photo=DEFAULT_PROFILE_PHOTO)
     try:

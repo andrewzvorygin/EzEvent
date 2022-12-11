@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, UniqueConstraint
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, UniqueConstraint, Float
 from sqlalchemy import text
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -19,6 +19,8 @@ class Event(Base):
     date_start = Column(DateTime(timezone=True))
     date_end = Column(DateTime(timezone=True))
     title = Column(String)
+    latitude = Column(Float)
+    longitude = Column(Float)
     description = Column(String)
     responsible_id = Column(Integer, ForeignKey('User.user_id'))
     visibility = Column(Boolean, default=False)
@@ -44,14 +46,15 @@ class Stage(Base):
 stage_orm = Stage.__table__
 
 
-class Edit(Base):
-    __tablename__ = 'Edit'
-    edit_id = Column(Integer, primary_key=True, autoincrement=True)
+class Participant(Base):
+    __tablename__ = 'Participant'
+    participant_id = Column(Integer, primary_key=True, autoincrement=True)
     event_id = Column(Integer, ForeignKey('Event.event_id'))
     user_id = Column(Integer, ForeignKey('User.user_id'))
+    is_editor = Column(Boolean, default=False)
     __table_args__ = (
         UniqueConstraint('event_id', 'user_id', name='user_pk'),
     )
 
 
-editor_orm = Edit.__table__
+participant_orm = Participant.__table__

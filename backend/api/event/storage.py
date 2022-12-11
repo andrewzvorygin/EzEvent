@@ -4,19 +4,33 @@ from databases.interfaces import Record
 from sqlalchemy import select, insert, update
 
 from api.auth.schemes import UserRead
+from api.auth.models import user_orm
 from core import database
-from .models import event_orm, editor_orm
-from .schemes import EventRead, Editor
+from .models import event_orm, participant_orm
+from .schemes import EventRead, Participant, EventForEditor
 
 
-async def get_event(event_uuid: UUID) -> EventRead:
+async def get_event_for_editor(event_uuid: UUID) -> EventForEditor:
     smtp = select(event_orm).where(event_orm.c.uuid_edit == event_uuid)
+    result = await database.fetch_one(smtp)
+    return EventForEditor.from_orm(result)
+
+
+async def get_event_for_visitor(event_uuid: UUID) -> EventRead:
+    smtp = select(event_orm).where(event_orm.c.uuid == event_uuid)
     result = await database.fetch_one(smtp)
     return EventRead.from_orm(result)
 
 
-async def add_editor(editor: Editor) -> None:
-    smtp = insert(editor_orm).values(event_id=editor.event_id, user_id=editor.user_id)
+async def add_participant(participant: Participant) -> None:
+    smtp = (
+        insert(participant_orm)
+        .values(
+            event_id=participant.event_id,
+            user_id=participant.user_id,
+            is_editor=participant.is_editor
+        )
+    )
     await database.execute(smtp)
 
 
@@ -42,3 +56,12 @@ async def get_key_invite(event_uuid: UUID) -> str:
     smtp = select(event_orm.c.key_invite).where(event_orm.c.uuid_edit == event_uuid)
     key = await database.fetch_val(smtp)
     return key
+
+
+async def get_users_by_email(email: str) -> list[UserRead]:
+    smtp = (
+        select(user_orm)
+        .where(user_orm.c.email.like(f'{email}%'))
+    )
+    result = await database.fetch_all(smtp)
+    return [UserRead.from_orm(user) for user in result]
