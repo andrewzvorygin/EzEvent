@@ -24,9 +24,10 @@ class EventRead(Event):
     key_invite: str | None
 
 
-class Editor(BaseModel):
+class Participant(BaseModel):
     user_id: int
     event_id: int
+    is_editor: bool = False
 
 
 class Key(BaseModel):

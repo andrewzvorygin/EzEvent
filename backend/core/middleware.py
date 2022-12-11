@@ -5,6 +5,7 @@ from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from core.settgings import SECRET_KEY_CSRF
+from api.auth import auth_router
 
 UNSAFE_METHODS = ['POST', 'PUT', 'DELETE']
 
@@ -20,7 +21,7 @@ def get_csrf_config():
 
 class CheckingCsrfToken(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        if request.method in UNSAFE_METHODS and not request.url.path.startswith('/auth'):
+        if request.method in UNSAFE_METHODS and not request.url.path.startswith(auth_router.prefix):
             csrf_protect = CsrfProtect()
             csrf_token = csrf_protect.get_csrf_from_headers(request.headers)
             csrf_protect.validate_csrf(csrf_token)

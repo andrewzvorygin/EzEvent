@@ -57,4 +57,4 @@ class Participant(Base):
     )
 
 
-editor_orm = Participant.__table__
+participant_orm = Participant.__table__

@@ -14,9 +14,8 @@ class User(BaseModel):
     class Config:
         orm_mode = True
 
-    @staticmethod
     @validator('phone')
-    def is_valid_phone_number(value):
+    def is_valid_phone_number(cls, value):
         if value is None:
             return None
         phone_regular = re.fullmatch(r'(\+7|8)\d{10}', value)
@@ -29,7 +28,7 @@ class UserPassword(User):
     password: str
 
 
-class UserRead(UserPassword):
+class UserRead(User):
     user_id: int
     uuid: uuid.UUID
     is_admin: bool = False
