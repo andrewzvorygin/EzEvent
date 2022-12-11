@@ -7,13 +7,13 @@ from api.auth.schemes import UserRead
 from api.auth.models import user_orm
 from core import database
 from .models import event_orm, participant_orm
-from .schemes import EventRead, Participant
+from .schemes import EventRead, Participant, EventForEditor
 
 
-async def get_event_for_editor(event_uuid: UUID) -> EventRead:
+async def get_event_for_editor(event_uuid: UUID) -> EventForEditor:
     smtp = select(event_orm).where(event_orm.c.uuid_edit == event_uuid)
     result = await database.fetch_one(smtp)
-    return EventRead.from_orm(result)
+    return EventForEditor.from_orm(result)
 
 
 async def get_event_for_visitor(event_uuid: UUID) -> EventRead:
@@ -65,11 +65,3 @@ async def get_users_by_email(email: str) -> list[UserRead]:
     )
     result = await database.fetch_all(smtp)
     return [UserRead.from_orm(user) for user in result]
-
-
-async def add_editor_by_email():
-    select_smtp = select(user_orm.c.user_id).where(user_orm.c.email == email)
-    insert_smtp = (
-        insert(participant_orm)
-        .values(select_smtp)
-    )

@@ -80,3 +80,7 @@ async def add_participant(event_uuid: UUID, user_id: int, is_editor: bool):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='Пользователь уже является участником мероприятия'
         )
+
+
+async def get_event(event_uuid: UUID):
+    return await st.get_event_for_visitor(event_uuid)

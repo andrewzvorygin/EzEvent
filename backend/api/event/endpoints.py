@@ -6,10 +6,16 @@ from api.auth.schemes import UserRead
 from api.auth.service import get_current_user
 
 from . import service
-from .schemes import Key
+from . import schemes
 from .websocket import manager
 
 event_router = APIRouter(prefix='/event', tags=['event'])
+
+
+@event_router.get('/read/{event}', response_model=schemes.EventRead)
+async def get_event(event: UUID):
+    event = await service.get_event(event)
+    return event
 
 
 @event_router.post('/')
@@ -35,7 +41,9 @@ async def update_key_event(event: UUID, current_user: UserRead = Depends(get_cur
 
 
 @event_router.post('/organizers/{event}')
-async def add_organizer(key: Key, event: UUID, current_user: UserRead = Depends(get_current_user)):
+async def add_organizer(
+        key: schemes.Key, event: UUID, current_user: UserRead = Depends(get_current_user)
+):
     """Добавить редактора"""
     await service.add_editor_by_key(event, key.key, current_user)
 
