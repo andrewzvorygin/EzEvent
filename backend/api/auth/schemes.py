@@ -24,8 +24,12 @@ class User(BaseModel):
         return value
 
 
-class UserPassword(User):
+class UserCreate(User):
     password: str
+
+
+class UserPassword(UserCreate):
+    user_id: int
 
 
 class UserRead(User):

@@ -7,11 +7,11 @@ from . import exception as exc
 from . import schemes as sch
 
 
-async def authenticate_user(user_login: sch.UserLogin) -> sch.UserRead:
+async def authenticate_user(user_login: sch.UserLogin) -> sch.UserPassword:
     """Аутентификация пользователя"""
     user_model = await storage.get_user_by_email(user_login.email)
     try:
-        user = sch.UserRead.from_orm(user_model)
+        user = sch.UserPassword.from_orm(user_model)
     except ValidationError:
         raise exc.INCORRECT_LOGIN_OR_PASSWORD_EXCEPTION
     if not utils.verify_password(user_login.password, user.password):
@@ -29,13 +29,13 @@ async def get_current_user(access_token: str = Cookie()) -> sch.UserRead:
     return user
 
 
-async def create_user(user: sch.UserPassword) -> int:
+async def create_user(user: sch.UserCreate) -> int:
     """Создать пользователя"""
     user.password = utils.get_password_hash(user.password)
     return await storage.create_user(user)
 
 
-async def get_authorization_token(user: sch.UserRead) -> sch.AuthorizationToken:
+async def get_authorization_token(user: sch.UserPassword) -> sch.AuthorizationToken:
     token = utils.get_token(user)
     authorization_token = sch.AuthorizationToken(user_id=user.user_id, token=token)
     await storage.add_authorization_token(authorization_token)

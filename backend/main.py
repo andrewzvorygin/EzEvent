@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from core import database, HOST, PORT
+from core import database, settings
 from core.events import set_city_in_db
 from core.middleware import CheckingCsrfToken
 
@@ -46,4 +46,4 @@ async def shutdown():
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host=HOST, log_level="info", port=PORT)
+    uvicorn.run("main:app", host=settings.app.host, log_level="info", port=settings.app.port)

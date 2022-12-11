@@ -3,7 +3,7 @@ from fastapi import APIRouter, Response, Depends, Cookie
 
 from starlette import status
 
-from .schemes import UserPassword, UserLogin, UserRead
+from .schemes import UserCreate, UserLogin, UserRead
 
 from . import service
 
@@ -11,7 +11,7 @@ auth_router = APIRouter(prefix='/auth')
 
 
 @auth_router.post('/registration', tags=['auth'])
-async def registration(user: UserPassword, response: Response):
+async def registration(user: UserCreate, response: Response):
     user_id = await service.create_user(user)
     response.status_code = status.HTTP_201_CREATED
     return {'id': user_id}
