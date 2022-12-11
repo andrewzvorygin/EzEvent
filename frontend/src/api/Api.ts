@@ -51,7 +51,7 @@ export const eventsAPI = {
         "Access-Token": accessToken,
       },
     })
-      .then((response) => console.log(response))
+      .then((response) => response.json())
       .catch((error) => console.error(error));
   },
   async getEvent(eventId: string) {

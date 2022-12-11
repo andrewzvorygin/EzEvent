@@ -4,13 +4,21 @@ import {
   ControlPointOutlined,
   EventNoteOutlined,
   MailOutlined,
+  LogoutOutlined,
+  LoginOutlined,
 } from "@mui/icons-material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
 import { StyledIconButton } from "../StyledControls/StyledControls";
+import { authAPI, eventsAPI } from "../../api/Api";
 
-const Header = () => {
+interface HeaderPropsType {
+  auth: boolean;
+  setAuth: (auth: boolean) => void;
+}
+
+const Header: React.FC<HeaderPropsType> = (props) => {
   const navigate = useNavigate();
   return (
     <Box component="header" sx={{ py: 3, px: 3, display: "flex" }}>
@@ -26,33 +34,60 @@ const Header = () => {
           gap: 2.5,
         }}
       >
-        <StyledIconButton
-          title="Мои мероприятия"
-          onClick={() => {
-            navigate(`/events`);
-          }}
-        >
-          <EventNoteOutlined />
-        </StyledIconButton>
-        <StyledIconButton title="Оповещения">
-          <MailOutlined />
-        </StyledIconButton>
-        <StyledIconButton
-          title="Создать мероприятие"
-          onClick={() => {
-            navigate(`/events/1/edit`);
-          }}
-        >
-          <ControlPointOutlined />
-        </StyledIconButton>
-        <StyledIconButton
-          title="Профиль"
-          onClick={() => {
-            navigate(`/profile`);
-          }}
-        >
-          <AccountBoxOutlined />
-        </StyledIconButton>
+        {props.auth ? (
+          <>
+            <StyledIconButton
+              title="Мои мероприятия"
+              onClick={() => {
+                navigate(`/events`);
+              }}
+            >
+              <EventNoteOutlined />
+            </StyledIconButton>
+            <StyledIconButton title="Оповещения">
+              <MailOutlined />
+            </StyledIconButton>
+            <StyledIconButton
+              title="Создать мероприятие"
+              onClick={() => {
+                eventsAPI.postEvent().then((data) => {
+                  navigate(`/event/${data}/edit`);
+                });
+              }}
+            >
+              <ControlPointOutlined />
+            </StyledIconButton>
+            <StyledIconButton
+              title="Профиль"
+              onClick={() => {
+                navigate(`/profile`);
+              }}
+            >
+              <AccountBoxOutlined />
+            </StyledIconButton>
+            <StyledIconButton
+              title="Выйти"
+              onClick={() => {
+                authAPI.deleteAuthLogin().then(() => {
+                  props.setAuth(false);
+                });
+              }}
+            >
+              <LogoutOutlined />
+            </StyledIconButton>
+          </>
+        ) : (
+          <>
+            <StyledIconButton
+              title="Войти"
+              onClick={() => {
+                navigate(`/auth`);
+              }}
+            >
+              <LoginOutlined />
+            </StyledIconButton>
+          </>
+        )}
       </Box>
     </Box>
   );
