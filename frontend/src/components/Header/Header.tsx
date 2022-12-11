@@ -6,6 +6,7 @@ import {
   MailOutlined,
   LogoutOutlined,
   LoginOutlined,
+  HomeOutlined,
 } from "@mui/icons-material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
@@ -58,6 +59,14 @@ const Header: React.FC<HeaderPropsType> = (props) => {
               <ControlPointOutlined />
             </StyledIconButton>
             <StyledIconButton
+              title="Главная"
+              onClick={() => {
+                navigate(`/events`);
+              }}
+            >
+              <HomeOutlined />
+            </StyledIconButton>
+            <StyledIconButton
               title="Профиль"
               onClick={() => {
                 navigate(`/profile`);
@@ -78,6 +87,14 @@ const Header: React.FC<HeaderPropsType> = (props) => {
           </>
         ) : (
           <>
+            <StyledIconButton
+              title="Главная"
+              onClick={() => {
+                navigate(`/events`);
+              }}
+            >
+              <HomeOutlined />
+            </StyledIconButton>
             <StyledIconButton
               title="Войти"
               onClick={() => {

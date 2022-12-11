@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Box, Typography } from "@mui/material";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import MuiMarkdown from "mui-markdown";
 
 import Editor from "./Editor";
