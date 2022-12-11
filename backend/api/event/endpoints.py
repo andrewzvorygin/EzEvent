@@ -1,7 +1,6 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
-from pydantic import EmailStr
 
 from api.auth.schemes import UserRead
 from api.auth.service import get_current_user

@@ -47,14 +47,14 @@ def generate_key_invite() -> str:
     return key_invite
 
 
-async def add_editor(event_uuid: UUID, user: UserRead):
-    await add_participant(event_uuid, user, True)
+async def add_editor(event_uuid: UUID, user_id: int):
+    await add_participant(event_uuid, user_id, True)
 
 
 async def add_editor_by_key(event_uuid: UUID, key: str, current_user: UserRead):
     event = await st.get_event_for_editor(event_uuid=event_uuid)
     if event.key_invite == key:
-        await add_editor(user=current_user, event_uuid=event_uuid)
+        await add_editor(user_id=current_user.user_id, event_uuid=event_uuid)
     else:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Не верный ключ')
 
@@ -64,15 +64,15 @@ async def search_users_by_email(email_prefix: str) -> list[UserRead]:
 
 
 async def add_visitor(event_uuid: UUID, current_user: UserRead):
-    await add_participant(event_uuid, current_user, False)
+    await add_participant(event_uuid, current_user.user_id, False)
 
 
-async def add_participant(event_uuid: UUID, current_user: UserRead, is_editor: bool):
+async def add_participant(event_uuid: UUID, user_id: int, is_editor: bool):
     if is_editor:
         event = await st.get_event_for_editor(event_uuid)
     else:
         event = await st.get_event_for_visitor(event_uuid)
-    participant = Participant(user_id=current_user.user_id, event_id=event.event_id, is_editor=is_editor)
+    participant = Participant(user_id=user_id, event_id=event.event_id, is_editor=is_editor)
     try:
         await st.add_participant(participant)
     except Exception:
