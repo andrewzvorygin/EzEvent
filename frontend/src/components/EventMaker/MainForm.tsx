@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useState } from "react";
 import {
   Box,
   Button,
@@ -7,11 +7,14 @@ import {
   Grid,
   Input,
   TextField,
-  Typography
-} from '@mui/material';
-import { AddAPhotoOutlined } from '@mui/icons-material';
-import { StyledButton } from '../StyledControls/StyledControls';
-import ButtonMap from '../Map/ButtonMap';
+  Typography,
+} from "@mui/material";
+import { AddAPhotoOutlined } from "@mui/icons-material";
+
+import { StyledButton } from "../StyledControls/StyledControls";
+import ButtonMap from "../Map/ButtonMap";
+
+import Description from "./Description/Description";
 
 const MainForm = () => {
   const [photo, setPhoto] = useState<string | null>(null);
@@ -35,28 +38,20 @@ const MainForm = () => {
             Обложка мероприятия
           </Typography>
           <Button component="label" startIcon={<AddAPhotoOutlined />}>
-            <input hidden accept="image/*" type="file" onChange={onPhotoChange} />
+            <input
+              hidden
+              accept="image/*"
+              type="file"
+              onChange={onPhotoChange}
+            />
             Загрузите фотографию
           </Button>
           {photo && (
-            <Box
-              component="img"
-              sx={{ maxWidth: '100%' }}
-              src={photo}
-            />
+            <Box component="img" sx={{ maxWidth: "100%" }} src={photo} />
           )}
         </Grid>
-        <Grid item>
-          <Typography variant="h3" gutterBottom>
-            Описание мероприятия
-          </Typography>
-          <TextField
-            multiline
-            fullWidth
-            label="Введите текст"
-            variant="filled"
-            rows={4}
-          />
+        <Grid item maxWidth={"100%"} overflow={"hidden"}>
+          <Description />
         </Grid>
         <Grid item>
           <Typography variant="h3" gutterBottom>
@@ -75,8 +70,8 @@ const MainForm = () => {
             Кто организовывает мероприятие?
           </Typography>
           <Typography variant="caption">
-            Если это мероприятие организовывает организация, то можете
-            добавить логотип организации
+            Если это мероприятие организовывает организация, то можете добавить
+            логотип организации
           </Typography>
         </Grid>
         <Grid item>
