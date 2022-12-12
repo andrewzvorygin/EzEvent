@@ -1,6 +1,7 @@
 import React from "react";
 import { Grid, TextField, Typography } from "@mui/material";
 import { FilterListOutlined, SearchOutlined } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 import {
   StyledButton,
@@ -10,7 +11,27 @@ import {
 import EventCard from "./EventCard/EventCard";
 
 const EventList = () => {
-  const arr = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  const arr = [
+    "be86c52b-5520-4629-b148-ad41e391a144",
+    "be86c52b-5520-4629-b148-ad41e391a144",
+    "be86c52b-5520-4629-b148-ad41e391a144",
+    "be86c52b-5520-4629-b148-ad41e391a144",
+    "be86c52b-5520-4629-b148-ad41e391a144",
+    "be86c52b-5520-4629-b148-ad41e391a144",
+    "be86c52b-5520-4629-b148-ad41e391a144",
+    "be86c52b-5520-4629-b148-ad41e391a144",
+    "be86c52b-5520-4629-b148-ad41e391a144",
+    "be86c52b-5520-4629-b148-ad41e391a144",
+    "be86c52b-5520-4629-b148-ad41e391a144",
+    "be86c52b-5520-4629-b148-ad41e391a144",
+    "be86c52b-5520-4629-b148-ad41e391a144",
+    "be86c52b-5520-4629-b148-ad41e391a144",
+    "be86c52b-5520-4629-b148-ad41e391a144",
+    "be86c52b-5520-4629-b148-ad41e391a144",
+  ];
+
+  const navigate = useNavigate();
+
   return (
     <>
       <Typography variant="h1" component="h1" gutterBottom>
@@ -62,8 +83,8 @@ const EventList = () => {
         </Grid>
       </Grid>
       <Grid component="article" container spacing={2.5}>
-        {arr.map((_, index) => (
-          <EventCard key={index} />
+        {arr.map((item, index) => (
+          <EventCard key={index} onClick={() => navigate(`/event/${item}`)} />
         ))}
       </Grid>
     </>
