@@ -1,5 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
+from .settints import Token
 from main import app
 
 
@@ -29,12 +30,14 @@ def test_login():
         response_2 = client.post("/auth/login", json=payload)
     assert response_1.status_code == 200
     assert response_1.cookies is not None
-    assert response_1.cookies['access_token'] is not None
+    assert response_1.cookies['refresh_token'] is not None
+    assert response_1.json() is not None
+    assert response_1.json()['access_token'] is not None
     assert response_2.status_code == 401
 
 
 @pytest.fixture(scope='module')
-def cookie():
+def authorization_token():
     payload = {
         "email": "user_1@example.com",
         "name": "string",
@@ -44,21 +47,40 @@ def cookie():
     }
     with TestClient(app) as client:
         client.post("/auth/registration", json=payload)
-        response_2 = client.post("/auth/login", json=payload)
-    return response_2.cookies
+        response = client.post("/auth/login", json=payload)
+    access_token = response.json()['access_token']
+    refresh_token = response.cookies['refresh_token']
+    return Token(access_token=access_token, refresh_token=refresh_token)
 
 
-def test_is_auth(cookie):
+def test_is_auth(authorization_token):
     with TestClient(app) as client:
-        response_is_auth = client.get('/auth/isAuth', cookies=cookie)
+        response_is_auth = client.get(
+            '/auth/isAuth', headers={'access-token': authorization_token.access_token}
+        )
     assert response_is_auth.status_code == 200
     assert 'user_id' in response_is_auth.json()
+    assert response_is_auth.json()['user_id'] is not None
 
 
-def test_logout(cookie):
+def test_refresh(authorization_token):
     with TestClient(app) as client:
-        response_logout = client.delete('/auth/logout', cookies=cookie)
-        print(response_logout.json())
+        response = client.put(
+            '/auth/refresh_token', cookies={'refresh_token': authorization_token.refresh_token}
+        )
+    assert response.status_code == 200
+    assert response.cookies is not None
+    assert response.cookies['refresh_token'] is not None
+    assert response.json() is not None
+    assert response.json()['access_token'] is not None
+    assert response.cookies['refresh_token'] != authorization_token.refresh_token
+    assert response.json()['access_token'] != authorization_token.access_token
+
+
+def test_logout(authorization_token):
+    with TestClient(app) as client:
+        response_logout = client.delete(
+            '/auth/logout', headers={'access-token': authorization_token.access_token}
+        )
         assert response_logout.status_code == 200
-        response_logout = client.delete('/auth/logout', cookies=cookie)
-        assert response_logout.status_code == 401
+        assert response_logout.json()['access_token'] != authorization_token.access_token

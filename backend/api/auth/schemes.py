@@ -1,5 +1,6 @@
 import re
-import uuid
+from uuid import UUID, uuid4
+from datetime import datetime
 
 from pydantic import BaseModel, EmailStr, validator
 
@@ -32,9 +33,9 @@ class UserPassword(UserCreate):
     user_id: int
 
 
-class UserRead(User):
+class UserRead(UserCreate):
     user_id: int
-    uuid: uuid.UUID
+    uuid: UUID
     is_admin: bool = False
     photo: str | None = None
 
@@ -47,9 +48,23 @@ class UserLogin(BaseModel):
         orm_mode = True
 
 
-class AuthorizationToken(BaseModel):
+class UserFromToken(BaseModel):
     user_id: int
-    token: str
+    email: EmailStr
+    uuid: UUID
+    is_admin: bool
+    in_system: bool = True
+
+    class Config:
+        orm_mode = True
+
+
+class RefreshSession(BaseModel):
+    user_id: int
+    refresh_session: UUID = uuid4()
+    access_token: str | None
+    expires_in: int
+    time_created: datetime
 
     class Config:
         orm_mode = True

@@ -13,10 +13,10 @@ class DataBaseSettings(BaseSettings):
 
 
 class AppSettings(BaseSettings):
-    secret_key: str
-    secret_key_solt: str
-    host: str = 'localhost'
-    port: int = 8000
+    SECRET_KEY: str
+    SECRET_KEY_SOLT: str
+    HOST: str = 'localhost'
+    PORT: int = 8000
 
     class Config:
         env_file = ".env"

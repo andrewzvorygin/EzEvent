@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, BigInteger
 from sqlalchemy import func, text
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -27,11 +27,13 @@ class User(Base):
 user_orm = User.__table__
 
 
-class AuthorizationToken(Base):
-    __tablename__ = 'AuthorizationToken'
+class RefreshToken(Base):
+    __tablename__ = 'RefreshToken'
     token_id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('User.user_id'))
-    token = Column(String)
+    user_id = Column(Integer, ForeignKey('User.user_id'), nullable=False)
+    refresh_session = Column(UUID, nullable=False)
+    expires_in = Column(BigInteger, nullable=False)
+    time_created = Column(DateTime(timezone=True), nullable=False)
 
 
-authorization_token_orm = AuthorizationToken.__table__
+refresh_session_orm = RefreshToken.__table__

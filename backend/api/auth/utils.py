@@ -19,4 +19,4 @@ def get_password_hash(password) -> str:
 
 def get_token(user: User) -> str:
     data_encode = {'sub': user.email, 'time': str(time.time())}
-    return jwt.encode(data_encode, settings.app.secret_key, algorithm=ALGORITHM)
+    return jwt.encode(data_encode, settings.app.SECRET_KEY, algorithm=ALGORITHM)
