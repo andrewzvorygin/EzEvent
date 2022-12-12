@@ -1,9 +1,9 @@
 """Модуль бл для работы с пользователями"""
-from fastapi import APIRouter, Response, Depends, Cookie
+from fastapi import APIRouter, Response, Depends
 
 from starlette import status
 
-from .schemes import UserCreate, UserLogin, UserRead
+from .schemes import UserCreate, UserLogin, RefreshSession, UserFromToken
 
 from . import service
 
@@ -20,26 +20,38 @@ async def registration(user: UserCreate, response: Response):
 @auth_router.post("/login", tags=['auth'])
 async def login(user_login: UserLogin, response: Response):
     user = await service.authenticate_user(user_login)
-    authorization_token = await service.get_authorization_token(user)
-    response.set_cookie(key='access_token', value=authorization_token.token, httponly=True)
-    response.status_code = status.HTTP_200_OK
+    authorization_token: RefreshSession = await service.get_authorization_token(user)
+    response.set_cookie(
+        key='refresh_token',
+        value=str(authorization_token.refresh_session),
+        httponly=True,
+        max_age=authorization_token.expires_in
+    )
+    return {'access_token': authorization_token.access_token}
 
 
 @auth_router.get("/isAuth", tags=['auth'])
-async def read_me(
-        access_token: str | None = Cookie(default=None),
-        response: Response = None
-):
-    await service.set_csrf_token_into_cookie_response(response)
-    if access_token is None:
-        return {'user_id': None}
-    current_user: UserRead = await service.get_current_user(access_token)
+async def is_auth(current_user: UserFromToken = Depends(service.get_current_user)):
     return {'user_id': current_user.user_id}
 
 
 @auth_router.delete('/logout', tags=['auth'])
 async def logout(
-        response: Response, current_user: UserRead = Depends(service.get_current_user)
+        response: Response, current_user: UserFromToken = Depends(service.get_current_user)
 ):
-    response.delete_cookie('access_token')
-    await service.block_access_token(current_user)
+    response.delete_cookie('refresh_token')
+    return {'access_token': await service.token_logout(current_user)}
+
+
+@auth_router.put('/refresh_token', tags=['auth'])
+async def update_token(
+        response: Response,
+        authorization_token: RefreshSession = Depends(service.new_refresh_token)
+):
+    response.set_cookie(
+        key='refresh_token',
+        value=str(authorization_token.refresh_session),
+        httponly=True,
+        max_age=authorization_token.expires_in
+    )
+    return {'access_token': authorization_token.access_token}
