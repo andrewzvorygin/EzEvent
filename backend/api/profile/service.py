@@ -5,7 +5,6 @@ import aiofiles
 
 from fastapi import UploadFile
 
-from api.auth.schemes import UserRead
 from api.auth import schemes as sh
 
 from core import PHOTO_PROFILE_PATH
@@ -14,11 +13,11 @@ from api.profile.exceptions import INVALID_FILE
 from api.profile import storage
 
 
-async def update_profile(update_data: sh.User, current_user: sh.UserRead):
+async def update_profile(update_data: sh.User, current_user: sh.UserFromToken):
     await storage.update_profile(update_data, current_user)
 
 
-async def save_photo_profile(photo: UploadFile, current_user: UserRead):
+async def save_photo_profile(photo: UploadFile, current_user: sh.UserFromToken):
     """Сохранить фото профиля"""
     extension = get_extension(photo.filename)
     if not extension:
@@ -26,13 +25,6 @@ async def save_photo_profile(photo: UploadFile, current_user: UserRead):
     path_to_photo = await get_path_to_file(extension)
     await save_file(path_to_photo, photo)
     await storage.save_photo_profile(path_to_photo, current_user.uuid)
-    await delete_last_photo(current_user)
-
-
-async def delete_last_photo(current_user):
-    """Удалить последнее загруженное фото, чтобы не хранить неиспользуемые фото"""
-    if current_user.photo and os.path.isfile(current_user.photo):
-        os.remove(current_user.photo)
 
 
 async def save_file(path_to_photo: str, photo: UploadFile):

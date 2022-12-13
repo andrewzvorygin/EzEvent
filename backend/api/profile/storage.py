@@ -5,7 +5,7 @@ from api.auth import schemes as sh
 from core import database
 
 
-async def update_profile(update_data: sh.User, current_user: sh.UserRead):
+async def update_profile(update_data: sh.User, current_user: sh.UserFromToken):
     smtp = (
         update(user_orm)
         .where(user_orm.c.user_id == current_user.user_id)

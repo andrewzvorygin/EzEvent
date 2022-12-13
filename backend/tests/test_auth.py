@@ -1,6 +1,8 @@
 import pytest
 from fastapi.testclient import TestClient
+
 from .settints import Token
+
 from main import app
 
 
@@ -12,6 +14,7 @@ def test_registration():
         "patronymic": "string",
         "password": "string"
     }
+    logger.info('Hellloooooooooooooo')
     with TestClient(app) as client:
         response_1 = client.post("/auth/registration", json=payload)
         response_2 = client.post("/auth/registration", json=payload)
