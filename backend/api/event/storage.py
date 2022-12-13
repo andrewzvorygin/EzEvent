@@ -3,7 +3,7 @@ from uuid import UUID
 from databases.interfaces import Record
 from sqlalchemy import select, insert, update
 
-from api.auth.schemes import UserRead
+from api.auth.schemes import UserRead, UserFromToken
 from api.auth.models import user_orm
 from core import database
 from .models import event_orm, participant_orm
@@ -43,7 +43,7 @@ async def update_key_invite(event_uuid: UUID, new_key: str) -> None:
     await database.execute(smtp_update_key_invite)
 
 
-async def create_event(current_user: UserRead) -> Record:
+async def create_event(current_user: UserFromToken) -> Record:
     smtp = (
         insert(event_orm)
         .values(responsible_id=current_user.user_id)

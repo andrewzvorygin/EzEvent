@@ -5,13 +5,13 @@ from uuid import UUID
 from fastapi import HTTPException
 from starlette import status
 
-from api.auth.schemes import UserRead
+from api.auth.schemes import UserFromToken, UserRead
 from . import storage as st
 
 from .schemes import Participant
 
 
-async def check_responsible(event_uuid: UUID, current_user: UserRead):
+async def check_responsible(event_uuid: UUID, current_user: UserFromToken):
     event = await st.get_event_for_editor(event_uuid)
     if event.responsible_id != current_user.user_id:
         raise HTTPException(
@@ -20,7 +20,7 @@ async def check_responsible(event_uuid: UUID, current_user: UserRead):
         )
 
 
-async def create_empty_event(current_user: UserRead) -> UUID:
+async def create_empty_event(current_user: UserFromToken) -> UUID:
     event_identifier = await st.create_event(current_user)
     editor = Participant(user_id=current_user.user_id, event_id=event_identifier['event_id'])
     await st.add_participant(editor)
@@ -51,7 +51,7 @@ async def add_editor(event_uuid: UUID, user_id: int):
     await add_participant(event_uuid, user_id, True)
 
 
-async def add_editor_by_key(event_uuid: UUID, key: str, current_user: UserRead):
+async def add_editor_by_key(event_uuid: UUID, key: str, current_user: UserFromToken):
     event = await st.get_event_for_editor(event_uuid=event_uuid)
     if event.key_invite == key:
         await add_editor(user_id=current_user.user_id, event_uuid=event_uuid)
@@ -63,7 +63,7 @@ async def search_users_by_email(email_prefix: str) -> list[UserRead]:
     return await st.get_users_by_email(email_prefix)
 
 
-async def add_visitor(event_uuid: UUID, current_user: UserRead):
+async def add_visitor(event_uuid: UUID, current_user: UserFromToken):
     await add_participant(event_uuid, current_user.user_id, False)
 
 

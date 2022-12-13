@@ -3,6 +3,8 @@ from uuid import UUID
 
 from fastapi import WebSocket
 
+from . import schemes as sch
+
 
 class ConnectionManager:
     def __init__(self):

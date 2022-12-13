@@ -15,6 +15,9 @@ class Event(BaseModel):
     title: str | None = None
     description: str | None = None
     visibility: bool = False
+
+
+class EventFromDB(Event):
     latitude: float | None = Field(alias='latitude')
     longitude: float | None = Field(alias='longitude')
     location: Location | None
@@ -30,7 +33,7 @@ class Event(BaseModel):
         return location
 
 
-class EventRead(Event):
+class EventRead(EventFromDB):
     event_id: int
     uuid: UUID
     uuid_edit: UUID
@@ -50,3 +53,19 @@ class Participant(BaseModel):
 
 class Key(BaseModel):
     key: str
+
+
+class EventWS(Event):
+    location: Location | None
+    longitude: float | None = Field(alias='longitude')
+    latitude: float | None = Field(alias='latitude')
+
+    @validator('longitude')
+    def set_longitude(cls, v, values):
+        location: Location = values.get('longitude')
+        return location.longitude
+
+    @validator('latitude')
+    def set_latitude(cls, v, values):
+        location: Location = values.get('latitude')
+        return location.latitude

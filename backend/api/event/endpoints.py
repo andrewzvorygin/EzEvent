@@ -2,7 +2,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 
-from api.auth.schemes import UserRead
+from api.auth.schemes import UserFromToken, UserRead
 from api.auth.service import get_current_user
 
 from . import service
@@ -19,13 +19,13 @@ async def get_event(event: UUID):
 
 
 @event_router.post('/')
-async def create_empty(current_user: UserRead = Depends(get_current_user)):
+async def create_empty(current_user: UserFromToken = Depends(get_current_user)):
     uuid_edit = await service.create_empty_event(current_user)
     return {'uuid_edit': uuid_edit}
 
 
 @event_router.post('/organizers/key_invite/{event}')
-async def get_key_invite(event: UUID, current_user: UserRead = Depends(get_current_user)):
+async def get_key_invite(event: UUID, current_user: UserFromToken = Depends(get_current_user)):
     """Получить ключ-приглашение для мероприятия. Доступно только ответственному за мероприятие"""
     await service.check_responsible(event, current_user)
     key = await service.get_key_invite(event_uuid=event)
@@ -33,7 +33,7 @@ async def get_key_invite(event: UUID, current_user: UserRead = Depends(get_curre
 
 
 @event_router.put('/organizers/key_invite/{event}')
-async def update_key_event(event: UUID, current_user: UserRead = Depends(get_current_user)):
+async def update_key_event(event: UUID, current_user: UserFromToken = Depends(get_current_user)):
     """Получить ключ-приглашение для мероприятия. Доступно только ответственному за мероприятие"""
     await service.check_responsible(event, current_user)
     key = await service.update_key_invite(event_uuid=event)
@@ -42,7 +42,7 @@ async def update_key_event(event: UUID, current_user: UserRead = Depends(get_cur
 
 @event_router.post('/organizers/{event}')
 async def add_organizer(
-        key: schemes.Key, event: UUID, current_user: UserRead = Depends(get_current_user)
+        key: schemes.Key, event: UUID, current_user: UserFromToken = Depends(get_current_user)
 ):
     """Добавить редактора"""
     await service.add_editor_by_key(event, key.key, current_user)
@@ -68,7 +68,7 @@ async def search_by_email(email_prefix: str):
 @event_router.post('/organizers/email/{event}')
 async def add_editor_by_email(
         event: UUID, user_id: int,
-        current_user: UserRead = Depends(get_current_user)
+        current_user: UserFromToken = Depends(get_current_user)
 ):
     await service.check_responsible(event, current_user)
     await service.add_editor(event_uuid=event, user_id=user_id)
@@ -76,6 +76,6 @@ async def add_editor_by_email(
 
 @event_router.post('/visit/{event}')
 async def add_visitor(
-        event: UUID, current_user: UserRead = Depends(get_current_user)
+        event: UUID, current_user: UserFromToken = Depends(get_current_user)
 ):
     await service.add_visitor(event, current_user)
