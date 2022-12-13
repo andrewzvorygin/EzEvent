@@ -1,3 +1,4 @@
+import json
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
@@ -55,6 +56,7 @@ async def websocket_endpoint(websocket: WebSocket, event_uuid: UUID):
         while True:
             data: str = await websocket.receive_text()
             await manager.broadcast(data, event_uuid)
+            await service.update_event(event_uuid, json.loads(data))
     except WebSocketDisconnect:
         await manager.disconnect(websocket, event_uuid)
 

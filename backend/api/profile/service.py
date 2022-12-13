@@ -47,4 +47,3 @@ def get_extension(filename: str) -> str:
     if extension not in {'jpg', 'jpeg', 'bmp', 'png'}:
         raise INVALID_FILE
     return extension
-

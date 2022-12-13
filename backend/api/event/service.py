@@ -84,3 +84,7 @@ async def add_participant(event_uuid: UUID, user_id: int, is_editor: bool):
 
 async def get_event(event_uuid: UUID):
     return await st.get_event_for_visitor(event_uuid)
+
+
+async def update_event(event_uuid: UUID, data: dict):
+    await st.update_event(data, event_uuid)
