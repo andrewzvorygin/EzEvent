@@ -20,7 +20,9 @@ app.include_router(event_router)
 
 origins = [
     "http://localhost",
+    "https://localhost",
     "http://localhost:3000",
+    "https://localhost:3000"
 ]
 app.add_middleware(
     CORSMiddleware,
