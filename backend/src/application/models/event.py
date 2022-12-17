@@ -58,3 +58,13 @@ class Participant(Base):
 
 
 participant_orm = Participant.__table__
+
+
+class Comment(Base):
+    __tablename__ = 'Comment'
+    comment_id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('User.user_id'))
+    text = Column(String)
+    event_id = Column(Integer, ForeignKey('Event.event_id'))
+    parent_id = Column(Integer)
+

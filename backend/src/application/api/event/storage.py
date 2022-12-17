@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from databases.interfaces import Record
-from sqlalchemy import select, insert, update
+from sqlalchemy import select, insert, update, join
 
 from schemes import UserRead, UserFromToken, EventRead, Participant, EventForEditor
 from models import user_orm, event_orm, participant_orm
@@ -72,3 +72,13 @@ async def update_event(data: dict[str, str], event_uuid: UUID):
         .where(event_orm.c.uuid_edit == event_uuid)
     )
     await database.execute(smtp)
+
+
+async def get_editor(event_uuid: UUID, current_user: UserFromToken):
+    smtp = (
+        select(event_orm.c.event_id)
+        .select_from(
+            join(event_orm.c.event_id == participant_orm.c.event_id)
+        )
+        .where(event_orm.c.uuid_edit == event_uuid)
+    )

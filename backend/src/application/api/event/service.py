@@ -18,6 +18,10 @@ async def check_responsible(event_uuid: UUID, current_user: UserFromToken):
         )
 
 
+# async def check_editor(event_uuid: UUID, current_user: UserFromToken):
+
+
+
 async def create_empty_event(current_user: UserFromToken) -> UUID:
     event_identifier = await st.create_event(current_user)
     editor = Participant(user_id=current_user.user_id, event_id=event_identifier['event_id'])
@@ -80,7 +84,9 @@ async def add_participant(event_uuid: UUID, user_id: int, is_editor: bool):
         )
 
 
-async def get_event(event_uuid: UUID):
+async def get_event(event_uuid: UUID, is_editor = False):
+    if is_editor:
+        return await st.get_event_for_editor(event_uuid)
     return await st.get_event_for_visitor(event_uuid)
 
 

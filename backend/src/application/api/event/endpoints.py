@@ -49,7 +49,11 @@ async def add_organizer(
 
 
 @event_router.websocket("/ws/{event_uuid}")
-async def websocket_endpoint(websocket: WebSocket, event_uuid: UUID):
+async def websocket_endpoint(
+        websocket: WebSocket,
+        event_uuid: UUID,
+        current_user: UserFromToken = Depends(get_current_user)
+):
     await manager.connect(websocket, event_uuid)
     try:
         while True:
