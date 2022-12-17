@@ -44,15 +44,19 @@ const App = () => {
   const [userId, setUserId] = useState(null);
 
   useEffect(() => {
-    const authMe = authAPI.getAuthMe().then((data) => {
-      if (data.user_id === null) {
-        setAuth(false);
-        setUserId(null);
-      } else {
-        setAuth(true);
-        setUserId(data.user_id);
-      }
-    });
+    const authMe = authAPI
+      .getAuthMe((response) => {
+        if (response.status === 401) {
+          setAuth(false);
+          setUserId(null);
+        }
+      })
+      .then((data) => {
+        if (data.user_id) {
+          setAuth(true);
+          setUserId(data.user_id);
+        }
+      });
     Promise.all([authMe]).then(() => {
       setInitialized(true);
     });

@@ -16,7 +16,7 @@ const Login: React.FC<LoginPropsType> = (props) => {
       password: "",
     },
     onSubmit: (values) => {
-      authAPI.postAuthLogin(values).then(async (response: Response) => {
+      authAPI.postAuthLogin(values, (response: Response) => {
         if (response.status === 200) {
           props.setAuth();
         }

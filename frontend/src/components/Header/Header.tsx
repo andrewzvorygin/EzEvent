@@ -52,7 +52,7 @@ const Header: React.FC<HeaderPropsType> = (props) => {
               title="Создать мероприятие"
               onClick={() => {
                 eventsAPI.postEvent().then((data) => {
-                  navigate(`/event/${data}/edit`);
+                  navigate(`/event/${data.uuid_edit}/edit`);
                 });
               }}
             >

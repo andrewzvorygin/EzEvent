@@ -8,3 +8,12 @@ export interface RegisterType extends LoginType {
   surname: string;
   patronymic: string;
 }
+
+export interface EventType {
+  title: string | null;
+  photoCover: string | null;
+  description: string | undefined;
+  dateStart: Date | null;
+  dateEnd?: Date | null;
+  visibility: boolean | null;
+}

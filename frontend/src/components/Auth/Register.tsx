@@ -21,16 +21,17 @@ const Register: React.FC<RegisterPropsType> = (props) => {
     },
     onSubmit: (values) => {
       authAPI.postAuthRegister(values).then(() => {
-        authAPI
-          .postAuthLogin({
+        authAPI.postAuthLogin(
+          {
             email: values.email,
             password: values.password,
-          })
-          .then(async (response: Response) => {
+          },
+          (response: Response) => {
             if (response.status === 200) {
               props.setAuth();
             }
-          });
+          },
+        );
       });
     },
   });

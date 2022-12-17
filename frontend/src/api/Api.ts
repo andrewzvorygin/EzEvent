@@ -1,21 +1,52 @@
-import Cookies from "js-cookie";
-
 import { LoginType, RegisterType } from "../types";
 
 const baseUrl = "http://127.0.0.1:8000/";
 
+const { fetch: originalFetch } = window;
+
+window.fetch = async (...args) => {
+  const [resource, config] = args;
+  const response = await originalFetch(resource, config);
+  if (response.status === 401 && resource !== `${baseUrl}auth/refresh_token`) {
+    await authAPI.putRefreshToken();
+    return await originalFetch(resource, config);
+  }
+  return response;
+};
+
 export const authAPI = {
-  async postAuthLogin(data: LoginType) {
+  async postAuthLogin(
+    data: LoginType,
+    checkResponse?: (response: Response) => void,
+  ) {
     return await fetch(`${baseUrl}auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json; charset=utf-8" },
+      credentials: "include",
       body: JSON.stringify(data),
-    });
+    })
+      .then((response) => {
+        if (checkResponse) {
+          checkResponse(response);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        window.localStorage.setItem("access_token", data.access_token);
+      });
   },
   async deleteAuthLogin() {
     return await fetch(`${baseUrl}auth/logout`, {
       method: "DELETE",
-    }).catch((error) => console.error(error));
+      headers: {
+        "Access-Token": window.localStorage.getItem("access_token") || "",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        window.localStorage.setItem("access_token", data.access_token);
+      })
+      .catch((error) => console.error(error));
   },
   async postAuthRegister(data: RegisterType) {
     return await fetch(`${baseUrl}auth/registration`, {
@@ -26,29 +57,39 @@ export const authAPI = {
       .then((response) => response.json())
       .catch((error) => console.error(error));
   },
-  getAuthMe: async () => {
-    const accessToken = Cookies.get("access_token") || "";
+  async putRefreshToken() {
+    return await fetch(`${baseUrl}auth/refresh_token`, {
+      method: "PUT",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        window.localStorage.setItem("access_token", data.access_token);
+      })
+      .catch((error) => console.error(error));
+  },
+  getAuthMe: async (checkResponse?: (response: Response) => void) => {
     return await fetch(`${baseUrl}auth/isAuth`, {
       method: "GET",
       headers: {
-        "Content-Type": "application/json; charset=utf-8",
-        "Access-Token": accessToken,
+        "Access-Token": window.localStorage.getItem("access_token") || "",
       },
     })
-      .then((response) => response.json())
+      .then((response) => {
+        console.log(response);
+        if (checkResponse) {
+          checkResponse(response);
+        }
+        return response.json();
+      })
       .catch((error) => console.error(error));
   },
 };
 export const eventsAPI = {
   async postEvent() {
-    const accessToken = Cookies.get("access_token") || "";
-    const csrftoken = Cookies.get("X-CSRF-Token") || "";
     return await fetch(`${baseUrl}event/`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json; charset=utf-8",
-        "X-CSRF-Token": csrftoken,
-        "Access-Token": accessToken,
+        "Access-Token": window.localStorage.getItem("access_token") || "",
       },
     })
       .then((response) => response.json())

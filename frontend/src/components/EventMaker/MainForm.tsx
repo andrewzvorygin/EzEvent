@@ -15,8 +15,14 @@ import { StyledButton } from "../StyledControls/StyledControls";
 import ButtonMap from "../Map/ButtonMap";
 
 import Description from "./Description/Description";
+import { EventType } from '../../types';
 
-const MainForm = () => {
+interface MainFormPropsType {
+  ws: WebSocket;
+  eventData: EventType;
+}
+
+const MainForm: React.FC<MainFormPropsType> = ({ ws, eventData }) => {
   const [photo, setPhoto] = useState<string | null>(null);
   function onPhotoChange(event: ChangeEvent<HTMLInputElement>): void {
     if (event.target.files) {
@@ -51,7 +57,7 @@ const MainForm = () => {
           )}
         </Grid>
         <Grid item maxWidth={"100%"} overflow={"hidden"}>
-          <Description />
+          <Description ws={ws} description={eventData.description} />
         </Grid>
         <Grid item>
           <Typography variant="h3" gutterBottom>
