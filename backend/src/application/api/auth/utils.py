@@ -2,7 +2,7 @@ import time
 
 from jose import jwt
 
-from src.application.core import settings
+from core import settings
 from .config import pwd_context, ALGORITHM
 from schemes.userbase import UserBase
 

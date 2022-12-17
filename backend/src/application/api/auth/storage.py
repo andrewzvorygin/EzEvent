@@ -3,7 +3,7 @@ from uuid import UUID
 from databases.interfaces import Record
 from sqlalchemy import select, insert, delete
 
-from src.application.core import database, DEFAULT_PROFILE_PHOTO
+from core import database, DEFAULT_PROFILE_PHOTO
 from models import user_orm, refresh_session_orm
 
 from . import exception

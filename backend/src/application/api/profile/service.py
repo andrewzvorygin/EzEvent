@@ -7,7 +7,7 @@ from fastapi import UploadFile
 
 import schemes as sh
 
-from src.application.core import PHOTO_PROFILE_PATH
+from core import PHOTO_PROFILE_PATH
 from .exceptions import INVALID_FILE
 
 from api.profile import storage

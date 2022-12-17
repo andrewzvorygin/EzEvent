@@ -1,6 +1,6 @@
 from sqlalchemy import select
 
-from src.application.core import database
+from core import database
 from models import city_orm
 
 

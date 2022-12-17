@@ -5,7 +5,7 @@ from fastapi import Header, Cookie
 from jose import jwt, JWTError
 from pydantic import ValidationError
 
-from src.application.core import settings
+from core import settings
 
 import schemes as sch
 
@@ -90,7 +90,7 @@ async def token_logout(current_user: sch.UserFromToken) -> str:
     return token
 
 
-async def new_refresh_token(refresh_token: UUID = Cookie()):
+async def new_refresh_token(refresh_token: UUID = Cookie(None)):
     try:
         refresh_session = await storage.get_refresh_session(refresh_token)
     except ValidationError:

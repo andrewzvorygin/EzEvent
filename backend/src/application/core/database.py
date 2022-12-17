@@ -2,7 +2,7 @@ import databases
 
 from sqlalchemy.orm import declarative_base
 
-from .settgings import settings
+from .settings import settings
 
 
 db = settings.db

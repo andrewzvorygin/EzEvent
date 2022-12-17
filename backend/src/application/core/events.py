@@ -1,7 +1,7 @@
 import os
 
-from src.application.core import ROOT_PATH
-from src.application.core.database import database
+from core import ROOT_PATH
+from core.database import database
 from models import city_orm
 
 
