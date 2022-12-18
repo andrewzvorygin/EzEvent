@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { Grid, Typography } from "@mui/material";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-import { EventType } from "../../types";
+import { DeviceType, EventType } from "../../types";
+import { DeviceContext } from "../../App";
 
 import MainForm from "./MainForm";
 import Organizers from "./Organizers";
 
-const EventMaker = () => {
+interface EventMakerPropsType {
+  device: DeviceType;
+}
+
+const EventMaker: React.FC<EventMakerPropsType> = (props) => {
+  const navigate = useNavigate();
   const [wsChannel, setWsChannel] = useState<WebSocket | null>(null);
   const eventId = useParams().eventId;
   const [eventData, setEventData] = useState<EventType>({
@@ -20,6 +26,10 @@ const EventMaker = () => {
   });
 
   useEffect(() => {
+    if (props.device === DeviceType.mobile) {
+      navigate("/events", { replace: true });
+      return;
+    }
     function createChannel() {
       setWsChannel(new WebSocket(`wss://127.0.0.1:8000/event/ws/${eventId}`));
     }
@@ -55,4 +65,12 @@ const EventMaker = () => {
   );
 };
 
-export default EventMaker;
+const EventMakerPage = () => {
+  return (
+    <DeviceContext.Consumer>
+      {({ device }) => <EventMaker device={device} />}
+    </DeviceContext.Consumer>
+  );
+};
+
+export default EventMakerPage;

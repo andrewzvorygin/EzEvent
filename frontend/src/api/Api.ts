@@ -1,6 +1,6 @@
 import { LoginType, RegisterType } from "../types";
 
-const baseUrl = "http://127.0.0.1:8000/";
+const baseUrl = "http://localhost:8000/";
 
 const { fetch: originalFetch } = window;
 
@@ -8,8 +8,13 @@ window.fetch = async (...args) => {
   const [resource, config] = args;
   const response = await originalFetch(resource, config);
   if (response.status === 401 && resource !== `${baseUrl}auth/refresh_token`) {
-    await authAPI.putRefreshToken();
-    return await originalFetch(resource, config);
+    const accessToken = await authAPI.putRefreshToken();
+    return await originalFetch(resource, {
+      ...config,
+      headers: {
+        "Access-Token": accessToken,
+      },
+    });
   }
   return response;
 };
@@ -60,10 +65,12 @@ export const authAPI = {
   async putRefreshToken() {
     return await fetch(`${baseUrl}auth/refresh_token`, {
       method: "PUT",
+      credentials: "include",
     })
       .then((response) => response.json())
       .then((data) => {
         window.localStorage.setItem("access_token", data.access_token);
+        return data.access_token;
       })
       .catch((error) => console.error(error));
   },
@@ -75,7 +82,6 @@ export const authAPI = {
       },
     })
       .then((response) => {
-        console.log(response);
         if (checkResponse) {
           checkResponse(response);
         }

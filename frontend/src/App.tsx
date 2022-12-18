@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Box, Container, CssBaseline, ThemeProvider } from "@mui/material";
 import {
   Outlet,
@@ -17,18 +17,24 @@ import Auth from "./components/Auth/Auth";
 import EventPage from "./components/Event/EventPage";
 import Profile from "./components/Profile/Profile";
 import { authAPI } from "./api/Api";
+import { AuthContextType, DeviceContextType, DeviceType } from "./types";
 import styles from "./App.module.scss";
 
-interface AppPropsType {
-  auth: boolean;
-  setAuth: (auth: boolean) => void;
-}
+export const DeviceContext = React.createContext<DeviceContextType>({
+  device: window.innerWidth < 1000 ? DeviceType.mobile : DeviceType.computer,
+  setDevice: (device) => {},
+});
 
-const AppWrapper: React.FC<AppPropsType> = (props) => (
+export const AuthContext = React.createContext<AuthContextType>({
+  auth: false,
+  setAuth: (auth) => {},
+});
+
+const AppWrapper = () => (
   <ThemeProvider theme={theme}>
     <CssBaseline />
     <Box className={styles.appWrapper}>
-      <Header auth={props.auth} setAuth={props.setAuth} />
+      <Header />
       <Container component="main" sx={{ mt: 4, mb: 2 }}>
         <Outlet />
       </Container>
@@ -40,26 +46,42 @@ const App = () => {
   const navigate = useNavigate();
   const location = useLocation().pathname;
   const [initialized, setInitialized] = useState(false);
-  const [auth, setAuth] = useState(false);
-  const [userId, setUserId] = useState(null);
+  const [auth, setAuth] = useState<boolean>(false);
+  const [device, setDevice] = useState<DeviceType>(
+    window.innerWidth < 1000 ? DeviceType.mobile : DeviceType.computer,
+  );
+  const deviceRef = useRef<DeviceType>(
+    window.innerWidth < 1000 ? DeviceType.mobile : DeviceType.computer
+  );
+
+  const resizeListener = () => {
+    if (window.innerWidth < 1000 && deviceRef.current === DeviceType.computer) {
+      setDevice(DeviceType.mobile);
+    }
+    if (window.innerWidth >= 1000 && deviceRef.current === DeviceType.mobile) {
+      setDevice(DeviceType.computer);
+    }
+  };
 
   useEffect(() => {
+    window.addEventListener("resize", resizeListener);
     const authMe = authAPI
       .getAuthMe((response) => {
         if (response.status === 401) {
           setAuth(false);
-          setUserId(null);
         }
       })
       .then((data) => {
         if (data.user_id) {
           setAuth(true);
-          setUserId(data.user_id);
         }
       });
     Promise.all([authMe]).then(() => {
       setInitialized(true);
     });
+    return () => {
+      window.removeEventListener("resize", resizeListener);
+    };
   }, []);
 
   useEffect(() => {
@@ -68,24 +90,29 @@ const App = () => {
     }
   }, [initialized]);
 
+  useEffect(() => {
+    deviceRef.current = device;
+  }, [device]);
+
   return (
-    <Routes>
-      <Route path="/" element={<AppWrapper auth={auth} setAuth={setAuth} />}>
-        <Route path="events">
-          <Route path=":profileId" element={<EventMap />} />
-          <Route index element={<EventList />} />
-        </Route>
-        <Route path="event">
-          <Route path=":eventId" element={<EventPage />} />
-          <Route path=":eventId/edit" element={<EventMaker />} />
-        </Route>
-        <Route path="profile" element={<Profile />} />
-      </Route>
-      <Route
-        path="auth"
-        element={<Auth auth={auth} setAuth={() => setAuth(true)} />}
-      />
-    </Routes>
+    <DeviceContext.Provider value={{ device, setDevice }}>
+      <AuthContext.Provider value={{ auth, setAuth }}>
+        <Routes>
+          <Route path="/" element={<AppWrapper />}>
+            <Route path="events">
+              <Route path=":profileId" element={<EventMap />} />
+              <Route index element={<EventList />} />
+            </Route>
+            <Route path="event">
+              <Route path=":eventId" element={<EventPage />} />
+              <Route path=":eventId/edit" element={<EventMaker />} />
+            </Route>
+            <Route path="profile" element={<Profile />} />
+          </Route>
+          <Route path="auth" element={<Auth />} />
+        </Routes>
+      </AuthContext.Provider>
+    </DeviceContext.Provider>
   );
 };
 

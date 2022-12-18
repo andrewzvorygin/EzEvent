@@ -3,24 +3,23 @@ import {
   AccountBoxOutlined,
   ControlPointOutlined,
   EventNoteOutlined,
-  MailOutlined,
-  LogoutOutlined,
-  LoginOutlined,
   HomeOutlined,
+  LoginOutlined,
+  LogoutOutlined,
+  MailOutlined,
 } from "@mui/icons-material";
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { StyledIconButton } from "../StyledControls/StyledControls";
 import { authAPI, eventsAPI } from "../../api/Api";
+import { AuthContext, DeviceContext } from "../../App";
+import { AuthContextType, DeviceContextType, DeviceType } from "../../types";
 
-interface HeaderPropsType {
-  auth: boolean;
-  setAuth: (auth: boolean) => void;
-}
-
-const Header: React.FC<HeaderPropsType> = (props) => {
+const Header: React.FC<AuthContextType & DeviceContextType> = (props) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  console.log(props.device)
   return (
     <Box component="header" sx={{ py: 3, px: 3, display: "flex" }}>
       <Avatar
@@ -38,6 +37,13 @@ const Header: React.FC<HeaderPropsType> = (props) => {
         {props.auth ? (
           <>
             <StyledIconButton
+              title="Мобильная версия"
+              onClick={() => {
+                navigate(`/events`);
+              }}
+            >
+              <EventNoteOutlined />
+            </StyledIconButton><StyledIconButton
               title="Мои мероприятия"
               onClick={() => {
                 navigate(`/events`);
@@ -48,16 +54,18 @@ const Header: React.FC<HeaderPropsType> = (props) => {
             <StyledIconButton title="Оповещения">
               <MailOutlined />
             </StyledIconButton>
-            <StyledIconButton
-              title="Создать мероприятие"
-              onClick={() => {
-                eventsAPI.postEvent().then((data) => {
-                  navigate(`/event/${data.uuid_edit}/edit`);
-                });
-              }}
-            >
-              <ControlPointOutlined />
-            </StyledIconButton>
+            {props.device !== DeviceType.mobile && (
+              <StyledIconButton
+                title="Создать мероприятие"
+                onClick={() => {
+                  eventsAPI.postEvent().then((data) => {
+                    navigate(`/event/${data.uuid_edit}/edit`);
+                  });
+                }}
+              >
+                <ControlPointOutlined />
+              </StyledIconButton>
+            )}
             <StyledIconButton
               title="Главная"
               onClick={() => {
@@ -98,7 +106,7 @@ const Header: React.FC<HeaderPropsType> = (props) => {
             <StyledIconButton
               title="Войти"
               onClick={() => {
-                navigate(`/auth`);
+                navigate(`/auth`, { state: location });
               }}
             >
               <LoginOutlined />
@@ -110,4 +118,23 @@ const Header: React.FC<HeaderPropsType> = (props) => {
   );
 };
 
-export default Header;
+const HeaderPage = () => {
+  return (
+    <AuthContext.Consumer>
+      {({ auth, setAuth }) => (
+        <DeviceContext.Consumer>
+          {({ device, setDevice }) => (
+            <Header
+              auth={auth}
+              setAuth={setAuth}
+              device={device}
+              setDevice={setDevice}
+            />
+          )}
+        </DeviceContext.Consumer>
+      )}
+    </AuthContext.Consumer>
+  );
+};
+
+export default HeaderPage;

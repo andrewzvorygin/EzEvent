@@ -2,16 +2,14 @@ import React, { useEffect, useState } from "react";
 import { Card, CardContent, Container } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 
+import { AuthContext } from "../../App";
+import { AuthContextType } from "../../types";
+
 import Register from "./Register";
 import Login from "./Login";
 import styles from "./Auth.module.scss";
 
-interface AuthPropsType {
-  auth: boolean;
-  setAuth: () => void;
-}
-
-const Auth: React.FC<AuthPropsType> = (props) => {
+const Auth: React.FC<AuthContextType> = (props) => {
   const navigate = useNavigate();
   const location = useLocation().state as string;
   const prevLocation =
@@ -32,12 +30,12 @@ const Auth: React.FC<AuthPropsType> = (props) => {
             {loginForm ? (
               <Login
                 setLoginForm={() => setLoginForm(false)}
-                setAuth={props.setAuth}
+                setAuth={() => props.setAuth(true)}
               />
             ) : (
               <Register
                 setLoginForm={() => setLoginForm(true)}
-                setAuth={props.setAuth}
+                setAuth={() => props.setAuth(true)}
                 back={() => navigate("/events")}
               />
             )}
@@ -48,4 +46,12 @@ const Auth: React.FC<AuthPropsType> = (props) => {
   );
 };
 
-export default Auth;
+const AuthPage = () => {
+  return (
+    <AuthContext.Consumer>
+      {({ auth, setAuth }) => <Auth auth={auth} setAuth={setAuth} />}
+    </AuthContext.Consumer>
+  );
+};
+
+export default AuthPage;
