@@ -1,3 +1,4 @@
+"""Сервисные функции"""
 from datetime import timedelta, datetime
 from uuid import UUID, uuid4
 
