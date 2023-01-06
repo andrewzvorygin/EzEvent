@@ -47,8 +47,8 @@ const EventList = () => {
           item
           lg={4}
           md={6}
-          sm={6}
-          xs={6}
+          sm={12}
+          xs={12}
           sx={{ display: "flex", alignItems: "flex-end" }}
         >
           <SearchOutlined fontSize="large" sx={{ mr: 1 }} />
@@ -70,8 +70,8 @@ const EventList = () => {
           item
           lg={8}
           md={6}
-          sm={6}
-          xs={6}
+          sm={12}
+          xs={12}
           sx={{
             display: "flex",
             gap: 2.5,

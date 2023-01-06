@@ -1,23 +1,36 @@
 import React, { FC } from "react";
 import {
   Avatar,
-  Box,
   Button,
   Stack,
-  TextField,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 
 import SwitchInput from "./SwitchInput";
 
 const Profile: FC = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"), {
+    defaultMatches: true,
+  });
   return (
-    <Stack justifyContent={"center"} direction={"row"} spacing={5}>
-      <Stack spacing={3}>
+    <Stack
+      justifyContent={isMobile ? "flex-start" : "center"}
+      direction={isMobile ? "column" : "row"}
+      alignItems={"center"}
+      spacing={isMobile ? 2 : 5}
+      marginLeft={isMobile ? 2 : 0}
+      marginRight={isMobile ? 2 : 0}
+      sx={{ flexWrap: "wrap" }}
+    >
+      <Stack spacing={3} mb={isMobile ? 2 : 0}>
         <Avatar
           sx={{
             width: 250,
             height: 250,
+            [theme.breakpoints.down("sm")]: { width: 200, height: 200 },
           }}
           src={
             "https://sun9-9.userapi.com/impg/TG2QZczG3Q4O8wZSCsOlJ9E9lzthQvwkohLQ6w/Be84mY8Wk-A.jpg?size=1044x1138&quality=96&sign=d1b687acd59d8cfe2cfd60506fb809bd&type=album"
@@ -25,11 +38,25 @@ const Profile: FC = () => {
         />
         <Button variant="contained">Изменить фото</Button>
       </Stack>
-      <Stack spacing={4}>
-        <Typography variant={"h2"}>Валинурка ХагиВаги ДымТатар</Typography>
+      <Stack spacing={isMobile ? 2 : 4}>
+        <Typography
+          variant={"h2"}
+          sx={{
+            typography: {
+              [theme.breakpoints.down("md")]: { fontSize: "1.5rem" },
+            },
+          }}
+        >
+          Валинурка ХагиВаги ДымТатар
+        </Typography>
         <SwitchInput label={"Почта:"} value={"мерси.захил-ваших@жоп"} />
         <SwitchInput label={"Телефон:"} value={"8800 555 3535"} />
-        <Button sx={{ alignSelf: "flex-start", marginTop: "auto !important" }}>
+        <Button
+          sx={{
+            alignSelf: "flex-start",
+            marginTop: "auto !important",
+          }}
+        >
           сменить пароль
         </Button>
       </Stack>
