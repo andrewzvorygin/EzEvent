@@ -1,9 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Box, Typography } from "@mui/material";
+import React, { useRef, useState } from "react";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import MuiMarkdown from "mui-markdown";
 import JoditEditor from "jodit-react";
+import { Typography } from "@mui/material";
 
 import styles from "./Description.module.scss";
 
@@ -15,35 +14,27 @@ interface DescriptionPropsType {
 const Description: React.FC<DescriptionPropsType> = ({ ws, description }) => {
   const editor = useRef(null);
   const [content, setContent] = useState("Начните писать");
-  const config = {
+  const [config] = useState({
     readonly: false,
     height: 400,
-  };
-  useEffect(() => {
-    if (description) {
-      setContent(description);
-    }
-  }, [description]);
-
-  const handleUpdate = (content: string) => {
-    setContent(content);
-  };
+  });
 
   function onChange(value: string) {
-    ws.send(JSON.stringify({ description: value }));
+    setContent(value);
   }
 
   return (
     <>
+      <Typography variant="h3" gutterBottom>
+        Описание мероприятия
+      </Typography>
       <JoditEditor
         className={styles.editor}
         ref={editor}
         value={content}
         config={config}
-        onBlur={handleUpdate}
         onChange={onChange}
       />
-      <div dangerouslySetInnerHTML={{ __html: content }} />
     </>
   );
 };
