@@ -1,4 +1,4 @@
-import { LoginType, RegisterType } from "../types";
+import { LoginType, ProfileType, RegisterType } from '../types';
 
 const baseUrl = "http://localhost:8000/";
 
@@ -90,6 +90,54 @@ export const authAPI = {
       .catch((error) => console.error(error));
   },
 };
+
+export const profileAPI = {
+  async getProfile() {
+    return await fetch(`${baseUrl}profile/`, {
+      method: "GET",
+      headers: {
+        "Access-Token": window.localStorage.getItem("access_token") || "",
+      },
+    })
+      .then((response) => response.json())
+      .catch((error) => console.error(error));
+  },
+  async putProfile(data: ProfileType) {
+    return await fetch(`${baseUrl}profile/`, {
+      method: "PUT",
+      headers: {
+        "Access-Token": window.localStorage.getItem("access_token") || "",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .catch((error) => console.error(error));
+  },
+  async getProfilePhoto() {
+    return await fetch(`${baseUrl}profile/`, {
+      method: "GET",
+      headers: {
+        "Access-Token": window.localStorage.getItem("access_token") || "",
+      },
+    })
+      .then((response) => response.json())
+      .catch((error) => console.error(error));
+  },
+  async putProfilePhoto(photo: File) {
+    const formData = new FormData();
+    formData.append("photo", photo);
+    return await fetch(`${baseUrl}profile/uploadPhoto`, {
+      method: "PUT",
+      headers: {
+        "Access-Token": window.localStorage.getItem("access_token") || "",
+      },
+      body: formData,
+    })
+      .then((response) => response.json())
+      .catch((error) => console.error(error));
+  },
+};
+
 export const eventsAPI = {
   async postEvent() {
     return await fetch(`${baseUrl}event/`, {
@@ -126,4 +174,3 @@ export const eventsAPI = {
     }).then((response) => response);
   },
 };
-//eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzc3NAc3NzLnJ1IiwiZXhwIjoxNjcwNjcyNTAzfQ.aD6F9JeIZzQ968e7pMshw7etdILdsM4HXZotFVxFpFE

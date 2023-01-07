@@ -1,4 +1,7 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import MuiMarkdown from "mui-markdown";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import JoditEditor from "jodit-react";
@@ -20,7 +23,7 @@ const Description: React.FC<DescriptionPropsType> = ({ ws, description }) => {
   });
 
   function onChange(value: string) {
-    setContent(value);
+    //ws.send(JSON.stringify({ description: value }));
   }
 
   return (
@@ -35,6 +38,8 @@ const Description: React.FC<DescriptionPropsType> = ({ ws, description }) => {
         config={config}
         onChange={onChange}
       />
+      {/* eslint-disable-next-line @typescript-eslint/naming-convention */}
+      <div dangerouslySetInnerHTML={{ __html: content }} />
     </>
   );
 };

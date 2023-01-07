@@ -3,13 +3,13 @@ import { Card, CardContent, Container } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { AuthContext } from "../../App";
-import { AuthContextType } from "../../types";
+import { AuthType } from '../../types';
 
 import Register from "./Register";
 import Login from "./Login";
 import styles from "./Auth.module.scss";
 
-const Auth: React.FC<AuthContextType> = (props) => {
+const Auth: React.FC<AuthType> = (props) => {
   const navigate = useNavigate();
   const location = useLocation().state as string;
   const prevLocation =

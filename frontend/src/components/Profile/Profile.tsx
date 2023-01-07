@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useEffect } from "react";
 import {
   Avatar,
   Button,
@@ -7,14 +7,30 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+
+import { AuthContext } from "../../App";
 
 import SwitchInput from "./SwitchInput";
 
-const Profile: FC = () => {
+interface ProfilePropsType {
+  auth: boolean;
+  initialized: boolean;
+}
+
+const Profile: FC<ProfilePropsType> = (props) => {
+  const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"), {
     defaultMatches: true,
   });
+
+  useEffect(() => {
+    if (props.initialized && !props.auth) {
+      navigate("/events", { replace: true });
+    }
+  }, [props.auth, props.initialized]);
+
   return (
     <Stack
       justifyContent={isMobile ? "flex-start" : "center"}
@@ -64,4 +80,14 @@ const Profile: FC = () => {
   );
 };
 
-export default Profile;
+const ProfilePage = () => {
+  return (
+    <AuthContext.Consumer>
+      {({ auth, initialized }) => (
+        <Profile auth={auth} initialized={initialized} />
+      )}
+    </AuthContext.Consumer>
+  );
+};
+
+export default ProfilePage;
