@@ -1,4 +1,4 @@
-import { LoginType, ProfileType, RegisterType } from '../types';
+import { LoginType, ProfileType, RegisterType } from "../types";
 
 const baseUrl = "http://localhost:8000/";
 
