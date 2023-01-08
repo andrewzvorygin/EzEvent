@@ -6,7 +6,6 @@ import {
   HomeOutlined,
   LoginOutlined,
   LogoutOutlined,
-  MailOutlined,
 } from "@mui/icons-material";
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -14,12 +13,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { StyledIconButton } from "../StyledControls/StyledControls";
 import { authAPI, eventsAPI } from "../../api/Api";
 import { AuthContext, DeviceContext } from "../../App";
-import { AuthContextType, DeviceContextType, DeviceType } from "../../types";
+import { AuthType, DeviceContextType, DeviceType } from "../../types";
 
-const Header: React.FC<AuthContextType & DeviceContextType> = (props) => {
+const Header: React.FC<AuthType & DeviceContextType> = (props) => {
   const navigate = useNavigate();
   const location = useLocation();
-  console.log(props.device)
   return (
     <Box component="header" sx={{ py: 3, px: 3, display: "flex" }}>
       <Avatar
@@ -37,22 +35,12 @@ const Header: React.FC<AuthContextType & DeviceContextType> = (props) => {
         {props.auth ? (
           <>
             <StyledIconButton
-              title="Мобильная версия"
-              onClick={() => {
-                navigate(`/events`);
-              }}
-            >
-              <EventNoteOutlined />
-            </StyledIconButton><StyledIconButton
               title="Мои мероприятия"
               onClick={() => {
                 navigate(`/events`);
               }}
             >
               <EventNoteOutlined />
-            </StyledIconButton>
-            <StyledIconButton title="Оповещения">
-              <MailOutlined />
             </StyledIconButton>
             {props.device !== DeviceType.mobile && (
               <StyledIconButton
@@ -121,7 +109,7 @@ const Header: React.FC<AuthContextType & DeviceContextType> = (props) => {
 const HeaderPage = () => {
   return (
     <AuthContext.Consumer>
-      {({ auth, setAuth }) => (
+      {({ auth, setAuth, initialized }) => (
         <DeviceContext.Consumer>
           {({ device, setDevice }) => (
             <Header

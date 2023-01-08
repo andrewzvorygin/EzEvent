@@ -3,13 +3,16 @@ import { Grid, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { DeviceType, EventType } from "../../types";
-import { DeviceContext } from "../../App";
+import { AuthContext, DeviceContext } from "../../App";
 
 import MainForm from "./MainForm";
 import Organizers from "./Organizers";
+import Visibility from "./Visibility/Visibility";
 
 interface EventMakerPropsType {
+  auth: boolean;
   device: DeviceType;
+  initialized: boolean;
 }
 
 const EventMaker: React.FC<EventMakerPropsType> = (props) => {
@@ -26,15 +29,23 @@ const EventMaker: React.FC<EventMakerPropsType> = (props) => {
   });
 
   useEffect(() => {
-    if (props.device === DeviceType.mobile) {
-      navigate("/events", { replace: true });
-      return;
-    }
     function createChannel() {
       setWsChannel(new WebSocket(`wss://127.0.0.1:8000/event/ws/${eventId}`));
     }
     createChannel();
   }, []);
+
+  useEffect(() => {
+    if (props.initialized && !props.auth) {
+      navigate("/events", { replace: true });
+    }
+  }, [props.auth, props.initialized]);
+
+  useEffect(() => {
+    if (props.device === DeviceType.mobile) {
+      navigate("/events", { replace: true });
+    }
+  }, [props.device]);
 
   useEffect(() => {
     wsChannel?.addEventListener("message", (e) => {
@@ -57,6 +68,7 @@ const EventMaker: React.FC<EventMakerPropsType> = (props) => {
             <MainForm ws={wsChannel} eventData={eventData} />
           </Grid>
           <Grid item xs={5}>
+            <Visibility />
             <Organizers />
           </Grid>
         </Grid>
@@ -67,9 +79,15 @@ const EventMaker: React.FC<EventMakerPropsType> = (props) => {
 
 const EventMakerPage = () => {
   return (
-    <DeviceContext.Consumer>
-      {({ device }) => <EventMaker device={device} />}
-    </DeviceContext.Consumer>
+    <AuthContext.Consumer>
+      {({ auth, initialized }) => (
+        <DeviceContext.Consumer>
+          {({ device }) => (
+            <EventMaker initialized={initialized} auth={auth} device={device} />
+          )}
+        </DeviceContext.Consumer>
+      )}
+    </AuthContext.Consumer>
   );
 };
 

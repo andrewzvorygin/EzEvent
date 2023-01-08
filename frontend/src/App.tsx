@@ -26,6 +26,8 @@ export const DeviceContext = React.createContext<DeviceContextType>({
 });
 
 export const AuthContext = React.createContext<AuthContextType>({
+  initialized: false,
+  setInitialized: (initialized) => {},
   auth: false,
   setAuth: (auth) => {},
 });
@@ -94,9 +96,15 @@ const App = () => {
     deviceRef.current = device;
   }, [device]);
 
+  if (!initialized) {
+    return null;
+  }
+
   return (
     <DeviceContext.Provider value={{ device, setDevice }}>
-      <AuthContext.Provider value={{ auth, setAuth }}>
+      <AuthContext.Provider
+        value={{ auth, setAuth, initialized, setInitialized }}
+      >
         <Routes>
           <Route path="/" element={<AppWrapper />}>
             <Route path="events">

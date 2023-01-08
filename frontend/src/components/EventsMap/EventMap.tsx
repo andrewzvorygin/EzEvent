@@ -30,6 +30,8 @@ const EventMap: FC = () => {
         query={{
           lang: "ru_RU",
           load: "package.full",
+          apikey: "4717d1ce-6249-47b3-8381-461cc257f802",
+          csp: true,
         }}
       >
         <Map
