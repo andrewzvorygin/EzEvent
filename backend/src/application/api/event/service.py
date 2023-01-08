@@ -1,11 +1,13 @@
 import string
 import secrets
+from datetime import datetime
 from uuid import UUID
 
 from fastapi import HTTPException
 from starlette import status
 
 from schemes import UserFromToken, UserRead, Participant
+from schemes.event import Navigation
 from . import storage as st
 
 
@@ -21,12 +23,24 @@ async def check_responsible(event_uuid: UUID, current_user: UserFromToken):
 # async def check_editor(event_uuid: UUID, current_user: UserFromToken):
 
 
-
 async def create_empty_event(current_user: UserFromToken) -> UUID:
     event_identifier = await st.create_event(current_user)
     editor = Participant(user_id=current_user.user_id, event_id=event_identifier['event_id'])
     await st.add_participant(editor)
     return event_identifier['uuid_edit']
+
+
+async def get_event_registry(
+        date_start: datetime,
+        date_end: datetime,
+        navigation: Navigation,
+        type_user: int,
+        current_user: UserFromToken
+):
+    """asdas"""
+    events_id = await st.get_events_keys(current_user.user_id, type_user)
+    events = await st.get_events(date_start, date_end, events_id, navigation)
+    return events
 
 
 async def get_key_invite(event_uuid) -> str:
@@ -84,7 +98,7 @@ async def add_participant(event_uuid: UUID, user_id: int, is_editor: bool):
         )
 
 
-async def get_event(event_uuid: UUID, is_editor = False):
+async def get_event(event_uuid: UUID, is_editor=False):
     if is_editor:
         return await st.get_event_for_editor(event_uuid)
     return await st.get_event_for_visitor(event_uuid)

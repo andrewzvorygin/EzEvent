@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, UniqueConstraint, Float
 from sqlalchemy import text
 from sqlalchemy.dialects.postgresql import UUID
@@ -16,8 +17,8 @@ class Event(Base):
         UUID(), server_default=text("gen_random_uuid()"),
         nullable=False, unique=True, index=True
     )
-    date_start = Column(DateTime(timezone=True))
-    date_end = Column(DateTime(timezone=True))
+    date_start = Column(DateTime(timezone=True), default=datetime.now())
+    date_end = Column(DateTime(timezone=True), default=datetime.now())
     title = Column(String)
     latitude = Column(Float)
     longitude = Column(Float)

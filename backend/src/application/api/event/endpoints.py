@@ -1,10 +1,12 @@
 import json
+from datetime import datetime
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 
 from schemes import UserFromToken, UserRead, EventRead, Key
 from api.auth.service import get_current_user
+from schemes.event import Navigation
 
 from . import service
 from .websocket import manager
@@ -22,6 +24,27 @@ async def get_event(event: UUID):
 async def create_empty(current_user: UserFromToken = Depends(get_current_user)):
     uuid_edit = await service.create_empty_event(current_user)
     return {'uuid_edit': uuid_edit}
+
+
+@event_router.get('/events')
+async def get_events(
+        dateStart: datetime,
+        dateEnd: datetime,
+        order: str,
+        limit: int,
+        offset: int,
+        typeUser: int,
+        current_user: UserFromToken = Depends(get_current_user)
+):
+    """Получить список мероприятий """
+    res = await service.get_event_registry(
+        dateStart,
+        dateEnd,
+        Navigation(order=order, limit=limit, offset=offset),
+        typeUser,
+        current_user
+    )
+    return {'Events': res}
 
 
 @event_router.post('/organizers/key_invite/{event}')

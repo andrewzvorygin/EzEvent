@@ -1,3 +1,5 @@
+from datetime import datetime
+from typing import List
 from uuid import UUID
 
 from databases.interfaces import Record
@@ -6,6 +8,7 @@ from sqlalchemy import select, insert, update, join
 from schemes import UserRead, UserFromToken, EventRead, Participant, EventForEditor
 from models import user_orm, event_orm, participant_orm
 from core import database
+from schemes.event import Navigation
 
 
 async def get_event_for_editor(event_uuid: UUID) -> EventForEditor:
@@ -48,6 +51,53 @@ async def create_event(current_user: UserFromToken) -> Record:
         .returning(event_orm.c.uuid_edit, event_orm.c.event_id)
     )
     return await database.fetch_one(smtp)
+
+
+async def get_events_keys(user_id: int, user_type: int) -> List[int]:
+    smtp = (
+        select(participant_orm)
+        .where(
+            (
+                participant_orm.c.user_id == user_id
+                and user_type in (0, 2)
+                and not participant_orm.c.is_editor
+            )
+            or (
+                participant_orm.c.user_id == user_id
+                and user_type in (0, 1)
+                and participant_orm.c.is_editor
+            )
+        )
+    )
+
+    res = await database.fetch_all(smtp)
+    return [Participant.from_orm(key).event_id for key in res]
+
+
+async def get_events(
+        date_start: datetime,
+        date_end: datetime,
+        events_id: List[int],
+        navigation: Navigation
+) -> List[EventRead]:
+    if navigation.order == 'forward':
+        offset = (navigation.offset - 1) * navigation.limit
+    else:
+        offset = (navigation.offset - 2) * navigation.limit
+
+    start = date_start if date_start else datetime.min
+    smtp = (
+        select(event_orm)
+        .where(
+            event_orm.c.date_start >= start
+            and (event_orm.c.date_end or datetime.max) <= date_end
+            and event_orm.c.event_id in events_id
+        )
+        .limit(navigation.limit)
+        .offset(offset)
+    )
+    result = await database.fetch_all(smtp)
+    return [EventRead.from_orm(event) for event in result]
 
 
 async def get_key_invite(event_uuid: UUID) -> str:

@@ -41,6 +41,12 @@ class EventRead(EventFromDB):
     responsible_id: int
 
 
+class Navigation(BaseModel):
+    order: str
+    limit: int
+    offset: int
+
+
 class EventForEditor(EventRead):
     key_invite: str | None
 
@@ -49,6 +55,9 @@ class Participant(BaseModel):
     user_id: int
     event_id: int
     is_editor: bool = False
+
+    class Config:
+        orm_mode = True
 
 
 class Key(BaseModel):
