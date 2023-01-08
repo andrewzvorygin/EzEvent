@@ -16,6 +16,7 @@ import ButtonMap from "../Map/ButtonMap";
 import { EventType } from "../../types";
 
 import Description from "./Description/Description";
+import Comments from "./Comments/Comments";
 
 interface MainFormPropsType {
   ws: WebSocket;
@@ -90,13 +91,7 @@ const MainForm: React.FC<MainFormPropsType> = ({ ws, eventData }) => {
           </Typography>
         </Grid>
         <Grid item>
-          <Typography variant="h3" gutterBottom>
-            Добавить комментарии к мероприятию?
-          </Typography>
-          <ButtonGroup variant="outlined">
-            <StyledButton>Да</StyledButton>
-            <StyledButton>Нет</StyledButton>
-          </ButtonGroup>
+          <Comments />
         </Grid>
         <Grid item>
           <Typography variant="h3" gutterBottom>

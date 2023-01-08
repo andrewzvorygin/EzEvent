@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from "react";
+import React, { ChangeEvent, FC, useState, useEffect } from "react";
 import {
   Avatar,
   Button,
@@ -24,6 +24,19 @@ const Profile: FC<ProfilePropsType> = (props) => {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"), {
     defaultMatches: true,
   });
+  const [phone, setPhone] = useState("8800 555 3535");
+  const [email, setEmail] = useState("мерси.захил-ваших@жоп");
+  function onChangePhone(
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) {
+    setPhone(e.target.value);
+  }
+
+  function onChangeEmail(
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) {
+    setEmail(e.target.value);
+  }
 
   useEffect(() => {
     if (props.initialized && !props.auth) {
@@ -65,8 +78,12 @@ const Profile: FC<ProfilePropsType> = (props) => {
         >
           Валинурка ХагиВаги ДымТатар
         </Typography>
-        <SwitchInput label={"Почта:"} value={"мерси.захил-ваших@жоп"} />
-        <SwitchInput label={"Телефон:"} value={"8800 555 3535"} />
+        <SwitchInput label={"Почта:"} value={email} onChange={onChangeEmail} />
+        <SwitchInput
+          label={"Телефон:"}
+          value={phone}
+          onChange={onChangePhone}
+        />
         <Button
           sx={{
             alignSelf: "flex-start",

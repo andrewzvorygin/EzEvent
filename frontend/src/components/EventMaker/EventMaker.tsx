@@ -7,6 +7,7 @@ import { AuthContext, DeviceContext } from "../../App";
 
 import MainForm from "./MainForm";
 import Organizers from "./Organizers";
+import Visibility from "./Visibility/Visibility";
 
 interface EventMakerPropsType {
   auth: boolean;
@@ -67,6 +68,7 @@ const EventMaker: React.FC<EventMakerPropsType> = (props) => {
             <MainForm ws={wsChannel} eventData={eventData} />
           </Grid>
           <Grid item xs={5}>
+            <Visibility />
             <Organizers />
           </Grid>
         </Grid>
