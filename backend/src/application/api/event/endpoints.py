@@ -75,8 +75,10 @@ async def add_organizer(
 async def websocket_endpoint(
         websocket: WebSocket,
         event_uuid: UUID,
-        current_user: UserFromToken = Depends(get_current_user)
+        access_token: str
 ):
+    current_user: UserFromToken = await get_current_user(access_token)
+    await service.check_editor(event_uuid, current_user)
     await manager.connect(websocket, event_uuid)
     try:
         while True:

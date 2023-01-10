@@ -20,7 +20,13 @@ async def check_responsible(event_uuid: UUID, current_user: UserFromToken):
         )
 
 
-# async def check_editor(event_uuid: UUID, current_user: UserFromToken):
+async def check_editor(event_uuid: UUID, current_user: UserFromToken):
+    editors_id = await st.get_editors(event_uuid)
+    if current_user.user_id not in editors_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail='Действие доступно только редакторам'
+        )
 
 
 async def create_empty_event(current_user: UserFromToken) -> UUID:

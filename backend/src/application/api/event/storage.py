@@ -124,11 +124,11 @@ async def update_event(data: dict[str, str], event_uuid: UUID):
     await database.execute(smtp)
 
 
-async def get_editor(event_uuid: UUID, current_user: UserFromToken):
+async def get_editors(event_uuid: UUID):
     smtp = (
-        select(event_orm.c.event_id)
-        .select_from(
-            join(event_orm.c.event_id == participant_orm.c.event_id)
-        )
-        .where(event_orm.c.uuid_edit == event_uuid)
+        select(participant_orm.c.user_id)
+        .join(event_orm, event_orm.c.event_id == participant_orm.c.event_id)
+        .where(event_orm.c.uuid_edit == event_uuid and participant_orm.c.is_editor)
     )
+    result = await database.fetch_all(smtp)
+    return list(result)
