@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, UploadFile, status, Response
 from fastapi.responses import FileResponse
 
 from api.auth.service import get_current_user
-from schemes import UserRead, UserFromToken
+from schemes import UserRead, UserFromToken, ProfileUser
 
 from . import service
 from .exceptions import PHOTO_NOT_FOUND
@@ -14,7 +14,7 @@ profile_router = APIRouter(prefix='/profile')
 
 @profile_router.put('/', tags=['profile'])
 async def put_profile(
-        new_data: UserRead,
+        new_data: ProfileUser,
         response: Response,
         current_user: UserFromToken = Depends(get_current_user),
 ):
@@ -31,7 +31,7 @@ async def get_profile(current_user: UserRead = Depends(get_current_user)):
 async def upload_photo_profile(
         photo: UploadFile,
         response: Response,
-        current_user: UserRead = Depends(get_current_user)
+        current_user: UserFromToken = Depends(get_current_user)
 ):
     await service.save_photo_profile(photo, current_user)
     response.status_code = status.HTTP_202_ACCEPTED
