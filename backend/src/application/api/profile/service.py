@@ -13,7 +13,7 @@ from .exceptions import INVALID_FILE
 from api.profile import storage
 
 
-async def update_profile(update_data: sh.UserBase, current_user: sh.UserFromToken):
+async def update_profile(update_data: sh.ProfileUser, current_user: sh.UserFromToken):
     await storage.update_profile(update_data, current_user)
 
 

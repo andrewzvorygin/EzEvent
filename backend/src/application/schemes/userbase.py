@@ -68,3 +68,13 @@ class RefreshSession(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class ProfileUser(BaseModel):
+    name: str
+    surname: str
+    patronymic: str | None = None
+    phone: str | None = None
+
+    class Config:
+        orm_mode = True
