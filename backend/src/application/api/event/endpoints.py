@@ -26,24 +26,36 @@ async def create_empty(current_user: UserFromToken = Depends(get_current_user)):
     return {'uuid_edit': uuid_edit}
 
 
-@event_router.get('/events')
+@event_router.get('/my_events')
 async def get_events(
-        dateStart: datetime,
-        dateEnd: datetime,
-        order: str,
         limit: int,
         offset: int,
         typeUser: int,
+        date_start: datetime = datetime.min,
+        date_end: datetime = datetime.max,
         current_user: UserFromToken = Depends(get_current_user)
 ):
-    """Получить список мероприятий """
-    res = await service.get_event_registry(
-        dateStart,
-        dateEnd,
-        Navigation(order=order, limit=limit, offset=offset),
+    """Получить список моих мероприятий """
+    res = await service.get_my_events(
+        date_start,
+        date_end,
+        Navigation(limit=limit, offset=offset),
         typeUser,
         current_user
     )
+    return {'Events': res}
+
+
+@event_router.get('/events_registry')
+async def get_registry(
+        limit: int,
+        offset: int,
+        date_start: datetime = datetime.min,
+        date_end: datetime = datetime.max,
+        location: int = None
+):
+    """Получить реестр мероприятий"""
+    res = await service.get_registry(Navigation(limit=limit, offset=offset), date_start, date_end, location)
     return {'Events': res}
 
 

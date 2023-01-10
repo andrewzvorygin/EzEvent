@@ -30,7 +30,7 @@ async def create_empty_event(current_user: UserFromToken) -> UUID:
     return event_identifier['uuid_edit']
 
 
-async def get_event_registry(
+async def get_my_events(
         date_start: datetime,
         date_end: datetime,
         navigation: Navigation,
@@ -39,8 +39,16 @@ async def get_event_registry(
 ):
     """asdas"""
     events_id = await st.get_events_keys(current_user.user_id, type_user)
-    events = await st.get_events(date_start, date_end, events_id, navigation)
-    return events
+    return await st.get_events(date_start, date_end, events_id, navigation)
+
+
+async def get_registry(
+        navigation: Navigation,
+        date_start: datetime,
+        date_end: datetime,
+        location: int
+):
+    return await st.get_registry(navigation, date_start, date_end, location)
 
 
 async def get_key_invite(event_uuid) -> str:

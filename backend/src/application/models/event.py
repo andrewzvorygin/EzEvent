@@ -20,6 +20,7 @@ class Event(Base):
     date_start = Column(DateTime(timezone=True), default=datetime.now())
     date_end = Column(DateTime(timezone=True), default=datetime.now())
     title = Column(String)
+    city = Column(Integer, ForeignKey('City.id'))
     latitude = Column(Float)
     longitude = Column(Float)
     description = Column(String)

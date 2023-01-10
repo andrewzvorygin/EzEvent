@@ -14,7 +14,7 @@ class Event(BaseModel):
     date_end: datetime | None = None
     title: str | None = None
     description: str | None = None
-    visibility: bool = False
+    visibility: bool | None = False
 
 
 class EventFromDB(Event):
@@ -39,10 +39,10 @@ class EventRead(EventFromDB):
     uuid_edit: UUID
     photo_cover: str | None
     responsible_id: int
+    city: int | None
 
 
 class Navigation(BaseModel):
-    order: str
     limit: int
     offset: int
 

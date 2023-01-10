@@ -3,7 +3,7 @@ from typing import List
 from uuid import UUID
 
 from databases.interfaces import Record
-from sqlalchemy import select, insert, update, join
+from sqlalchemy import select, insert, update, join, not_
 
 from schemes import UserRead, UserFromToken, EventRead, Participant, EventForEditor
 from models import user_orm, event_orm, participant_orm
@@ -54,20 +54,14 @@ async def create_event(current_user: UserFromToken) -> Record:
 
 
 async def get_events_keys(user_id: int, user_type: int) -> List[int]:
+    def _check_type(user_type: int):
+        if user_type in (0, 1):
+            return participant_orm.c.is_editor
+        return not_(participant_orm.c.is_editor)
+
     smtp = (
         select(participant_orm)
-        .where(
-            (
-                participant_orm.c.user_id == user_id
-                and user_type in (0, 2)
-                and not participant_orm.c.is_editor
-            )
-            or (
-                participant_orm.c.user_id == user_id
-                and user_type in (0, 1)
-                and participant_orm.c.is_editor
-            )
-        )
+        .where(participant_orm.c.user_id == user_id, _check_type(user_type))
     )
 
     res = await database.fetch_all(smtp)
@@ -80,22 +74,49 @@ async def get_events(
         events_id: List[int],
         navigation: Navigation
 ) -> List[EventRead]:
-    if navigation.order == 'forward':
-        offset = (navigation.offset - 1) * navigation.limit
-    else:
-        offset = (navigation.offset - 2) * navigation.limit
+    offset = navigation.offset * navigation.limit
 
-    start = date_start if date_start else datetime.min
     smtp = (
         select(event_orm)
         .where(
-            event_orm.c.date_start >= start
-            and (event_orm.c.date_end or datetime.max) <= date_end
-            and event_orm.c.event_id in events_id
+            event_orm.c.date_start >= date_start,
+            event_orm.c.date_end <= date_end,
+            event_orm.c.event_id.in_(events_id)
         )
         .limit(navigation.limit)
         .offset(offset)
+        .order_by(event_orm.c.event_id.desc())
     )
+    result = await database.fetch_all(smtp)
+    return [EventRead.from_orm(event) for event in result]
+
+
+async def get_registry(
+        navigation: Navigation,
+        date_start: datetime,
+        date_end: datetime,
+        location: int
+):
+    def _check_location(location:int):
+        if location:
+            return event_orm.c.city == location
+        return True
+
+    offset = navigation.offset * navigation.limit
+
+    smtp = (
+        select(event_orm)
+        .where(
+            event_orm.c.date_start >= date_start,
+            event_orm.c.date_end <= date_end,
+            event_orm.c.visibility,
+            _check_location(location)
+        )
+        .limit(navigation.limit)
+        .offset(offset)
+        .order_by(event_orm.c.event_id.desc())
+    )
+
     result = await database.fetch_all(smtp)
     return [EventRead.from_orm(event) for event in result]
 
