@@ -3,7 +3,7 @@ from typing import List
 from uuid import UUID
 
 from databases.interfaces import Record
-from sqlalchemy import select, insert, update, join
+from sqlalchemy import select, insert, update
 
 from schemes import UserRead, UserFromToken, EventRead, Participant, EventForEditor
 from models import user_orm, event_orm, participant_orm
@@ -131,4 +131,4 @@ async def get_editors(event_uuid: UUID):
         .where(event_orm.c.uuid_edit == event_uuid and participant_orm.c.is_editor)
     )
     result = await database.fetch_all(smtp)
-    return list(result)
+    return [record['user_id'] for record in result]
