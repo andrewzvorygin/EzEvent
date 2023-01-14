@@ -69,7 +69,7 @@ async def get_key_invite(event: UUID, current_user: UserFromToken = Depends(get_
 
 @event_router.put('/organizers/key_invite/{event}')
 async def update_key_event(event: UUID, current_user: UserFromToken = Depends(get_current_user)):
-    """Получить ключ-приглашение для мероприятия. Доступно только ответственному за мероприятие"""
+    """Обновить ключ-приглашение для мероприятия. Доступно только ответственному за мероприятие"""
     await service.check_responsible(event, current_user)
     key = await service.update_key_invite(event_uuid=event)
     return {'key': key}
