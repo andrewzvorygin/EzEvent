@@ -21,7 +21,7 @@ async def check_responsible(event_uuid: UUID, current_user: UserFromToken):
 
 
 async def check_editor(event_uuid: UUID, current_user: UserFromToken):
-    editors_id = await st.get_editors(event_uuid)
+    editors_id = await st.get_editors_id(event_uuid)
     if current_user.user_id not in editors_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -128,3 +128,7 @@ async def add_comment(comment: CommentCreate):
 
 async def get_comments(event_id: int):
     return await st.get_comment(event_id)
+
+
+async def get_editors(event_uuid):
+    return await st.get_editors(event_uuid)

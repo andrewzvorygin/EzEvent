@@ -70,11 +70,14 @@ class RefreshSession(BaseModel):
         orm_mode = True
 
 
-class ProfileUser(BaseModel):
+class ShortUser(BaseModel):
     name: str
     surname: str
     patronymic: str | None = None
-    phone: str | None = None
 
     class Config:
         orm_mode = True
+
+
+class ProfileUser(ShortUser):
+    phone: str | None = None

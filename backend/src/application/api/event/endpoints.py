@@ -81,6 +81,7 @@ async def add_organizer(
 ):
     """Добавить редактора"""
     await service.add_editor_by_key(event, key.key, current_user)
+    await manager.add_editor(event)
 
 
 @event_router.websocket("/ws/{event_uuid}")
@@ -114,6 +115,7 @@ async def add_editor_by_email(
 ):
     await service.check_responsible(event, current_user)
     await service.add_editor(event_uuid=event, user_id=user_id)
+    await manager.add_editor(event)
 
 
 @event_router.post('/visit/{event}')

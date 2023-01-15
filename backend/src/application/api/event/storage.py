@@ -5,7 +5,7 @@ from uuid import UUID
 from databases.interfaces import Record
 from sqlalchemy import select, insert, update, not_
 
-from schemes import UserRead, UserFromToken, EventRead, Participant, EventForEditor, CommentCreate, CommentRead
+from schemes import UserRead, UserFromToken, EventRead, Participant, EventForEditor, CommentCreate, CommentRead, ShortUser
 from models import user_orm, event_orm, participant_orm, comment_orm
 from core import database
 from schemes.event import Navigation
@@ -147,7 +147,7 @@ async def update_event(data: dict[str, str], event_uuid: UUID):
     await database.execute(smtp)
 
 
-async def get_editors(event_uuid: UUID):
+async def get_editors_id(event_uuid: UUID):
     smtp = (
         select(participant_orm.c.user_id)
         .join(event_orm, event_orm.c.event_id == participant_orm.c.event_id)
@@ -170,3 +170,14 @@ async def get_comment(event_id: int) -> list[CommentRead]:
     )
     record_set = await database.fetch_all(smtp)
     return [CommentRead.from_orm(record) for record in record_set]
+
+
+async def get_editors(event_uuid) -> list[ShortUser]:
+    smtp = (
+        select(user_orm)
+            .join(event_orm, event_orm.c.event_id == participant_orm.c.event_id)
+            .join(user_orm, participant_orm.c.user_id == user_orm.c.user_id)
+            .where(event_orm.c.uuid_edit == event_uuid and participant_orm.c.is_editor)
+    )
+    rs = await database.fetch_all(smtp)
+    return [ShortUser.from_orm(record) for record in rs]
