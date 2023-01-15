@@ -55,9 +55,11 @@ async def create_event(current_user: UserFromToken) -> Record:
 
 async def get_events_keys(user_id: int, user_type: int) -> List[int]:
     def _check_type(user_type: int):
-        if user_type in (0, 1):
+        if user_type == 1:
             return participant_orm.c.is_editor
-        return not_(participant_orm.c.is_editor)
+        if user_type == 2:
+            return not_(participant_orm.c.is_editor)
+        return True
 
     smtp = (
         select(participant_orm)
