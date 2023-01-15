@@ -4,7 +4,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 
-from schemes import UserFromToken, UserRead, EventRead, Key
+from schemes import UserFromToken, UserRead, EventRead, Key, CommentCreate, CommentRead
 from api.auth.service import get_current_user
 from schemes.event import Navigation
 
@@ -121,3 +121,17 @@ async def add_visitor(
         event: UUID, current_user: UserFromToken = Depends(get_current_user)
 ):
     await service.add_visitor(event, current_user)
+
+
+@event_router.post('/comment')
+async def add_comment(
+        comment: CommentCreate,
+        current_user: UserFromToken = Depends(get_current_user)
+):
+    comment.user_id = current_user.user_id
+    await service.add_comment(comment)
+
+
+@event_router.get('/event/comment/{event_id}')
+async def read_comment(event_id: int):
+    return await service.get_comments(event_id)

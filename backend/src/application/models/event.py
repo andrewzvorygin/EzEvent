@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, UniqueConstraint, Float
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, UniqueConstraint, Float, Date
 from sqlalchemy import text
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -69,4 +69,7 @@ class Comment(Base):
     text = Column(String)
     event_id = Column(Integer, ForeignKey('Event.event_id'))
     parent_id = Column(Integer)
+    date_comment = Column(Date)
 
+
+comment_orm = Comment.__table__

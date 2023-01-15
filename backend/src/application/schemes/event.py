@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from uuid import UUID
 
 from pydantic import BaseModel, validator, Field
@@ -78,3 +78,28 @@ class EventWS(Event):
     def set_latitude(cls, v, values):
         location: Location = values.get('latitude')
         return location.latitude
+
+
+class CommentCreate(BaseModel):
+    user_id: int | None = None
+    text: str
+    event_id: int
+    parent_id: int | None
+    date_comment: date = date.today()
+
+
+class CommentRead(CommentCreate):
+    comment_id: int
+    name: str
+    surname: str
+    patronymic: str
+    photo: str
+
+    @validator('user_id')
+    def set_longitude(cls, value):
+        if not isinstance(value, int):
+            raise ValueError()
+        return value
+
+    class Config:
+        orm_mode = True

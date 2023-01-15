@@ -3,10 +3,10 @@ from typing import List
 from uuid import UUID
 
 from databases.interfaces import Record
-from sqlalchemy import select, insert, update, join, not_
+from sqlalchemy import select, insert, update, not_
 
-from schemes import UserRead, UserFromToken, EventRead, Participant, EventForEditor
-from models import user_orm, event_orm, participant_orm
+from schemes import UserRead, UserFromToken, EventRead, Participant, EventForEditor, CommentCreate, CommentRead
+from models import user_orm, event_orm, participant_orm, comment_orm
 from core import database
 from schemes.event import Navigation
 
@@ -153,3 +153,18 @@ async def get_editors(event_uuid: UUID):
     )
     result = await database.fetch_all(smtp)
     return [record['user_id'] for record in result]
+
+
+async def add_comment(comment: CommentCreate):
+    smtp = (insert(comment_orm).values(**comment.dict()))
+    await database.execute(smtp)
+
+
+async def get_comment(event_id: int) -> list[CommentRead]:
+    smtp = (
+        select(comment_orm, user_orm.c.name, user_orm.c.surname, user_orm.c.patronymic, user_orm.c.photo)
+        .join(user_orm, comment_orm.c.user_id == user_orm.c.user_id)
+        .where(comment_orm.c.event_id == event_id)
+    )
+    record_set = await database.fetch_all(smtp)
+    return [CommentRead.from_orm(record) for record in record_set]

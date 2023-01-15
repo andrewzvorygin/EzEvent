@@ -7,7 +7,7 @@ from fastapi import HTTPException
 from starlette import status
 
 from schemes import UserFromToken, UserRead, Participant
-from schemes.event import Navigation
+from schemes.event import Navigation, CommentCreate
 from . import storage as st
 
 
@@ -120,3 +120,11 @@ async def get_event(event_uuid: UUID, is_editor=False):
 
 async def update_event(event_uuid: UUID, data: dict):
     await st.update_event(data, event_uuid)
+
+
+async def add_comment(comment: CommentCreate):
+    await st.add_comment(comment)
+
+
+async def get_comments(event_id: int):
+    return await st.get_comment(event_id)

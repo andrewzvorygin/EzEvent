@@ -11,7 +11,7 @@ class ConnectionManager:
         self.active_connections: dict[UUID, list] = defaultdict(list)
 
     async def connect(self, websocket: WebSocket, event_uuid: UUID):
-        event = await get_event(event_uuid)
+        event = await get_event(event_uuid, is_editor=True)
         await websocket.accept()
         await websocket.send_text(event.json())
         self.active_connections[event_uuid].append(websocket)
