@@ -1,13 +1,13 @@
 import os
 
-from core import ROOT_PATH
+from core import APPLICATION_PATH
 from core.database import database
 from models import city_orm
 
 
 def get_cities():
     cities_name = []
-    path = os.path.join(ROOT_PATH, 'city_name.txt')
+    path = os.path.join(APPLICATION_PATH, 'city_name.txt')
 
     with open(path, 'r', encoding='utf-8') as file:
         for city in file.readlines():
@@ -18,6 +18,7 @@ def get_cities():
 
 # TODO Переделать на фикстуры
 async def set_city_in_db():
+
     city_select = city_orm.select().limit(1)
     city = await database.fetch_one(city_select)
     if not city:

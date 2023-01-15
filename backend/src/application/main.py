@@ -40,7 +40,7 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup():
     await database.connect()
-    # await set_city_in_db()
+    await set_city_in_db()
 
 
 @app.on_event("shutdown")
