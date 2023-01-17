@@ -3,7 +3,7 @@ from typing import List
 from uuid import UUID
 
 from databases.interfaces import Record
-from sqlalchemy import select, insert, update, not_
+from sqlalchemy import select, insert, update, not_, func
 
 from schemes import UserRead, UserFromToken, EventRead, Participant, EventForEditor, CommentCreate, CommentRead, ShortUser
 from models import user_orm, event_orm, participant_orm, city_orm, comment_orm
@@ -76,13 +76,20 @@ async def get_events(
         events_id: List[int],
         navigation: Navigation
 ) -> List[EventRead]:
+    def _check_dates(_date: datetime, start: bool):
+        if _date:
+            if start:
+                return func.coalesce(event_orm.c.date_start, datetime.min) >= _date
+            return func.coalesce(event_orm.c.date_end, datetime.max) <= _date
+        return True
+
     offset = navigation.offset * navigation.limit
 
     smtp = (
         select(event_orm)
         .where(
-            event_orm.c.date_start >= date_start,
-            event_orm.c.date_end <= date_end,
+            _check_dates(date_start, True),
+            _check_dates(date_end, False),
             event_orm.c.event_id.in_(events_id)
         )
         .limit(navigation.limit)
@@ -108,8 +115,8 @@ async def get_registry(
     def _check_dates(_date: datetime, start: bool):
         if _date:
             if start:
-                return event_orm.c.date_start >= date_start
-            return event_orm.c.date_end <= date_end
+                return event_orm.c.date_start >= _date
+            return event_orm.c.date_end <= _date
         return True
 
     def _check_search(search: str):
