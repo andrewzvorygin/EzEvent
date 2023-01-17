@@ -50,12 +50,13 @@ async def get_events(
 async def get_registry(
         limit: int,
         offset: int,
-        date_start: datetime = datetime.min,
-        date_end: datetime = datetime.max,
+        search: str = None,
+        date_start: datetime = None,
+        date_end: datetime = None,
         location: int = None
 ):
     """Получить реестр мероприятий"""
-    res = await service.get_registry(Navigation(limit=limit, offset=offset), date_start, date_end, location)
+    res = await service.get_registry(Navigation(limit=limit, offset=offset), search, date_start, date_end, location)
     return {'Events': res}
 
 

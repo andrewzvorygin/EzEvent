@@ -39,7 +39,7 @@ class EventRead(EventFromDB):
     uuid_edit: UUID
     photo_cover: str | None
     responsible_id: int
-    city: int | None
+    city: str | None
 
 
 class Navigation(BaseModel):
