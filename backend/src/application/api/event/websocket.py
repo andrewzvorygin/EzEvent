@@ -15,8 +15,8 @@ class ConnectionManager:
         event = await get_event(event_uuid, is_editor=True)
         editors = await get_editors(event_uuid)
         result = {**event.dict(), 'editors': editors}
-        result['date_start'] = str(result['date_start'])
-        result['date_end'] = str(result['date_end'])
+        result['date_start'] = str(result['date_start']) if result['date_start'] else None
+        result['date_end'] = str(result['date_end']) if result['date_start'] else None
         await websocket.accept()
         await websocket.send_text(json.dumps(result))
         self.active_connections[event_uuid].append(websocket)
