@@ -15,6 +15,8 @@ class ConnectionManager:
         event = await get_event(event_uuid, is_editor=True)
         editors = await get_editors(event_uuid)
         result = {**event.dict(), 'editors': editors}
+        result['uuid_edit'] = str(result['uuid_edit'])
+        result['uuid'] = str(result['uuid'])
         result['date_start'] = str(result['date_start']) if result['date_start'] else None
         result['date_end'] = str(result['date_end']) if result['date_start'] else None
         await websocket.accept()
