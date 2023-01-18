@@ -42,11 +42,6 @@ class EventRead(EventFromDB):
 
 
 class RegistryEvent(EventRead):
-    event_id: int
-    uuid: UUID
-    uuid_edit: UUID
-    photo_cover: str | None
-    responsible_id: int
     responsible_name: str | None
     city: str | None
 
