@@ -3,10 +3,10 @@ from typing import List
 from uuid import UUID
 
 from databases.interfaces import Record
-from sqlalchemy import select, insert, update, not_
+from sqlalchemy import select, insert, update, not_, func
 
 from schemes import UserRead, UserFromToken, EventRead, Participant, EventForEditor, CommentCreate, CommentRead, ShortUser
-from models import user_orm, event_orm, participant_orm, comment_orm
+from models import user_orm, event_orm, participant_orm, city_orm, comment_orm
 from core import database
 from schemes.event import Navigation
 
@@ -76,13 +76,20 @@ async def get_events(
         events_id: List[int],
         navigation: Navigation
 ) -> List[EventRead]:
+    def _check_dates(_date: datetime, start: bool):
+        if _date:
+            if start:
+                return func.coalesce(event_orm.c.date_start, datetime.min) >= _date
+            return func.coalesce(event_orm.c.date_end, datetime.max) <= _date
+        return True
+
     offset = navigation.offset * navigation.limit
 
     smtp = (
         select(event_orm)
         .where(
-            event_orm.c.date_start >= date_start,
-            event_orm.c.date_end <= date_end,
+            _check_dates(date_start, True),
+            _check_dates(date_end, False),
             event_orm.c.event_id.in_(events_id)
         )
         .limit(navigation.limit)
@@ -95,24 +102,54 @@ async def get_events(
 
 async def get_registry(
         navigation: Navigation,
+        search: str,
         date_start: datetime,
         date_end: datetime,
         location: int
 ):
-    def _check_location(location:int):
+    def _check_location(location: int):
         if location:
             return event_orm.c.city == location
+        return True
+
+    def _check_dates(_date: datetime, start: bool):
+        if _date:
+            if start:
+                return event_orm.c.date_start >= _date
+            return event_orm.c.date_end <= _date
+        return True
+
+    def _check_search(search: str):
+        if search:
+            return event_orm.c.title.like(f'%{search}%')
         return True
 
     offset = navigation.offset * navigation.limit
 
     smtp = (
-        select(event_orm)
-        .where(
-            event_orm.c.date_start >= date_start,
-            event_orm.c.date_end <= date_end,
+        select(
+            event_orm.c.event_id,
+            event_orm.c.uuid,
+            event_orm.c.uuid_edit,
+            event_orm.c.date_start,
+            event_orm.c.date_end,
+            event_orm.c.title,
+            city_orm.c.name.label('city'),
+            event_orm.c.latitude,
+            event_orm.c.longitude,
+            event_orm.c.description,
+            event_orm.c.responsible_id,
             event_orm.c.visibility,
-            _check_location(location)
+            event_orm.c.photo_cover,
+            event_orm.c.key_invite,
+        )
+        .join(city_orm, event_orm.c.city == city_orm.c.id)
+        .where(
+            event_orm.c.visibility,
+            _check_dates(date_start, True),
+            _check_dates(date_end, False),
+            _check_location(location),
+            _check_search(search)
         )
         .limit(navigation.limit)
         .offset(offset)

@@ -50,11 +50,12 @@ async def get_my_events(
 
 async def get_registry(
         navigation: Navigation,
+        search: str,
         date_start: datetime,
         date_end: datetime,
         location: int
 ):
-    return await st.get_registry(navigation, date_start, date_end, location)
+    return await st.get_registry(navigation, search, date_start, date_end, location)
 
 
 async def get_key_invite(event_uuid) -> str:
