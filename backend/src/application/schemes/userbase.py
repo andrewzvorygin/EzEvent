@@ -81,3 +81,12 @@ class ShortUser(BaseModel):
 
 class ProfileUser(ShortUser):
     phone: str | None = None
+
+    @validator('phone')
+    def is_valid_phone_number(cls, value):
+        if value is None:
+            return None
+        phone_regular = re.fullmatch(r'(\+7|8)\d{10}', value)
+        if not phone_regular:
+            raise ValueError(f"Не валидный номер {value}")
+        return value
