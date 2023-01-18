@@ -51,6 +51,6 @@ def get_extension(filename: str) -> str:
     return extension
 
 
-def get_user_info(user_from_token: UserFromToken = Depends(get_current_user)):
+async def get_user_info(user_from_token: UserFromToken = Depends(get_current_user)):
     record = await storage.get_user_info(user_from_token.user_id)
     return UserRead.from_orm(record)
