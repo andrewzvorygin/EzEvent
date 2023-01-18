@@ -5,10 +5,13 @@ from uuid import UUID
 from databases.interfaces import Record
 from sqlalchemy import select, insert, update, not_, func
 
-from schemes import UserRead, UserFromToken, EventRead, Participant, EventForEditor, CommentCreate, CommentRead, ShortUser
+from schemes import (
+    UserRead, RegistryEvent, UserFromToken, EventRead,
+    Participant, EventForEditor, CommentCreate, CommentRead,
+    ShortUser, Navigation
+)
 from models import user_orm, event_orm, participant_orm, city_orm, comment_orm
 from core import database
-from schemes.event import Navigation
 
 
 async def get_event_for_editor(event_uuid: UUID) -> EventForEditor:
@@ -97,7 +100,7 @@ async def get_events(
         .order_by(event_orm.c.event_id.desc())
     )
     result = await database.fetch_all(smtp)
-    return [EventRead.from_orm(event) for event in result]
+    return [RegistryEvent.from_orm(event) for event in result]
 
 
 async def get_registry(
@@ -159,7 +162,7 @@ async def get_registry(
     )
 
     result = await database.fetch_all(smtp)
-    return [EventRead.from_orm(event) for event in result]
+    return [RegistryEvent.from_orm(event) for event in result]
 
 
 async def get_key_invite(event_uuid: UUID) -> str:
