@@ -3,14 +3,16 @@ from uuid import uuid1
 
 import aiofiles
 
-from fastapi import UploadFile
+from fastapi import UploadFile, Depends
 
 import schemes as sh
 
 from core import PHOTO_PROFILE_PATH
+from schemes import UserFromToken, UserRead
 from .exceptions import INVALID_FILE
 
 from api.profile import storage
+from ..auth.service import get_current_user
 
 
 async def update_profile(update_data: sh.ProfileUser, current_user: sh.UserFromToken):
@@ -47,3 +49,8 @@ def get_extension(filename: str) -> str:
     if extension not in {'jpg', 'jpeg', 'bmp', 'png'}:
         raise INVALID_FILE
     return extension
+
+
+def get_user_info(user_from_token: UserFromToken = Depends(get_current_user)):
+    record = await storage.get_user_info(user_from_token.user_id)
+    return UserRead.from_orm(record)

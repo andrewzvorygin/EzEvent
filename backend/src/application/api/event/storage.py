@@ -175,8 +175,8 @@ async def get_comment(event_id: int) -> list[CommentRead]:
 async def get_editors(event_uuid) -> list[ShortUser]:
     smtp = (
         select(user_orm)
+            .join(participant_orm, participant_orm.c.user_id == user_orm.c.user_id)
             .join(event_orm, event_orm.c.event_id == participant_orm.c.event_id)
-            .join(user_orm, participant_orm.c.user_id == user_orm.c.user_id)
             .where(event_orm.c.uuid_edit == event_uuid and participant_orm.c.is_editor)
     )
     rs = await database.fetch_all(smtp)

@@ -23,7 +23,7 @@ async def put_profile(
 
 
 @profile_router.get('/', tags=['profile'])
-async def get_profile(current_user: UserRead = Depends(get_current_user)):
+async def get_profile(current_user: UserFromToken = Depends(service.get_user_info)):
     return current_user
 
 
