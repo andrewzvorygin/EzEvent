@@ -39,6 +39,7 @@ class EventRead(EventFromDB):
     uuid_edit: UUID
     photo_cover: str | None
     responsible_id: int
+    responsible_name: str
     city: str | None
 
 

@@ -139,11 +139,13 @@ async def get_registry(
             event_orm.c.longitude,
             event_orm.c.description,
             event_orm.c.responsible_id,
+            user_orm.c.name.label('responsible_name'),
             event_orm.c.visibility,
             event_orm.c.photo_cover,
             event_orm.c.key_invite,
         )
         .join(city_orm, event_orm.c.city == city_orm.c.id)
+        .join(user_orm, user_orm.c.user_id == event_orm.c.responsible_id)
         .where(
             event_orm.c.visibility,
             _check_dates(date_start, True),
