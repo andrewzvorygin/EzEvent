@@ -219,4 +219,4 @@ async def get_editors(event_uuid) -> list[ShortUser]:
             .where(event_orm.c.uuid_edit == event_uuid and participant_orm.c.is_editor)
     )
     rs = await database.fetch_all(smtp)
-    return [ShortUser.from_orm(record) for record in rs]
+    return [ShortUser.from_orm(record).dict() for record in rs]
