@@ -1,22 +1,33 @@
-import React, { useState } from "react";
-import { Button, Stack, Collapse, Box } from "@mui/material";
+import React, { FC, useState } from "react";
+import { Box, Collapse, Stack } from "@mui/material";
 
 import Comment from "./Comment";
 
-const CommentBranch = () => {
+interface IProps {
+  mainComment: {
+    value: string;
+    author: string;
+    avatar?: string;
+  };
+}
+
+const CommentBranch: FC<IProps> = ({ mainComment }) => {
+  const { value, author, avatar } = mainComment;
   const [expanded, setExpanded] = useState(false);
   const handleExpandClick = () => setExpanded((e) => !e);
 
   return (
     <Box>
-      <Comment />
-      <Box mt={1.5}>
-        <Button onClick={handleExpandClick}>toggle</Button>
-      </Box>
+      <Comment
+        expandComments={handleExpandClick}
+        value={value}
+        author={author}
+        avatar={avatar}
+      />
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <Stack pl={5} mt={1} spacing={2}>
-          <Comment />
-          <Comment />
+          <Comment value={"1"} author={"Пользователь"} />
+          <Comment value={"1"} author={"Пользователь"} />
         </Stack>
       </Collapse>
     </Box>

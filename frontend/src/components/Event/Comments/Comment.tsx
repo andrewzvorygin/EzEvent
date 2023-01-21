@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { FC, useState } from "react";
 import {
   Avatar,
   Box,
@@ -9,19 +9,21 @@ import {
   Typography,
 } from "@mui/material";
 
-const Comment = () => {
+interface IProps {
+  expandComments?: () => void;
+  value: string;
+  author: string;
+  avatar?: string;
+}
+
+const Comment: FC<IProps> = ({ expandComments, value, author, avatar }) => {
   const [expanded, setExpanded] = useState(false);
   const handleExpandClick = () => setExpanded((e) => !e);
 
   return (
     <Stack direction="row" spacing={2}>
       <Box paddingTop={0.5}>
-        <Avatar
-          alt="Remy Sharp"
-          src={
-            "https://sun9-66.userapi.com/impg/gpPdVT_I38wgnrXkvZXoaZRvnAShF_W7ZN2wOA/O7zIGq8XOdM.jpg?size=1620x2160&quality=96&sign=a4ff920a97a4bcd4ee513e3bc7c1a592&type=album"
-          }
-        />
+        <Avatar alt="Remy Sharp" src={avatar} />
       </Box>
       <Stack spacing={0} width={"100%"}>
         <Box
@@ -36,12 +38,36 @@ const Comment = () => {
           paddingBottom={1}
         >
           <Typography variant={"h4"} fontSize={14}>
-            Пользователь 1
+            {author}
           </Typography>
           <Typography variant={"body1"} fontSize={16}>
-            Какое классное мероприятие!
+            {value}
           </Typography>
           <Button onClick={handleExpandClick}>Ответить</Button>
+          {expandComments && (
+            <Box
+              onClick={() => {
+                expandComments();
+              }}
+              component={"button"}
+              sx={{
+                display: "block",
+                background: "none",
+                fontSize: 14,
+                color: "black",
+                ":hover": {
+                  textDecoration: "underline",
+                  cursor: "pointer",
+                },
+                margin: 0,
+                padding: 0,
+                pt: 1,
+                border: "none",
+              }}
+            >
+              Посмотреть ответы
+            </Box>
+          )}
         </Box>
         <Collapse sx={{ mt: 1.5 }} in={expanded} timeout="auto" unmountOnExit>
           <TextField
