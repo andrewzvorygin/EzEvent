@@ -60,7 +60,6 @@ const EventPage = () => {
       >
         <Box>28 сентября</Box>
         <Stack direction={"row"} spacing={2} alignItems={"center"}>
-          <Typography>Посмотреть на карте</Typography>
           <ButtonModalMap />
         </Stack>
         <Button variant="contained">Зарегистрироваться</Button>
