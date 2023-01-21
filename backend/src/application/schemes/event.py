@@ -4,6 +4,9 @@ from uuid import UUID
 from pydantic import BaseModel, validator, Field
 
 
+from .userbase import ShortUser
+
+
 class Location(BaseModel):
     latitude: float | None
     longitude: float | None
@@ -107,3 +110,7 @@ class CommentRead(CommentCreate):
 
     class Config:
         orm_mode = True
+
+
+class FullEvent(EventForEditor):
+    editors: list[ShortUser]

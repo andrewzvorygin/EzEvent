@@ -5,6 +5,7 @@ from uuid import UUID
 from fastapi import WebSocket
 
 from .service import get_event, get_editors
+from schemes import FullEvent
 
 
 class ConnectionManager:
@@ -14,13 +15,9 @@ class ConnectionManager:
     async def connect(self, websocket: WebSocket, event_uuid: UUID):
         event = await get_event(event_uuid, is_editor=True)
         editors = await get_editors(event_uuid)
-        result = {**event.dict(), 'editors': editors}
-        result['uuid_edit'] = str(result['uuid_edit'])
-        result['uuid'] = str(result['uuid'])
-        result['date_start'] = str(result['date_start']) if result['date_start'] else None
-        result['date_end'] = str(result['date_end']) if result['date_start'] else None
+        full_event = FullEvent(**event.dict(), editors=editors)
         await websocket.accept()
-        await websocket.send_text(json.dumps(result))
+        await websocket.send_text(full_event.json())
         self.active_connections[event_uuid].append(websocket)
 
     async def disconnect(self, websocket: WebSocket, event: UUID):
