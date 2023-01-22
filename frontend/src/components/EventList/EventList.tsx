@@ -1,7 +1,6 @@
-import React, { useMemo, useEffect, useState } from "react";
-import { Grid, TextField, Typography } from "@mui/material";
-import { FilterListOutlined, SearchOutlined } from "@mui/icons-material";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import { Grid, Typography } from "@mui/material";
+import { useLocation } from "react-router-dom";
 import Button from "@mui/material/Button";
 import { useFormik } from "formik";
 
@@ -9,8 +8,8 @@ import { StyledButton } from "../StyledControls/StyledControls";
 import { eventsAPI } from "../../api/Api";
 import { EventQueryType, UserType } from "../../types";
 
-import EventCard from "./EventCard/EventCard";
 import Filter from "./Filter/Filter";
+import EventCard from "./EventCard/EventCard";
 
 const EventList = () => {
   const [events, setEvents] = useState([]);

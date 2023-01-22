@@ -37,8 +37,8 @@ const Profile: FC<ProfilePropsType> = (props) => {
   const [patronymic, setPatronymic] = useState<string>();
   const [phone, setPhone] = useState<string>();
 
-  const loadPhoto = async (uuid: string) => {
-    await profileAPI.getProfilePhoto(uuid).then(async (response) => {
+  const loadPhoto = async (path: string) => {
+    await profileAPI.getProfilePhoto(path).then(async (response) => {
       if (response.status === 404) {
         setPhoto(null);
       } else {
@@ -56,7 +56,7 @@ const Profile: FC<ProfilePropsType> = (props) => {
 
   useEffect(() => {
     profileAPI.getProfile().then(async (data) => {
-      await loadPhoto(data.uuid);
+      await loadPhoto(data.photo);
       setProfile(data);
       setName(data.name);
       setSurname(data.surname);
@@ -99,7 +99,7 @@ const Profile: FC<ProfilePropsType> = (props) => {
               if (file) {
                 profileAPI
                   .putProfilePhoto(file)
-                  .then(() => loadPhoto(profile.uuid));
+                  .then(() => loadPhoto(profile.photo));
               }
             }}
           />
