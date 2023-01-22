@@ -1,9 +1,8 @@
 import React, { useMemo, useEffect, useState } from "react";
 import { Grid, TextField, Typography } from "@mui/material";
 import { FilterListOutlined, SearchOutlined } from "@mui/icons-material";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Button from "@mui/material/Button";
-import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 
 import { StyledButton } from "../StyledControls/StyledControls";
