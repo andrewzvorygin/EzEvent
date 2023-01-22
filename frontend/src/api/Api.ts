@@ -262,5 +262,25 @@ export const eventsAPI = {
       },
     });
   },
+  async postComment(eventId: number, text: string, parent_id?: number) {
+    return await fetch(`${baseUrl}event/comment`, {
+      method: "POST",
+      headers: {
+        "Access-Token": window.localStorage.getItem("access_token") || "",
+        "Content-Type": "application/json; charset=utf-8",
+      },
+      body: JSON.stringify({ event_id: eventId, text, parent_id }),
+    });
+  },
+  async getComments(eventId: number) {
+    return await fetch(`${baseUrl}event/event/comment/${eventId}`, {
+      method: "GET",
+      headers: {
+        "Access-Token": window.localStorage.getItem("access_token") || "",
+        "Content-Type": "application/json; charset=utf-8",
+      },
+    })
+      .then((response) => response.json())
+      .catch((error) => console.error(error));
+  },
 };
-

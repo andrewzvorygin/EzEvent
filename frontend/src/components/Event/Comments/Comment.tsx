@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { ChangeEvent, FC, useState } from "react";
 import {
   Avatar,
   Box,
@@ -9,21 +9,52 @@ import {
   Typography,
 } from "@mui/material";
 
+import { eventsAPI } from "../../../api/Api";
+import { CommentType } from "../../../types";
+
 interface IProps {
   expandComments?: () => void;
-  value: string;
-  author: string;
-  avatar?: string;
+  comment: CommentType;
+  eventId: number;
+  parentId?: number | null;
+  reload: () => void;
 }
 
-const Comment: FC<IProps> = ({ expandComments, value, author, avatar }) => {
+const { postComment } = eventsAPI;
+
+const Comment: FC<IProps> = ({
+  expandComments,
+  comment,
+  eventId,
+  parentId,
+  reload,
+}) => {
+  const {
+    date_comment,
+    name,
+    text: value,
+    surname,
+    photo,
+    comment_id,
+  } = comment;
   const [expanded, setExpanded] = useState(false);
   const handleExpandClick = () => setExpanded((e) => !e);
+  const [text, setText] = useState("");
+
+  function onChange(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    setText(e.target.value);
+  }
+
+  async function onClick() {
+    setText("");
+    await postComment(eventId, text, parentId ?? comment_id);
+    reload();
+  }
 
   return (
     <Stack direction="row" spacing={2}>
       <Box paddingTop={0.5}>
-        <Avatar alt="Remy Sharp" src={avatar} />
+        <Avatar alt="Remy Sharp" src={photo} />
       </Box>
       <Stack spacing={0} width={"100%"}>
         <Box
@@ -37,9 +68,12 @@ const Comment: FC<IProps> = ({ expandComments, value, author, avatar }) => {
           paddingTop={1}
           paddingBottom={1}
         >
-          <Typography variant={"h4"} fontSize={14}>
-            {author}
-          </Typography>
+          <Stack direction={"row"} justifyContent={"space-between"} spacing={1}>
+            <Typography variant={"h4"} fontSize={14}>
+              {`${surname} ${name}`}
+            </Typography>
+            <Typography variant={"body2"}>{date_comment}</Typography>
+          </Stack>
           <Typography variant={"body1"} fontSize={16}>
             {value}
           </Typography>
@@ -79,7 +113,10 @@ const Comment: FC<IProps> = ({ expandComments, value, author, avatar }) => {
             fullWidth
             label="Введите комментарий"
             variant="filled"
+            value={text}
+            onChange={onChange}
           />
+          <Button onClick={onClick}>Отправить</Button>
         </Collapse>
       </Stack>
     </Stack>

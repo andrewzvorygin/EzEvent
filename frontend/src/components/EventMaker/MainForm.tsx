@@ -1,14 +1,12 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
 import {
   Box,
-  Button,
   FormControl,
   Grid,
   InputBase,
   TextField,
   Typography,
 } from "@mui/material";
-import { AddAPhotoOutlined } from "@mui/icons-material";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
@@ -112,7 +110,7 @@ const MainForm: React.FC<MainFormPropsType> = ({ ws, eventData }) => {
           <Typography variant="h3" gutterBottom>
             Где будет проходить мероприятие?
           </Typography>
-          <ButtonMap eventData={eventData} ws={ws}/>
+          <ButtonMap eventData={eventData} ws={ws} />
         </Grid>
         <Grid item>
           <Typography variant="h3" gutterBottom>

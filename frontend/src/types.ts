@@ -21,6 +21,7 @@ export interface EventType {
   latitude: number | null;
   longitude: number | null;
   editors: ProfileNameType[];
+  event_id?: number;
 }
 
 export interface EventCardType extends EventType {
@@ -76,4 +77,18 @@ export interface EventQueryType {
 
 export interface MyEventQueryType extends EventQueryType {
   typeUser: UserType;
+}
+
+export interface CommentType {
+  user_id: number;
+  text: string;
+  event_id: number;
+  parent_id: null | number;
+  date_comment: string;
+  comment_id: number;
+  name: string;
+  surname: string;
+  patronymic: string;
+  photo: string;
+  nestedComments?: CommentType[];
 }

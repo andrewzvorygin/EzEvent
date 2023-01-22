@@ -140,7 +140,7 @@ const EventPage = () => {
       <Box mb={5}>
         <Divider />
       </Box>
-      <Comments />
+      {event?.event_id && <Comments eventId={event.event_id} />}
     </>
   );
 };
