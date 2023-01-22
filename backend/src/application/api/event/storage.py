@@ -180,10 +180,10 @@ async def get_users_by_email(email: str) -> list[UserRead]:
     return [UserRead.from_orm(user) for user in result]
 
 
-async def update_event(data: EventFromDB, event_uuid: UUID):
+async def update_event(data: dict, event_uuid: UUID):
     smtp = (
         update(event_orm)
-        .values(**data.dict())
+        .values(**data)
         .where(event_orm.c.uuid_edit == event_uuid)
     )
     await database.execute(smtp)
