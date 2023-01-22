@@ -58,6 +58,7 @@ export interface ProfileType {
   patronymic: string;
   phone?: string;
   uuid: string;
+  photo: string;
 }
 
 export enum UserType {
