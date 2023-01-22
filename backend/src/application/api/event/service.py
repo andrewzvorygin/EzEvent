@@ -6,9 +6,12 @@ from uuid import UUID
 from fastapi import HTTPException
 from starlette import status
 
+from geopy import Nominatim
+
 from schemes import UserFromToken, UserRead, Participant, EventFromDB
 from schemes.event import Navigation, CommentCreate
 from . import storage as st
+from api.city.storage import get_city_2
 
 
 async def check_responsible(event_uuid: UUID, current_user: UserFromToken):
@@ -120,12 +123,25 @@ async def get_event(event_uuid: UUID, is_editor=False):
 
 
 async def update_event(event_uuid: UUID, data: EventFromDB):
+    data_to_update = await filter_data(data)
+    if data.latitude and data.longitude:
+        nom = Nominatim(user_agent='user')
+        location = nom.reverse(f'{data.latitude}, {data.longitude}')
+        city: str = location.raw['address'].get('city')
+
+        if city:
+            data_to_update['city'] = await get_city_2(city.upper())
+
+    if data_to_update:
+        await st.update_event(data_to_update, event_uuid)
+
+
+async def filter_data(data):
     data_to_update = {}
     for key, val in data.dict().items():
         if val:
             data_to_update[key] = val
-    if data_to_update:
-        await st.update_event(data_to_update, event_uuid)
+    return data_to_update
 
 
 async def add_comment(comment: CommentCreate):
