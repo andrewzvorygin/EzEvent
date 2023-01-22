@@ -4,7 +4,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 
-from schemes import UserFromToken, UserRead, EventRead, Key, CommentCreate, CommentRead
+from schemes import UserFromToken, UserRead, EventRead, Key, CommentCreate, CommentRead, EventFromDB
 from api.auth.service import get_current_user
 from schemes.event import Navigation
 
@@ -98,7 +98,7 @@ async def websocket_endpoint(
         while True:
             data: str = await websocket.receive_text()
             await manager.broadcast(data, event_uuid)
-            await service.update_event(event_uuid, json.loads(data))
+            await service.update_event(event_uuid, EventFromDB.parse_raw(data))
     except WebSocketDisconnect:
         await manager.disconnect(websocket, event_uuid)
 

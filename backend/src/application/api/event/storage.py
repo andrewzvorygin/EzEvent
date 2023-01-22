@@ -8,7 +8,7 @@ from sqlalchemy import select, insert, update, not_, func
 from schemes import (
     UserRead, RegistryEvent, UserFromToken, EventRead,
     Participant, EventForEditor, CommentCreate, CommentRead,
-    ShortUser, Navigation
+    ShortUser, Navigation, EventFromDB
 )
 from models import user_orm, event_orm, participant_orm, city_orm, comment_orm
 from core import database
@@ -180,10 +180,10 @@ async def get_users_by_email(email: str) -> list[UserRead]:
     return [UserRead.from_orm(user) for user in result]
 
 
-async def update_event(data: dict[str, str], event_uuid: UUID):
+async def update_event(data: EventFromDB, event_uuid: UUID):
     smtp = (
         update(event_orm)
-        .values(**data)
+        .values(**data.dict())
         .where(event_orm.c.uuid_edit == event_uuid)
     )
     await database.execute(smtp)

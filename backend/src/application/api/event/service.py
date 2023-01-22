@@ -6,7 +6,7 @@ from uuid import UUID
 from fastapi import HTTPException
 from starlette import status
 
-from schemes import UserFromToken, UserRead, Participant
+from schemes import UserFromToken, UserRead, Participant, EventFromDB
 from schemes.event import Navigation, CommentCreate
 from . import storage as st
 
@@ -119,7 +119,7 @@ async def get_event(event_uuid: UUID, is_editor=False):
     return await st.get_event_for_visitor(event_uuid)
 
 
-async def update_event(event_uuid: UUID, data: dict):
+async def update_event(event_uuid: UUID, data: EventFromDB):
     await st.update_event(data, event_uuid)
 
 
