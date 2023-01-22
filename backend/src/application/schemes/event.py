@@ -23,17 +23,17 @@ class Event(BaseModel):
 class EventFromDB(Event):
     latitude: float | None = Field(alias='latitude')
     longitude: float | None = Field(alias='longitude')
-    location: Location | None
+    # location: Location | None
 
     class Config:
         orm_mode = True
 
-    @validator('location')
-    def set_location(cls, v, values):
-        latitude = values.get('latitude')
-        longitude = values.get('longitude')
-        location = Location(latitude=latitude, longitude=longitude)
-        return location
+    # @validator('location')
+    # def set_location(cls, v, values):
+    #     latitude = values.get('latitude')
+    #     longitude = values.get('longitude')
+    #     location = Location(latitude=latitude, longitude=longitude)
+    #     return location
 
 
 class EventRead(EventFromDB):
