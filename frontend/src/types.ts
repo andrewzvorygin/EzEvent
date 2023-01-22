@@ -3,19 +3,30 @@ export interface LoginType {
   password: string;
 }
 
-export interface RegisterType extends LoginType {
+export interface ProfileNameType {
   name: string;
   surname: string;
   patronymic: string;
 }
 
+export type RegisterType = LoginType & ProfileNameType;
+
 export interface EventType {
   title: string | null;
-  photoCover: string | null;
+  photo_cover: string | null;
   description: string | undefined;
-  dateStart: Date | null;
-  dateEnd?: Date | null;
+  date_start: string | null;
+  date_end: string | null;
   visibility: boolean | null;
+  latitude: number | null;
+  longitude: number | null;
+  editors: ProfileNameType[];
+}
+
+export interface EventCardType extends EventType {
+  city: string;
+  uuid: string;
+  uuid_edit: string;
 }
 
 export enum DeviceType {
@@ -41,20 +52,28 @@ export interface AuthType {
 export type AuthContextType = InitializedType & AuthType;
 
 export interface ProfileType {
-  email: "user@example.com";
-  name: "string";
-  surname: "string";
-  patronymic: "string";
-  phone: "string";
-  password: "string";
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  user_id: 0;
-  uuid: "3fa85f64-5717-4562-b3fc-2c963f66afa6";
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  is_admin: false;
-  photo: "string";
+  email: string;
+  name: string;
+  surname: string;
+  patronymic: string;
+  phone?: string;
+  uuid: string;
+}
+
+export enum UserType {
+  "all",
+  "organizer",
+  "particiapant",
+}
+
+export interface EventQueryType {
+  limit: number;
+  offset: number;
+  dateStart?: Date;
+  dateEnd?: Date;
+  location?: number;
+}
+
+export interface MyEventQueryType extends EventQueryType {
+  typeUser: UserType;
 }

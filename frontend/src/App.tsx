@@ -19,6 +19,7 @@ import Profile from "./components/Profile/Profile";
 import { authAPI } from "./api/Api";
 import { AuthContextType, DeviceContextType, DeviceType } from "./types";
 import styles from "./App.module.scss";
+import Invite from "./components/InvitePage/Invite";
 
 export const DeviceContext = React.createContext<DeviceContextType>({
   device: window.innerWidth < 1000 ? DeviceType.mobile : DeviceType.computer,
@@ -108,12 +109,13 @@ const App = () => {
         <Routes>
           <Route path="/" element={<AppWrapper />}>
             <Route path="events">
-              <Route path=":profileId" element={<EventMap />} />
+              <Route path="my" element={<EventList />} />
               <Route index element={<EventList />} />
             </Route>
             <Route path="event">
               <Route path=":eventId" element={<EventPage />} />
               <Route path=":eventId/edit" element={<EventMaker />} />
+              <Route path=":eventId/invite/:key" element={<Invite />} />
             </Route>
             <Route path="profile" element={<Profile />} />
           </Route>

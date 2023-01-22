@@ -1,4 +1,10 @@
-import { LoginType, ProfileType, RegisterType } from "../types";
+import {
+  EventQueryType,
+  LoginType,
+  MyEventQueryType,
+  ProfileType,
+  RegisterType,
+} from "../types";
 
 const baseUrl = "http://localhost:8000/";
 
@@ -6,6 +12,8 @@ const { fetch: originalFetch } = window;
 
 window.fetch = async (...args) => {
   const [resource, config] = args;
+  console.log(resource);
+  console.log(config);
   const response = await originalFetch(resource, config);
   if (response.status === 401 && resource !== `${baseUrl}auth/refresh_token`) {
     const accessToken = await authAPI.putRefreshToken();
@@ -102,26 +110,25 @@ export const profileAPI = {
       .then((response) => response.json())
       .catch((error) => console.error(error));
   },
-  async putProfile(data: ProfileType) {
+  async putProfile(data: any) {
     return await fetch(`${baseUrl}profile/`, {
       method: "PUT",
       headers: {
         "Access-Token": window.localStorage.getItem("access_token") || "",
+        "Content-Type": "application/json; charset=utf-8",
       },
       body: JSON.stringify(data),
     })
       .then((response) => response.json())
       .catch((error) => console.error(error));
   },
-  async getProfilePhoto() {
-    return await fetch(`${baseUrl}profile/`, {
+  async getProfilePhoto(profileId: string) {
+    return await fetch(`${baseUrl}profile/getPhoto?path=${profileId}`, {
       method: "GET",
       headers: {
         "Access-Token": window.localStorage.getItem("access_token") || "",
       },
-    })
-      .then((response) => response.json())
-      .catch((error) => console.error(error));
+    });
   },
   async putProfilePhoto(photo: File) {
     const formData = new FormData();
@@ -138,6 +145,19 @@ export const profileAPI = {
   },
 };
 
+export const cityAPI = {
+  async getCity(cityId: number) {
+    return await fetch(`${baseUrl}city?city_id=${cityId}/`)
+      .then((response) => response.json())
+      .catch((error) => console.error(error));
+  },
+  async getCityByPrefix(prefix: string) {
+    return await fetch(`${baseUrl}city/get_by_prefix?prefix=${prefix}/`)
+      .then((response) => response.json())
+      .catch((error) => console.error(error));
+  },
+};
+
 export const eventsAPI = {
   async postEvent() {
     return await fetch(`${baseUrl}event/`, {
@@ -146,6 +166,48 @@ export const eventsAPI = {
         "Access-Token": window.localStorage.getItem("access_token") || "",
       },
     })
+      .then((response) => response.json())
+      .catch((error) => console.error(error));
+  },
+  async getEvents(data: EventQueryType) {
+    const location =
+      data.location !== undefined ? `&location=${data.location}` : ``;
+    const dateEnd =
+      data.dateEnd !== undefined
+        ? `&date_end=${data.dateEnd.toISOString()}`
+        : ``;
+    const dateStart =
+      data.dateStart !== undefined
+        ? `&date_start=${data.dateStart.toISOString()}`
+        : ``;
+
+    return await fetch(
+      `${baseUrl}event/events_registry?limit=${data.limit}&offset=${data.offset}${dateStart}${dateEnd}${location}`,
+    )
+      .then((response) => response.json())
+      .catch((error) => console.error(error));
+  },
+  async getMyEvents(data: MyEventQueryType) {
+    const location =
+      data.location !== undefined ? `&location=${data.location}` : ``;
+    const dateEnd =
+      data.dateEnd !== undefined
+        ? `&date_end=${data.dateEnd.toISOString()}`
+        : ``;
+    const dateStart =
+      data.dateStart !== undefined
+        ? `&date_start=${data.dateStart.toISOString()}`
+        : ``;
+
+    return await fetch(
+      `${baseUrl}event/my_events?limit=${data.limit}&offset=${data.offset}&typeUser=${data.typeUser}${dateStart}${dateEnd}${location}`,
+      {
+        method: "GET",
+        headers: {
+          "Access-Token": window.localStorage.getItem("access_token") || "",
+        },
+      },
+    )
       .then((response) => response.json())
       .catch((error) => console.error(error));
   },
@@ -159,18 +221,46 @@ export const eventsAPI = {
   async putOrganizersKeyInvite(eventId: string) {
     return await fetch(`${baseUrl}event/organizers/key_invite/${eventId}`, {
       method: "PUT",
+      headers: {
+        "Access-Token": window.localStorage.getItem("access_token") || "",
+      },
     }).catch((error) => console.error(error));
   },
-  async getOrganizersKeyInvite(eventId: string) {
+  async getOrganizersKeyInvite(
+    eventId: string,
+    checkResponse?: (response: Response) => void,
+  ) {
     return await fetch(`${baseUrl}event/organizers/key_invite/${eventId}`, {
-      method: "GET",
+      method: "POST",
+      headers: {
+        "Access-Token": window.localStorage.getItem("access_token") || "",
+      },
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (checkResponse) {
+          checkResponse(response);
+        }
+        return response.json();
+      })
       .catch((error) => console.error(error));
   },
-  addOrganizers: async (eventId: string): Promise<Response> => {
-    return await fetch(`${baseUrl}/event/organizers/${eventId}`, {
+  async addOrganizers(eventId: string, key: string) {
+    return await fetch(`${baseUrl}event/organizers/${eventId}`, {
       method: "POST",
-    }).then((response) => response);
+      headers: {
+        "Access-Token": window.localStorage.getItem("access_token") || "",
+        "Content-Type": "application/json; charset=utf-8",
+      },
+      body: JSON.stringify({ key: key }),
+    });
+  },
+  async registerOnEvent(eventId: string) {
+    return await fetch(`${baseUrl}event/visit/${eventId}`, {
+      method: "POST",
+      headers: {
+        "Access-Token": window.localStorage.getItem("access_token") || "",
+      },
+    });
   },
 };
+

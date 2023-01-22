@@ -4,15 +4,15 @@ import { Map, Placemark, YMaps } from "@pbe/react-yandex-maps";
 
 interface IProps {
   onChange: (coords: [number, number]) => void;
-  value: [number, number] | null;
+  value: [number | null, number | null];
 }
 
 const MapInput: FC<IProps> = ({ onChange, value }) => {
   const map = useRef<any>(null);
   const [address, setAddress] = useState("");
   useEffect(() => {
-    if (value && map.current) {
-      getSetAddress(value);
+    if (value[0] && value[1] && map.current) {
+      getSetAddress(value as [number, number]);
     }
   }, [value]);
 
@@ -55,15 +55,18 @@ const MapInput: FC<IProps> = ({ onChange, value }) => {
         <Map
           onLoad={(ymapsInstance: any) => {
             map.current = ymapsInstance;
-            if (!address && value) {
-              getSetAddress(value);
+            if (!address && value[0] && value[1]) {
+              getSetAddress(value as [number, number]);
             }
           }}
           width="100%"
           height={435}
           onClick={onClick}
           defaultState={{
-            center: [56.85, 60.6122],
+            center:
+              value[0] && value[1]
+                ? (value as [number, number])
+                : [56.85, 60.6122],
             zoom: 12,
           }}
         >
