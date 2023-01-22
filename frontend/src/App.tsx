@@ -19,7 +19,7 @@ import Profile from "./components/Profile/Profile";
 import { authAPI } from "./api/Api";
 import { AuthContextType, DeviceContextType, DeviceType } from "./types";
 import styles from "./App.module.scss";
-import Invite from './components/InvitePage/Invite';
+import Invite from "./components/InvitePage/Invite";
 
 export const DeviceContext = React.createContext<DeviceContextType>({
   device: window.innerWidth < 1000 ? DeviceType.mobile : DeviceType.computer,

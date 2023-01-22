@@ -18,11 +18,13 @@ export interface EventType {
   date_start: string | null;
   date_end: string | null;
   visibility: boolean | null;
+  latitude: number | null;
+  longitude: number | null;
   editors: ProfileNameType[];
 }
 
 export interface EventCardType extends EventType {
-  city: number;
+  city: string;
   uuid: string;
   uuid_edit: string;
 }

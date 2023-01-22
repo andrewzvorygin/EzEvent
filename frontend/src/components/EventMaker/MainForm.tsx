@@ -2,21 +2,20 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 import {
   Box,
   Button,
-  ButtonGroup,
   FormControl,
   Grid,
-  Input,
   InputBase,
+  TextField,
   Typography,
 } from "@mui/material";
 import { AddAPhotoOutlined } from "@mui/icons-material";
+import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
-import { StyledButton } from "../StyledControls/StyledControls";
 import ButtonMap from "../Map/ButtonMap";
 import { EventType } from "../../types";
 
 import Description from "./Description/Description";
-import Comments from "./Comments/Comments";
 
 interface MainFormPropsType {
   ws: WebSocket;
@@ -39,12 +38,16 @@ const MainForm: React.FC<MainFormPropsType> = ({ ws, eventData }) => {
       setTitle(eventData.title);
     }
     if (eventData.date_start !== dateStart) {
+      eventData.date_start && console.log(new Date(eventData.date_start));
       setDateStart(
         eventData.date_start ? new Date(eventData.date_start) : null,
       );
     }
     if (eventData.date_end !== dateEnd) {
       setDateEnd(eventData.date_end ? new Date(eventData.date_end) : null);
+    }
+    if (eventData.photo_cover !== photo) {
+      setPhoto(eventData.photo_cover);
     }
   }, [eventData]);
 
@@ -79,15 +82,25 @@ const MainForm: React.FC<MainFormPropsType> = ({ ws, eventData }) => {
           <Typography variant="h3" gutterBottom>
             Обложка мероприятия
           </Typography>
-          <Button component="label" startIcon={<AddAPhotoOutlined />}>
-            <input
-              hidden
-              accept="image/*"
-              type="file"
-              onChange={onPhotoChange}
-            />
-            Загрузите фотографию
-          </Button>
+          <InputBase
+            fullWidth
+            placeholder="Введите ссылку"
+            sx={{
+              padding: 1,
+              background: "#edfffb",
+              fontSize: "1.5rem",
+              borderRadius: "4px",
+            }}
+            onChange={(event) => {
+              if (event.target.value !== photo) {
+                setPhoto(event.target.value);
+              }
+            }}
+            onBlur={() => {
+              ws.send(JSON.stringify({ photo_cover: photo }));
+            }}
+            value={photo}
+          />
           {photo && (
             <Box component="img" sx={{ maxWidth: "100%" }} src={photo} />
           )}
@@ -99,36 +112,47 @@ const MainForm: React.FC<MainFormPropsType> = ({ ws, eventData }) => {
           <Typography variant="h3" gutterBottom>
             Где будет проходить мероприятие?
           </Typography>
-          <ButtonMap />
+          <ButtonMap eventData={eventData} ws={ws}/>
         </Grid>
         <Grid item>
           <Typography variant="h3" gutterBottom>
             Когда будет проходить мероприятие?
           </Typography>
-          С{" "}
-          <Input
-            type="date"
-            onChange={(event) => {
-              const newDateStart = new Date(event.target.value);
-              if (newDateStart !== dateStart) {
-                setDateStart(newDateStart);
-                ws.send(
-                  JSON.stringify({ date_start: newDateStart.toISOString() }),
-                );
-              }
-            }}
-          />{" "}
-          по{" "}
-          <Input
-            type="date"
-            onChange={(event) => {
-              const newDateEnd = new Date(event.target.value);
-              if (newDateEnd !== dateEnd) {
-                setDateStart(newDateEnd);
-                ws.send(JSON.stringify({ date_end: newDateEnd.toISOString() }));
-              }
-            }}
-          />
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DateTimePicker
+                renderInput={(props) => <TextField {...props} />}
+                value={dateStart}
+                onChange={(value) => {
+                  if (value !== dateStart) {
+                    setDateStart(value);
+                    ws.send(
+                      JSON.stringify({
+                        date_start: value ? value.toJSON() : value,
+                      }),
+                    );
+                  }
+                }}
+              />
+            </LocalizationProvider>
+            <Typography mx={1}>-</Typography>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DateTimePicker
+                renderInput={(props) => <TextField {...props} />}
+                value={dateEnd}
+                onChange={(value) => {
+                  if (value !== dateEnd) {
+                    setDateStart(value);
+                    ws.send(
+                      JSON.stringify({
+                        date_end: value ? value.toJSON() : value,
+                      }),
+                    );
+                  }
+                }}
+              />
+            </LocalizationProvider>
+          </Box>
         </Grid>
       </Grid>
     </FormControl>

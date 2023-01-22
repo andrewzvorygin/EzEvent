@@ -60,9 +60,9 @@ const EventPage = () => {
         <Box
           component="img"
           sx={{
-            maxWidth: "100%",
+            height: "300px",
             width: "100%",
-            objectFit: "contain",
+            objectFit: "cover",
           }}
           src={event.photo_cover}
           mb={5}
@@ -89,7 +89,11 @@ const EventPage = () => {
           С {event.date_start} по {event.date_end}
         </Box>
         <Stack direction={"row"} spacing={2} alignItems={"center"}>
-          <ButtonModalMap />
+          {event.latitude && event.longitude ? (
+            <ButtonModalMap marker={[event.latitude, event.longitude]} />
+          ) : (
+            "Без места"
+          )}
         </Stack>
         <Button variant="contained">Зарегистрироваться</Button>
       </Stack>

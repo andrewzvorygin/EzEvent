@@ -7,6 +7,10 @@ import { Map, Placemark, YMaps } from "@pbe/react-yandex-maps";
 
 import MapWithMarker from "../../Map/MapWithMarker";
 
+interface ButtonModalMapPropsType {
+  marker: [number, number];
+}
+
 const style = {
   position: "absolute" as const,
   top: "50%",
@@ -19,9 +23,7 @@ const style = {
   p: 4,
 };
 
-const marker: [number, number] = [56.85, 60.6122];
-
-const ButtonModalMap: FC = () => {
+const ButtonModalMap: FC<ButtonModalMapPropsType> = ({ marker }) => {
   const mapRef = useRef<any>(null);
   const [expanded, setExpanded] = useState(false);
   const [address, setAddress] = useState("");
@@ -29,7 +31,7 @@ const ButtonModalMap: FC = () => {
   const theme = useTheme();
 
   useEffect(() => {
-    if (marker && mapRef.current) {
+    if (mapRef.current) {
       getSetAddress(marker);
     }
   }, [marker]);

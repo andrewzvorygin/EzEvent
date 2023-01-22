@@ -1,16 +1,35 @@
 import * as React from "react";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import Box from "@mui/material/Box";
+
+import { EventType } from "../../types";
 
 import MapInput from "./MapInput";
 
-const ButtonMap: FC = () => {
-  const [coordsMarker, setCoordsMarker] = useState<null | [number, number]>(
-    null,
-  );
+interface ButtonMapPropsType {
+  eventData: EventType;
+  ws: WebSocket;
+}
+
+const ButtonMap: FC<ButtonMapPropsType> = ({ ws, eventData }) => {
+  const [coordsMarker, setCoordsMarker] = useState<
+    [number | null, number | null]
+  >([eventData.latitude, eventData.longitude]);
+
+  useEffect(() => {
+    if (
+      eventData.latitude !== coordsMarker[0] ||
+      eventData.longitude !== coordsMarker[1]
+    ) {
+      setCoordsMarker([eventData.latitude, eventData.longitude]);
+    }
+  }, [eventData]);
 
   function onChange(coords: [number, number]) {
     setCoordsMarker(coords);
+    ws.send(
+      JSON.stringify({ latitude: coords[0], longitude: coords[1] }),
+    );
   }
 
   return (

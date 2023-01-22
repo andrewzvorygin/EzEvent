@@ -48,15 +48,17 @@ const EventCard: React.FC<EventCardPropsType> = ({ event }) => {
             }}
             gutterBottom
           >
-            Екатеринбург
+            {event.city
+              ? `${event.city.substring(0, 1)}${event.city.substring(1).toLowerCase()}`
+              : "Неизвестно"}
           </Typography>
           <Typography variant="body1" sx={{ textAlign: "right" }} gutterBottom>
             {event.date_start && event.date_end
               ? `С ${new Date(
-                    event.date_start,
-                  ).toLocaleDateString()} по ${new Date(
-                    event.date_end,
-                  ).toLocaleDateString()}`
+                  event.date_start,
+                ).toLocaleDateString()} по ${new Date(
+                  event.date_end,
+                ).toLocaleDateString()}`
               : "Без даты"}
           </Typography>
         </div>

@@ -12,8 +12,8 @@ const { fetch: originalFetch } = window;
 
 window.fetch = async (...args) => {
   const [resource, config] = args;
-  console.log(resource)
-  console.log(config)
+  console.log(resource);
+  console.log(config);
   const response = await originalFetch(resource, config);
   if (response.status === 401 && resource !== `${baseUrl}auth/refresh_token`) {
     const accessToken = await authAPI.putRefreshToken();
@@ -128,7 +128,7 @@ export const profileAPI = {
       headers: {
         "Access-Token": window.localStorage.getItem("access_token") || "",
       },
-    })
+    });
   },
   async putProfilePhoto(photo: File) {
     const formData = new FormData();
@@ -226,7 +226,10 @@ export const eventsAPI = {
       },
     }).catch((error) => console.error(error));
   },
-  async getOrganizersKeyInvite(eventId: string, checkResponse?: (response: Response) => void) {
+  async getOrganizersKeyInvite(
+    eventId: string,
+    checkResponse?: (response: Response) => void,
+  ) {
     return await fetch(`${baseUrl}event/organizers/key_invite/${eventId}`, {
       method: "POST",
       headers: {
@@ -242,7 +245,6 @@ export const eventsAPI = {
       .catch((error) => console.error(error));
   },
   async addOrganizers(eventId: string, key: string) {
-    console.log(JSON.stringify({ key: key }))
     return await fetch(`${baseUrl}event/organizers/${eventId}`, {
       method: "POST",
       headers: {
@@ -252,5 +254,13 @@ export const eventsAPI = {
       body: JSON.stringify({ key: key }),
     });
   },
+  async registerOnEvent(eventId: string) {
+    return await fetch(`${baseUrl}event/visit/${eventId}`, {
+      method: "POST",
+      headers: {
+        "Access-Token": window.localStorage.getItem("access_token") || "",
+      },
+    });
+  },
 };
-//http://localhost:3000/event/66dc1e10-48f6-4805-9c64-cb2c0f54a686/invite/q4XOfNoL
+

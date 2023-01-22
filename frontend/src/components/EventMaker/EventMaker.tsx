@@ -4,11 +4,11 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { DeviceType, EventType } from "../../types";
 import { AuthContext, DeviceContext } from "../../App";
+import { eventsAPI } from "../../api/Api";
 
 import MainForm from "./MainForm";
 import Organizers from "./Organizers";
 import Visibility from "./Visibility/Visibility";
-import { eventsAPI } from '../../api/Api';
 
 interface EventMakerPropsType {
   auth: boolean;
@@ -28,6 +28,8 @@ const EventMaker: React.FC<EventMakerPropsType> = (props) => {
     description: undefined,
     photo_cover: null,
     visibility: null,
+    latitude: null,
+    longitude: null,
     editors: [],
   });
 
@@ -88,8 +90,11 @@ const EventMaker: React.FC<EventMakerPropsType> = (props) => {
             <MainForm ws={wsChannel} eventData={eventData} />
           </Grid>
           <Grid item xs={5}>
-            <Visibility />
-            <Organizers editors={eventData.editors} eventId={eventId as string}/>
+            <Visibility eventData={eventData} ws={wsChannel} />
+            <Organizers
+              editors={eventData.editors}
+              eventId={eventId as string}
+            />
           </Grid>
         </Grid>
       )}

@@ -39,7 +39,7 @@ const EventList = () => {
   return (
     <>
       <Typography variant="h1" component="h1" gutterBottom>
-        Мероприятия
+        {location === "/events/my" ? "Мои мероприятия" : "Мероприятия"}
       </Typography>
       <Grid
         component="article"
