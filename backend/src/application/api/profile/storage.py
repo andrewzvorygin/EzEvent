@@ -26,3 +26,4 @@ async def save_photo_profile(path_to_photo, current_user_id):
 async def get_user_info(user_id: int):
     smtp = select(user_orm).where(user_orm.c.user_id == user_id)
     result = await database.fetch_one(smtp)
+    return result

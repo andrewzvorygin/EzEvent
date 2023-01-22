@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { DeviceType, EventType } from "../../types";
 import { AuthContext, DeviceContext } from "../../App";
+import { eventsAPI } from "../../api/Api";
 
 import MainForm from "./MainForm";
 import Organizers from "./Organizers";
@@ -18,19 +19,31 @@ interface EventMakerPropsType {
 const EventMaker: React.FC<EventMakerPropsType> = (props) => {
   const navigate = useNavigate();
   const [wsChannel, setWsChannel] = useState<WebSocket | null>(null);
+  const [connectOpen, setConnectOpen] = useState<boolean>(false);
   const eventId = useParams().eventId;
   const [eventData, setEventData] = useState<EventType>({
     title: null,
-    dateEnd: null,
-    dateStart: null,
+    date_end: null,
+    date_start: null,
     description: undefined,
-    photoCover: null,
+    photo_cover: null,
     visibility: null,
+    latitude: null,
+    longitude: null,
+    editors: [],
   });
 
   useEffect(() => {
     function createChannel() {
-      setWsChannel(new WebSocket(`wss://127.0.0.1:8000/event/ws/${eventId}`));
+      const accessToken = window.localStorage.getItem("access_token");
+      const accessTokenQuery = accessToken
+        ? `?access_token=${accessToken}`
+        : "";
+      setWsChannel(
+        new WebSocket(
+          `ws://127.0.0.1:8000/event/ws/${eventId}${accessTokenQuery}`,
+        ),
+      );
     }
     createChannel();
   }, []);
@@ -52,10 +65,19 @@ const EventMaker: React.FC<EventMakerPropsType> = (props) => {
       console.log(JSON.parse(e.data));
       setEventData((prevState) => ({ ...prevState, ...JSON.parse(e.data) }));
     });
+    wsChannel?.addEventListener("open", () => {
+      setConnectOpen(true);
+      console.log("OPEN");
+    });
     wsChannel?.addEventListener("close", () => {
+      setConnectOpen(false);
       console.log("CLOSE");
     });
   }, [wsChannel]);
+
+  if (!connectOpen) {
+    return null;
+  }
 
   return (
     <>
@@ -68,8 +90,11 @@ const EventMaker: React.FC<EventMakerPropsType> = (props) => {
             <MainForm ws={wsChannel} eventData={eventData} />
           </Grid>
           <Grid item xs={5}>
-            <Visibility />
-            <Organizers />
+            <Visibility eventData={eventData} ws={wsChannel} />
+            <Organizers
+              editors={eventData.editors}
+              eventId={eventId as string}
+            />
           </Grid>
         </Grid>
       )}

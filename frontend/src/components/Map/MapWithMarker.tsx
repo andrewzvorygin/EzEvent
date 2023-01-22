@@ -20,7 +20,7 @@ const MapWithMarker: FC<IProps> = ({ marker }) => {
           width="100%"
           height={435}
           defaultState={{
-            center: [56.85, 60.6122],
+            center: marker,
             zoom: 12,
           }}
         >

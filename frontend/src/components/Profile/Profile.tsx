@@ -1,7 +1,9 @@
 import React, { ChangeEvent, FC, useState, useEffect } from "react";
 import {
   Avatar,
+  Box,
   Button,
+  Input,
   Stack,
   Typography,
   useMediaQuery,
@@ -9,7 +11,10 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
+import placeholder from "../../assets/placeholder.jpg";
 import { AuthContext } from "../../App";
+import { profileAPI } from "../../api/Api";
+import { ProfileType } from "../../types";
 
 import SwitchInput from "./SwitchInput";
 
@@ -24,25 +29,45 @@ const Profile: FC<ProfilePropsType> = (props) => {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"), {
     defaultMatches: true,
   });
-  const [phone, setPhone] = useState("8800 555 3535");
-  const [email, setEmail] = useState("мерси.захил-ваших@жоп");
-  function onChangePhone(
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) {
-    setPhone(e.target.value);
-  }
+  const [editMode, setEditMode] = useState(false);
+  const [profile, setProfile] = useState<ProfileType | null>(null);
+  const [photo, setPhoto] = useState<any>();
+  const [name, setName] = useState<string>();
+  const [surname, setSurname] = useState<string>();
+  const [patronymic, setPatronymic] = useState<string>();
+  const [phone, setPhone] = useState<string>();
 
-  function onChangeEmail(
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) {
-    setEmail(e.target.value);
-  }
+  const loadPhoto = async (uuid: string) => {
+    await profileAPI.getProfilePhoto(uuid).then(async (response) => {
+      if (response.status === 404) {
+        setPhoto(null);
+      } else {
+        const data = await response.json();
+        setPhoto(data);
+      }
+    });
+  };
 
   useEffect(() => {
     if (props.initialized && !props.auth) {
       navigate("/events", { replace: true });
     }
   }, [props.auth, props.initialized]);
+
+  useEffect(() => {
+    profileAPI.getProfile().then(async (data) => {
+      await loadPhoto(data.uuid);
+      setProfile(data);
+      setName(data.name);
+      setSurname(data.surname);
+      setPatronymic(data.patronymic);
+      setPhone(data.phone);
+    });
+  }, []);
+
+  if (profile === null) {
+    return null;
+  }
 
   return (
     <Stack
@@ -61,36 +86,114 @@ const Profile: FC<ProfilePropsType> = (props) => {
             height: 250,
             [theme.breakpoints.down("sm")]: { width: 200, height: 200 },
           }}
-          src={
-            "https://sun9-9.userapi.com/impg/TG2QZczG3Q4O8wZSCsOlJ9E9lzthQvwkohLQ6w/Be84mY8Wk-A.jpg?size=1044x1138&quality=96&sign=d1b687acd59d8cfe2cfd60506fb809bd&type=album"
-          }
+          src={photo === null ? placeholder : window.URL.createObjectURL(photo)}
         />
-        <Button variant="contained">Изменить фото</Button>
+        <Button component="label">
+          Изменить фото
+          <input
+            hidden
+            accept="image/*"
+            type="file"
+            onChange={(e) => {
+              const file = e.target.files && e.target.files[0];
+              if (file) {
+                profileAPI
+                  .putProfilePhoto(file)
+                  .then(() => loadPhoto(profile.uuid));
+              }
+            }}
+          />
+        </Button>
       </Stack>
       <Stack spacing={isMobile ? 2 : 4}>
-        <Typography
-          variant={"h2"}
-          sx={{
-            typography: {
-              [theme.breakpoints.down("md")]: { fontSize: "1.5rem" },
-            },
-          }}
-        >
-          Валинурка ХагиВаги ДымТатар
-        </Typography>
-        <SwitchInput label={"Почта:"} value={email} onChange={onChangeEmail} />
-        <SwitchInput
-          label={"Телефон:"}
-          value={phone}
-          onChange={onChangePhone}
-        />
+        {editMode ? (
+          <>
+            <Typography
+              variant={"h2"}
+              sx={{
+                typography: {
+                  [theme.breakpoints.down("md")]: { fontSize: "1.5rem" },
+                },
+              }}
+            >
+              Редактирование профиля
+            </Typography>
+            <Box sx={{ display: "flex" }}>
+              <Typography>Фамилия:</Typography>
+              <Input
+                sx={{ flexGrow: 1, ml: 1 }}
+                onChange={(e) => setSurname(e.target.value)}
+                value={surname}
+              />
+            </Box>
+            <Box sx={{ display: "flex" }}>
+              <Typography>Имя:</Typography>
+              <Input
+                sx={{ flexGrow: 1, ml: 1 }}
+                onChange={(e) => setName(e.target.value)}
+                value={name}
+              />
+            </Box>
+            <Box sx={{ display: "flex" }}>
+              <Typography>Отчество:</Typography>
+              <Input
+                sx={{ flexGrow: 1, ml: 1 }}
+                onChange={(e) => setPatronymic(e.target.value)}
+                value={patronymic}
+              />
+            </Box>
+            <Box sx={{ display: "flex" }}>
+              <Typography>Номер:</Typography>
+              <Input
+                sx={{ flexGrow: 1, ml: 1 }}
+                onChange={(e) => setPhone(e.target.value)}
+                value={phone}
+              />
+            </Box>
+          </>
+        ) : (
+          <>
+            <Typography
+              variant={"h2"}
+              sx={{
+                typography: {
+                  [theme.breakpoints.down("md")]: { fontSize: "1.5rem" },
+                },
+              }}
+            >
+              {profile.surname} {profile.name} {profile.patronymic}
+            </Typography>
+            <Typography>Почта: {profile.email}</Typography>
+            <Typography>Телефон: {profile.phone || "Не указан"}</Typography>
+          </>
+        )}
         <Button
+          variant="contained"
           sx={{
             alignSelf: "flex-start",
-            marginTop: "auto !important",
+          }}
+          onClick={async () => {
+            editMode &&
+              (await profileAPI
+                .putProfile({
+                  name,
+                  surname,
+                  patronymic,
+                  phone,
+                })
+                .then(() => {
+                  profileAPI.getProfile().then(async (data) => {
+                    setProfile(data);
+                    setName(data.name);
+                    setSurname(data.surname);
+                    setPatronymic(data.patronymic);
+                    setPhone(data.phone);
+                  });
+                }));
+            setEditMode(!editMode);
           }}
         >
-          сменить пароль
+          {editMode ? "Сохранить" : "Редактировать профиль"}
         </Button>
       </Stack>
     </Stack>

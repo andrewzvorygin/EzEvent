@@ -37,7 +37,7 @@ const Header: React.FC<AuthType & DeviceContextType> = (props) => {
             <StyledIconButton
               title="Мои мероприятия"
               onClick={() => {
-                navigate(`/events`);
+                navigate(`/events/my`);
               }}
             >
               <EventNoteOutlined />

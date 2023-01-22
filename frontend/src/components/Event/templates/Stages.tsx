@@ -49,7 +49,7 @@ const Stages = () => {
           </Typography>
         </Stack>
       </Stack>
-      <Description />
+      {/* <Description /> */}
     </Box>
   );
 };

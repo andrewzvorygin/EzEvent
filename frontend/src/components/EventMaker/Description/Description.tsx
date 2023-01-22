@@ -14,16 +14,28 @@ interface DescriptionPropsType {
   description: string | undefined;
 }
 
-const Description: React.FC<DescriptionPropsType> = ({ ws, description }) => {
+const Description: React.FC<DescriptionPropsType> = ({
+  ws,
+  description = "",
+}) => {
   const editor = useRef(null);
-  const [content, setContent] = useState("Начните писать");
+  const [content, setContent] = useState(description || "");
   const [config] = useState({
     readonly: false,
     height: 400,
   });
 
+  useEffect(() => {
+    if (description !== content) {
+      setContent(description);
+    }
+  }, [description]);
+
   function onChange(value: string) {
-    //ws.send(JSON.stringify({ description: value }));
+    if (value !== description) {
+      setContent(value);
+      ws.send(JSON.stringify({ description: value }));
+    }
   }
 
   return (
@@ -36,10 +48,8 @@ const Description: React.FC<DescriptionPropsType> = ({ ws, description }) => {
         ref={editor}
         value={content}
         config={config}
-        onChange={onChange}
+        onBlur={onChange}
       />
-      {/* eslint-disable-next-line @typescript-eslint/naming-convention */}
-      <div dangerouslySetInnerHTML={{ __html: content }} />
     </>
   );
 };

@@ -77,30 +77,7 @@ module.exports = {
         },
       },
     ],
-    "@typescript-eslint/naming-convention": [
-      "error",
-      {
-        selector: "default",
-        format: ["camelCase", "PascalCase"],
-        leadingUnderscore: "allow",
-        trailingUnderscore: "allow",
-      },
-      {
-        selector: ["variable", "objectLiteralProperty"],
-        format: ["camelCase", "UPPER_CASE", "PascalCase"],
-        leadingUnderscore: "allow",
-        trailingUnderscore: "allow",
-      },
-      {
-        selector: "typeLike",
-        format: ["PascalCase"],
-      },
-      {
-        selector: "objectLiteralProperty",
-        modifiers: ["requiresQuotes"],
-        format: null,
-      },
-    ],
+    "@typescript-eslint/naming-convention": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/prefer-for-of": "warn",
     "@typescript-eslint/prefer-function-type": "warn",
