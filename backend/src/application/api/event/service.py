@@ -120,9 +120,12 @@ async def get_event(event_uuid: UUID, is_editor=False):
 
 
 async def update_event(event_uuid: UUID, data: EventFromDB):
-    data_to_update = {key: val for key, val in data.dict() if val}
-
-    await st.update_event(data_to_update, event_uuid)
+    data_to_update = {}
+    for key, val in data.dict().items():
+        if val:
+            data_to_update[key] = val
+    if data_to_update:
+        await st.update_event(data_to_update, event_uuid)
 
 
 async def add_comment(comment: CommentCreate):
