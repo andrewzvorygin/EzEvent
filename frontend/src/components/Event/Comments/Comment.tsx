@@ -59,6 +59,10 @@ const Comment: FC<IProps> = ({ expandComments, value, author, avatar }) => {
                   textDecoration: "underline",
                   cursor: "pointer",
                 },
+                ":focus": {
+                  outline: "none",
+                  textDecoration: "underline",
+                },
                 margin: 0,
                 padding: 0,
                 pt: 1,

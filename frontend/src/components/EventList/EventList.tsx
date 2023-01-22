@@ -1,14 +1,12 @@
-import React from "react";
-import { Grid, TextField, Typography } from "@mui/material";
-import { FilterListOutlined, SearchOutlined } from "@mui/icons-material";
+import React, { useMemo, useState } from "react";
+import { Grid, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useFormik } from "formik";
 
-import {
-  StyledButton,
-  StyledIconButton,
-} from "../StyledControls/StyledControls";
+import { StyledButton } from "../StyledControls/StyledControls";
 
 import EventCard from "./EventCard/EventCard";
+import Filter from "./Filter/Filter";
 
 const EventList = () => {
   const arr = [
@@ -30,8 +28,52 @@ const EventList = () => {
     "be86c52b-5520-4629-b148-ad41e391a144",
   ];
 
+  const cities = [
+    {
+      name: "Екб",
+      id: 0,
+    },
+    {
+      name: "Челяб",
+      id: 1,
+    },
+    {
+      name: "Москва",
+      id: 2,
+    },
+    {
+      name: "Жопосранск",
+      id: 3,
+    },
+    {
+      name: "МойДоДыр",
+      id: 4,
+    },
+  ];
+
   const navigate = useNavigate();
 
+  const formik = useFormik({
+    initialValues: {
+      city: null,
+      search: "",
+      dateStart: null,
+      dateEnd: null,
+      type: "Текущие",
+    },
+    onSubmit: (values) => {
+      console.log(values);
+      //todo: something
+    },
+  });
+
+  const [expandedFilter, setExpandedFilter] = useState(false);
+  const handleExpandClick = () => setExpandedFilter((e) => !e);
+
+  const selectedCity = useMemo(
+    () => cities?.find((value) => value.id === formik.values.city)?.name,
+    [formik.values.city]
+  );
   return (
     <>
       <Typography variant="h1" component="h1" gutterBottom>
@@ -51,20 +93,12 @@ const EventList = () => {
           xs={12}
           sx={{ display: "flex", alignItems: "flex-end" }}
         >
-          <SearchOutlined fontSize="large" sx={{ mr: 1 }} />
-          <TextField
-            id="search"
-            label="Название мероприятия"
-            variant="standard"
-            sx={{ alignSelf: "baseline", width: 220 }}
+          <Filter
+            formik={formik}
+            expanded={expandedFilter}
+            handleExpandClick={handleExpandClick}
+            cities={cities}
           />
-          <StyledIconButton
-            aria-label="filter"
-            title="Фильтр"
-            sx={{ ml: "auto", mb: -1 }}
-          >
-            <FilterListOutlined fontSize="large" />
-          </StyledIconButton>
         </Grid>
         <Grid
           item
@@ -78,8 +112,16 @@ const EventList = () => {
             alignItems: "baseline",
           }}
         >
-          <StyledButton variant="outlined">Екатеринбург</StyledButton>
-          <StyledButton variant="outlined">14 - 19 октября</StyledButton>
+          {selectedCity && (
+            <StyledButton variant="outlined" onClick={handleExpandClick}>
+              {selectedCity}
+            </StyledButton>
+          )}
+          {formik.values.type && (
+            <StyledButton variant="outlined" onClick={handleExpandClick}>
+              {formik.values.type}
+            </StyledButton>
+          )}
         </Grid>
       </Grid>
       <Grid component="article" container spacing={2.5}>
