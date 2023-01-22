@@ -89,7 +89,6 @@ const EventPage = () => {
           С {event.date_start} по {event.date_end}
         </Box>
         <Stack direction={"row"} spacing={2} alignItems={"center"}>
-          <Typography>Посмотреть на карте</Typography>
           <ButtonModalMap />
         </Stack>
         <Button variant="contained">Зарегистрироваться</Button>

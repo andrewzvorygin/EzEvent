@@ -9,7 +9,13 @@ interface IProps {
 const MapWithMarker: FC<IProps> = ({ marker }) => {
   return (
     <Box>
-      <YMaps>
+      <YMaps
+        query={{
+          apikey: "4717d1ce-6249-47b3-8381-461cc257f802",
+          lang: "ru_RU",
+          load: "package.full",
+        }}
+      >
         <Map
           width="100%"
           height={435}
