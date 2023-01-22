@@ -1,36 +1,40 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Grid, TextField, Typography } from "@mui/material";
 import { FilterListOutlined, SearchOutlined } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import Button from "@mui/material/Button";
 
 import {
   StyledButton,
   StyledIconButton,
 } from "../StyledControls/StyledControls";
+import { eventsAPI } from "../../api/Api";
+import { EventQueryType, UserType } from "../../types";
 
 import EventCard from "./EventCard/EventCard";
 
 const EventList = () => {
-  const arr = [
-    "be86c52b-5520-4629-b148-ad41e391a144",
-    "be86c52b-5520-4629-b148-ad41e391a144",
-    "be86c52b-5520-4629-b148-ad41e391a144",
-    "be86c52b-5520-4629-b148-ad41e391a144",
-    "be86c52b-5520-4629-b148-ad41e391a144",
-    "be86c52b-5520-4629-b148-ad41e391a144",
-    "be86c52b-5520-4629-b148-ad41e391a144",
-    "be86c52b-5520-4629-b148-ad41e391a144",
-    "be86c52b-5520-4629-b148-ad41e391a144",
-    "be86c52b-5520-4629-b148-ad41e391a144",
-    "be86c52b-5520-4629-b148-ad41e391a144",
-    "be86c52b-5520-4629-b148-ad41e391a144",
-    "be86c52b-5520-4629-b148-ad41e391a144",
-    "be86c52b-5520-4629-b148-ad41e391a144",
-    "be86c52b-5520-4629-b148-ad41e391a144",
-    "be86c52b-5520-4629-b148-ad41e391a144",
-  ];
+  const [events, setEvents] = useState([]);
+  const [filter, setFilter] = useState<EventQueryType>({
+    limit: 30,
+    offset: 0,
+  });
+  const location = useLocation().pathname;
 
-  const navigate = useNavigate();
+  useEffect(() => {
+    if (location === "/events/my") {
+      eventsAPI
+        .getMyEvents({ ...filter, typeUser: UserType.all })
+        .then((data) => {
+          setEvents(data.Events);
+        });
+    }
+    if (location === "/events") {
+      eventsAPI.getEvents(filter).then((data) => {
+        setEvents(data.Events);
+      });
+    }
+  }, [filter, location]);
 
   return (
     <>
@@ -83,9 +87,19 @@ const EventList = () => {
         </Grid>
       </Grid>
       <Grid component="article" container spacing={2.5}>
-        {arr.map((item, index) => (
-          <EventCard key={index} onClick={() => navigate(`/event/${item}`)} />
+        {events.map((event, index) => (
+          <EventCard key={index} event={event} />
         ))}
+        <Button
+          onClick={() =>
+            setFilter((prevFilter) => ({
+              ...prevFilter,
+              offset: prevFilter.offset + 1,
+            }))
+          }
+        >
+          Тык
+        </Button>
       </Grid>
     </>
   );

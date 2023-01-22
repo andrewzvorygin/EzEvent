@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -12,9 +12,12 @@ import {
 } from "@mui/material";
 import LinkIcon from "@mui/icons-material/Link";
 import IosShareIcon from "@mui/icons-material/IosShare";
+import { useParams } from "react-router-dom";
+
+import { eventsAPI } from "../../api/Api";
+import { EventType } from "../../types";
 
 import Person from "./templates/Person";
-import Stages from "./templates/Stages";
 import Description from "./templates/Description";
 import Comments from "./Comments/Comments";
 import SmallTitle from "./templates/SmallTitle";
@@ -25,11 +28,35 @@ const EventPage = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"), {
     defaultMatches: true,
   });
-  const photo =
-    "https://cs4.pikabu.ru/post_img/big/2015/08/06/8/1438865092_1172094034.png";
+
+  const eventId = useParams().eventId;
+
+  const [event, setEvent] = useState<EventType | null>(null);
+
+  useEffect(() => {
+    if (eventId) {
+      eventsAPI.getEvent(eventId).then((data) => {
+        console.log(data);
+        setEvent({
+          ...data,
+          date_start: data.date_start
+            ? new Date(data.date_start).toLocaleDateString()
+            : "неизвестно",
+          date_end: data.date_end
+            ? new Date(data.date_end).toLocaleDateString()
+            : "неизвестно",
+        });
+      });
+    }
+  }, []);
+
+  if (event === null) {
+    return null;
+  }
+
   return (
     <>
-      {photo && (
+      {event.photo_cover && (
         <Box
           component="img"
           sx={{
@@ -37,7 +64,7 @@ const EventPage = () => {
             width: "100%",
             objectFit: "contain",
           }}
-          src={photo}
+          src={event.photo_cover}
           mb={5}
         />
       )}
@@ -49,7 +76,7 @@ const EventPage = () => {
           [theme.breakpoints.down("md")]: { fontSize: "2rem" },
         }}
       >
-        Ботинкин Анджей Буховский. <br /> Мифы и предания 2ух тапков Ведьмака
+        {event.title}
       </Typography>
       <Stack
         direction={isMobile ? "column" : "row"}
@@ -58,7 +85,9 @@ const EventPage = () => {
         divider={<Divider orientation="vertical" flexItem />}
         justifyContent="space-between"
       >
-        <Box>28 сентября</Box>
+        <Box>
+          С {event.date_start} по {event.date_end}
+        </Box>
         <Stack direction={"row"} spacing={2} alignItems={"center"}>
           <Typography>Посмотреть на карте</Typography>
           <ButtonModalMap />
@@ -75,15 +104,6 @@ const EventPage = () => {
             <IosShareIcon />
           </IconButton>
         </Box>
-        <Typography
-          variant={"caption"}
-          fontSize={16}
-          fontWeight={300}
-          sx={{ fontStyle: "italic" }}
-          maxWidth={280}
-        >
-          *Мероприятие предназначено только для участников команды по проекту
-        </Typography>
       </Stack>
 
       <Grid container mb={5} spacing={2.5}>
@@ -111,13 +131,12 @@ const EventPage = () => {
           </Stack>
         </Grid>
         <Grid item sm={12} xs={12}>
-          <Description />
+          <Description description={event.description} />
         </Grid>
       </Grid>
       <Box mb={5}>
         <Divider />
       </Box>
-      <Stages />
       <Comments />
     </>
   );

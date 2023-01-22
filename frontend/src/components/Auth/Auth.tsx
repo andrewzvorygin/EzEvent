@@ -3,7 +3,7 @@ import { Card, CardContent, Container } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { AuthContext } from "../../App";
-import { AuthType } from '../../types';
+import { AuthType } from "../../types";
 
 import Register from "./Register";
 import Login from "./Login";

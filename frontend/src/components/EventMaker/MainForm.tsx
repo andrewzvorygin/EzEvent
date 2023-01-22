@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -25,11 +25,28 @@ interface MainFormPropsType {
 
 const MainForm: React.FC<MainFormPropsType> = ({ ws, eventData }) => {
   const [photo, setPhoto] = useState<string | null>(null);
+  const [title, setTitle] = useState<string | null>(null);
+  const [dateStart, setDateStart] = useState<Date | null>(null);
+  const [dateEnd, setDateEnd] = useState<Date | null>(null);
   function onPhotoChange(event: ChangeEvent<HTMLInputElement>): void {
     if (event.target.files) {
       setPhoto(URL.createObjectURL(event?.target?.files[0]));
     }
   }
+
+  useEffect(() => {
+    if (eventData.title !== title) {
+      setTitle(eventData.title);
+    }
+    if (eventData.date_start !== dateStart) {
+      setDateStart(
+        eventData.date_start ? new Date(eventData.date_start) : null,
+      );
+    }
+    if (eventData.date_end !== dateEnd) {
+      setDateEnd(eventData.date_end ? new Date(eventData.date_end) : null);
+    }
+  }, [eventData]);
 
   return (
     <FormControl fullWidth>
@@ -47,6 +64,15 @@ const MainForm: React.FC<MainFormPropsType> = ({ ws, eventData }) => {
               fontSize: "1.5rem",
               borderRadius: "4px",
             }}
+            onChange={(event) => {
+              if (event.target.value !== title) {
+                setTitle(event.target.value);
+              }
+            }}
+            onBlur={() => {
+              ws.send(JSON.stringify({ title: title }));
+            }}
+            value={title}
           />
         </Grid>
         <Grid item>
@@ -79,31 +105,30 @@ const MainForm: React.FC<MainFormPropsType> = ({ ws, eventData }) => {
           <Typography variant="h3" gutterBottom>
             Когда будет проходить мероприятие?
           </Typography>
-          <Input type="date" />
-        </Grid>
-        <Grid item>
-          <Typography variant="h3" gutterBottom>
-            Кто организовывает мероприятие?
-          </Typography>
-          <Typography variant="caption">
-            Если это мероприятие организовывает организация, то можете добавить
-            логотип организации
-          </Typography>
-        </Grid>
-        <Grid item>
-          <Comments />
-        </Grid>
-        <Grid item>
-          <Typography variant="h3" gutterBottom>
-            Будут ли этапы у мероприятия ?
-          </Typography>
-          <ButtonGroup
-            variant="outlined"
-            aria-label="outlined primary button group"
-          >
-            <StyledButton>Да</StyledButton>
-            <StyledButton>Нет</StyledButton>
-          </ButtonGroup>
+          С{" "}
+          <Input
+            type="date"
+            onChange={(event) => {
+              const newDateStart = new Date(event.target.value);
+              if (newDateStart !== dateStart) {
+                setDateStart(newDateStart);
+                ws.send(
+                  JSON.stringify({ date_start: newDateStart.toISOString() }),
+                );
+              }
+            }}
+          />{" "}
+          по{" "}
+          <Input
+            type="date"
+            onChange={(event) => {
+              const newDateEnd = new Date(event.target.value);
+              if (newDateEnd !== dateEnd) {
+                setDateStart(newDateEnd);
+                ws.send(JSON.stringify({ date_end: newDateEnd.toISOString() }));
+              }
+            }}
+          />
         </Grid>
       </Grid>
     </FormControl>
