@@ -165,7 +165,7 @@ async def update_event(event_uuid: UUID, data: EventFromDB):
 async def filter_data(data):
     data_to_update = {}
     for key, val in data.dict().items():
-        if val:
+        if val is not None:
             data_to_update[key] = val
     return data_to_update
 
