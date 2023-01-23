@@ -249,8 +249,9 @@ async def get_editors_id(event_uuid: UUID):
     smtp = (
         select(participant_orm.c.user_id)
         .join(event_orm, event_orm.c.event_id == participant_orm.c.event_id)
-        .where(event_orm.c.uuid_edit == event_uuid and participant_orm.c.is_editor)
+        .where(event_orm.c.uuid_edit == event_uuid).where(participant_orm.c.is_editor)
     )
+    print(smtp)
     result = await database.fetch_all(smtp)
     return [record['user_id'] for record in result]
 
