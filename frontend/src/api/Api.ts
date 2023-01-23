@@ -285,4 +285,15 @@ export const eventsAPI = {
       .then((response) => response.json())
       .catch((error) => console.error(error));
   },
+  async getParticipants(eventId: number) {
+    return await fetch(`${baseUrl}event/participants?event_uuid=${eventId}`, {
+      method: "GET",
+      headers: {
+        "Access-Token": window.localStorage.getItem("access_token") || "",
+        "Content-Type": "application/json; charset=utf-8",
+      },
+    })
+      .then((response) => response.json())
+      .catch((error) => console.error(error));
+  },
 };
