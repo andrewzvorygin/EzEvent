@@ -34,7 +34,7 @@ async def check_editor(event_uuid: UUID, current_user: UserFromToken):
 
 async def create_empty_event(current_user: UserFromToken) -> UUID:
     event_identifier = await st.create_event(current_user)
-    editor = Participant(user_id=current_user.user_id, event_id=event_identifier['event_id'])
+    editor = Participant(user_id=current_user.user_id, event_id=event_identifier['event_id'], is_editor=True)
     await st.add_participant(editor)
     return event_identifier['uuid_edit']
 
@@ -114,6 +114,11 @@ async def add_participant(event_uuid: UUID, user_id: int, is_editor: bool):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='Пользователь уже является участником мероприятия'
         )
+
+
+async def read_event(event_uuid: UUID, current_user):
+    if current_user:
+        pass
 
 
 async def get_event(event_uuid: UUID, is_editor=False):

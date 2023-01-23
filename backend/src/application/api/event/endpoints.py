@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect, Header
 
 from schemes import UserFromToken, UserRead, EventRead, Key, CommentCreate, CommentRead, EventFromDB
 from api.auth.service import get_current_user
@@ -15,8 +15,11 @@ event_router = APIRouter(prefix='/event', tags=['event'])
 
 
 @event_router.get('/read/{event}', response_model=EventRead)
-async def get_event(event: UUID):
-    event = await service.get_event(event)
+async def get_event(event: UUID, access_token: str | None = Header(default=None)):
+    current_user = None
+    if access_token:
+        current_user = await get_current_user(access_token)
+    event = await service.read_event(event, current_user)
     return event
 
 
