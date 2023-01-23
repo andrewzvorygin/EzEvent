@@ -46,6 +46,9 @@ const Comment: FC<IProps> = ({
   }
 
   async function onClick() {
+    if (text.length === 0) {
+      return;
+    }
     setText("");
     await postComment(eventId, text, parentId ?? comment_id);
     reload();

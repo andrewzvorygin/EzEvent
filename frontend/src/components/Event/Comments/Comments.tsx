@@ -49,6 +49,9 @@ const Comments: FC<IProps> = ({ eventId }) => {
   }
 
   async function onClick() {
+    if (text.length === 0) {
+      return;
+    }
     setText("");
     await postComment(eventId, text);
     getSetComments();
