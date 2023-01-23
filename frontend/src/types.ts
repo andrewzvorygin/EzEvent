@@ -74,6 +74,13 @@ export interface EventQueryType {
   dateStart?: Date;
   dateEnd?: Date;
   location?: number;
+  search?: string;
+  city?: number;
+}
+
+export interface CityType {
+  name: string;
+  id: number;
 }
 
 export interface MyEventQueryType extends EventQueryType {

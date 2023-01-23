@@ -50,7 +50,7 @@ const EventPage = () => {
     }
   }, []);
 
-  if (event === null) {
+  if (event === null || eventId === undefined) {
     return null;
   }
 
@@ -95,7 +95,9 @@ const EventPage = () => {
             "Без места"
           )}
         </Stack>
-        <Button variant="contained">Зарегистрироваться</Button>
+        <Button variant="contained" onClick={() => {
+          eventsAPI.registerOnEvent(eventId)
+        }}>Зарегистрироваться</Button>
       </Stack>
 
       <Stack direction="row" spacing={3} mb={5} justifyContent="space-between">

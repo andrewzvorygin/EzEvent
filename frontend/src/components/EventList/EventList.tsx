@@ -6,12 +6,19 @@ import { useFormik } from "formik";
 
 import { StyledButton } from "../StyledControls/StyledControls";
 import { eventsAPI } from "../../api/Api";
-import { EventQueryType, UserType } from "../../types";
+import {
+  CityType,
+  EventQueryType,
+  MyEventQueryType,
+  UserType,
+} from "../../types";
 
 import Filter from "./Filter/Filter";
 import EventCard from "./EventCard/EventCard";
 
 const EventList = () => {
+  const [userType, setUserType] = useState(UserType.all);
+  const [cities, setCities] = useState<CityType[]>([]);
   const [events, setEvents] = useState([]);
   const [filter, setFilter] = useState<EventQueryType>({
     limit: 30,
@@ -19,64 +26,57 @@ const EventList = () => {
   });
   const location = useLocation().pathname;
 
-  const cities = [
-    {
-      name: "Екб",
-      id: 0,
+  const formik = useFormik({
+    initialValues: {
+      location: undefined,
+      search: "",
+      dateStart: undefined,
+      dateEnd: undefined,
     },
-    {
-      name: "Челяб",
-      id: 1,
+    onSubmit: (values) => {
+      console.log(values);
+
+      if (location === "/events/my") {
+        eventsAPI
+          .getMyEvents({ ...values, typeUser: userType, ...filter })
+          .then((data) => {
+            setEvents(data.Events);
+          });
+      }
+      if (location === "/events") {
+        eventsAPI.getEvents({ ...values, ...filter }).then((data) => {
+          setEvents(data.Events);
+        });
+      }
     },
-    {
-      name: "Москва",
-      id: 2,
-    },
-    {
-      name: "Жопосранск",
-      id: 3,
-    },
-    {
-      name: "МойДоДыр",
-      id: 4,
-    },
-  ];
+  });
 
   useEffect(() => {
     if (location === "/events/my") {
       eventsAPI
-        .getMyEvents({ ...filter, typeUser: UserType.all })
+        .getMyEvents({ ...formik.values, typeUser: userType, ...filter })
         .then((data) => {
           setEvents(data.Events);
         });
     }
     if (location === "/events") {
-      eventsAPI.getEvents(filter).then((data) => {
-        setEvents(data.Events);
-      });
+      eventsAPI
+        .getEvents({
+          ...formik.values,
+          ...filter,
+        })
+        .then((data) => {
+          setEvents(data.Events);
+        });
     }
-  }, [filter, location]);
-
-  const formik = useFormik({
-    initialValues: {
-      city: null,
-      search: "",
-      dateStart: null,
-      dateEnd: null,
-      type: "Текущие",
-    },
-    onSubmit: (values) => {
-      console.log(values);
-      //todo: something
-    },
-  });
+  }, [filter]);
 
   const [expandedFilter, setExpandedFilter] = useState(false);
   const handleExpandClick = () => setExpandedFilter((e) => !e);
 
   const selectedCity = useMemo(
-    () => cities?.find((value) => value.id === formik.values.city)?.name,
-    [formik.values.city]
+    () => cities?.find((value) => value.id === formik.values.location)?.name,
+    [formik.values.location]
   );
   return (
     <>
@@ -102,6 +102,9 @@ const EventList = () => {
             expanded={expandedFilter}
             handleExpandClick={handleExpandClick}
             cities={cities}
+            setCities={setCities}
+            userType={location === "/events/my" ? userType : null}
+            setUserType={location === "/events/my" ? setUserType : null}
           />
         </Grid>
         <Grid
@@ -121,9 +124,14 @@ const EventList = () => {
               {selectedCity}
             </StyledButton>
           )}
-          {formik.values.type && (
+          {formik.values.dateStart && (
             <StyledButton variant="outlined" onClick={handleExpandClick}>
-              {formik.values.type}
+              <>С {formik.values.dateStart}</>
+            </StyledButton>
+          )}
+          {formik.values.dateEnd && (
+            <StyledButton variant="outlined" onClick={handleExpandClick}>
+              <>По {formik.values.dateEnd}</>
             </StyledButton>
           )}
         </Grid>
@@ -132,17 +140,17 @@ const EventList = () => {
         {events.map((event, index) => (
           <EventCard key={index} event={event} />
         ))}
-        <Button
-          onClick={() =>
-            setFilter((prevFilter) => ({
-              ...prevFilter,
-              offset: prevFilter.offset + 1,
-            }))
-          }
-        >
-          Тык
-        </Button>
       </Grid>
+      <Button
+        onClick={() =>
+          setFilter((prevFilter) => ({
+            ...prevFilter,
+            offset: prevFilter.offset + 1,
+          }))
+        }
+      >
+        Тык
+      </Button>
     </>
   );
 };

@@ -147,12 +147,12 @@ export const profileAPI = {
 
 export const cityAPI = {
   async getCity(cityId: number) {
-    return await fetch(`${baseUrl}city?city_id=${cityId}/`)
+    return await fetch(`${baseUrl}city?city_id=${cityId}`)
       .then((response) => response.json())
       .catch((error) => console.error(error));
   },
   async getCityByPrefix(prefix: string) {
-    return await fetch(`${baseUrl}city/get_by_prefix?prefix=${prefix}/`)
+    return await fetch(`${baseUrl}city/get_by_prefix?prefix=${prefix}`)
       .then((response) => response.json())
       .catch((error) => console.error(error));
   },
@@ -174,15 +174,16 @@ export const eventsAPI = {
       data.location !== undefined ? `&location=${data.location}` : ``;
     const dateEnd =
       data.dateEnd !== undefined
-        ? `&date_end=${data.dateEnd.toISOString()}`
+        ? `&date_end=${new Date(data.dateEnd).toISOString()}`
         : ``;
     const dateStart =
       data.dateStart !== undefined
-        ? `&date_start=${data.dateStart.toISOString()}`
+        ? `&date_start=${new Date(data.dateStart).toISOString()}`
         : ``;
+    const search = data.search?.length !== 0 ? `&search=${data.search}` : ``;
 
     return await fetch(
-      `${baseUrl}event/events_registry?limit=${data.limit}&offset=${data.offset}${dateStart}${dateEnd}${location}`,
+      `${baseUrl}event/events_registry?limit=${data.limit}&offset=${data.offset}${dateStart}${dateEnd}${location}${search}`,
     )
       .then((response) => response.json())
       .catch((error) => console.error(error));
@@ -192,15 +193,16 @@ export const eventsAPI = {
       data.location !== undefined ? `&location=${data.location}` : ``;
     const dateEnd =
       data.dateEnd !== undefined
-        ? `&date_end=${data.dateEnd.toISOString()}`
+        ? `&date_end=${new Date(data.dateEnd).toISOString()}`
         : ``;
     const dateStart =
       data.dateStart !== undefined
-        ? `&date_start=${data.dateStart.toISOString()}`
+        ? `&date_start=${new Date(data.dateStart).toISOString()}`
         : ``;
+    const search = data.search?.length !== 0 ? `&search=${data.search}` : ``;
 
     return await fetch(
-      `${baseUrl}event/my_events?limit=${data.limit}&offset=${data.offset}&typeUser=${data.typeUser}${dateStart}${dateEnd}${location}`,
+      `${baseUrl}event/my_events?limit=${data.limit}&offset=${data.offset}&typeUser=${data.typeUser}${dateStart}${dateEnd}${location}${search}`,
       {
         method: "GET",
         headers: {

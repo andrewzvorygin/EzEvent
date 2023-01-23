@@ -1,7 +1,8 @@
 import * as React from "react";
-import { FC, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import Box from "@mui/material/Box";
 import {
+  ButtonGroup,
   Input,
   InputAdornment,
   ListSubheader,
@@ -15,8 +16,14 @@ import {
 } from "@mui/material";
 import { FilterListOutlined, SearchOutlined } from "@mui/icons-material";
 import SearchIcon from "@mui/icons-material/Search";
+import Button from "@mui/material/Button";
 
-import { StyledIconButton } from "../../StyledControls/StyledControls";
+import {
+  StyledButton,
+  StyledIconButton,
+} from "../../StyledControls/StyledControls";
+import { CityType, UserType } from "../../../types";
+import { cityAPI } from "../../../api/Api";
 
 const style = {
   position: "absolute" as const,
@@ -30,11 +37,23 @@ const style = {
   p: 4,
 };
 
+const selectedStyle = {
+  background: "#1976d2",
+  color: "white",
+  ":hover": {
+    color: "white",
+    background: "rgba(25,118,210,0.43)",
+  },
+};
+
 interface IProps {
   formik: any;
   handleExpandClick: () => void;
   expanded: boolean;
-  cities: { name: string; id: number }[];
+  cities: CityType[];
+  setCities: (cities: CityType[]) => void;
+  userType: UserType | null;
+  setUserType: ((userType: UserType) => void) | null;
 }
 
 const Filter: FC<IProps> = ({
@@ -42,21 +61,22 @@ const Filter: FC<IProps> = ({
   handleExpandClick,
   expanded,
   cities,
+  setCities,
+  userType,
+  setUserType,
 }) => {
   const theme = useTheme();
   const [searchText, setSearchText] = useState("");
 
-  const filteredCities = useMemo(
-    () => cities.filter((option) => option.name.indexOf(searchText) !== -1),
-    [searchText]
-  );
+  useEffect(() => {
+    searchText &&
+      cityAPI.getCityByPrefix(searchText).then((data) => {
+        setCities(data.slice(0, 5));
+      });
+  }, [searchText]);
 
   return (
-    <form
-      onSubmit={formik.handleSubmit}
-      style={{ display: "contents" }}
-      onChange={formik.handleSubmit}
-    >
+    <form onSubmit={formik.handleSubmit} style={{ display: "contents" }}>
       <SearchOutlined fontSize="large" sx={{ mr: 1 }} />
       <TextField
         label="Название мероприятия"
@@ -69,6 +89,7 @@ const Filter: FC<IProps> = ({
         name="search"
         value={formik.values.search}
         onChange={formik.handleChange}
+        onSubmit={formik.handleSubmit}
       />
       <StyledIconButton
         aria-label="filter"
@@ -95,16 +116,16 @@ const Filter: FC<IProps> = ({
             <Typography variant="body1">Город:</Typography>
             <Select
               MenuProps={{ autoFocus: false }}
-              id="city"
-              name="city"
-              value={formik.values.city}
+              id="location"
+              name="location"
+              value={formik.values.location}
               onChange={(e) => {
                 formik.handleChange(e);
-                formik.submitForm();
               }}
               onClose={() => setSearchText("")}
               renderValue={() =>
-                cities?.find((value) => value.id === formik.values.city)?.name
+                cities?.find((value) => value.id === formik.values.location)
+                  ?.name
               }
             >
               <ListSubheader>
@@ -129,7 +150,7 @@ const Filter: FC<IProps> = ({
                   }}
                 />
               </ListSubheader>
-              {filteredCities.map(({ name, id }) => (
+              {cities.map(({ name, id }) => (
                 <MenuItem value={id} key={id}>
                   {name}
                 </MenuItem>
@@ -153,21 +174,53 @@ const Filter: FC<IProps> = ({
                 onChange={formik.handleChange}
               />
             </Stack>
-
-            <Typography variant="body1">Тип мероприятия</Typography>
-            <TextField
-              select
-              id="type"
-              name="type"
-              value={formik.values.type}
-              onChange={(e) => {
-                formik.handleChange(e);
-                formik.submitForm();
+            {userType !== null && setUserType && (
+              <ButtonGroup
+                variant="outlined"
+                aria-label="outlined primary button group"
+              >
+                <StyledButton
+                  onClick={() => {
+                    setUserType(UserType.all);
+                  }}
+                  sx={userType === UserType.all ? selectedStyle : undefined}
+                >
+                  Все
+                </StyledButton>
+                <StyledButton
+                  onClick={() => {
+                    setUserType(UserType.particiapant);
+                  }}
+                  sx={
+                    userType === UserType.particiapant
+                      ? selectedStyle
+                      : undefined
+                  }
+                >
+                  Посещенные
+                </StyledButton>
+                <StyledButton
+                  onClick={() => {
+                    setUserType(UserType.organizer);
+                  }}
+                  sx={
+                    userType === UserType.organizer ? selectedStyle : undefined
+                  }
+                >
+                  Организованные
+                </StyledButton>
+              </ButtonGroup>
+            )}
+            <Button
+              onClick={() => {
+                formik.handleSubmit();
+                handleExpandClick();
               }}
+              sx={{ alignSelf: "flex-start" }}
+              variant="contained"
             >
-              <MenuItem value={"Прошедшие"}>Прошедшие</MenuItem>
-              <MenuItem value={"Текущие"}>Текущие</MenuItem>
-            </TextField>
+              Применить
+            </Button>
           </Stack>
         </Box>
       </Modal>

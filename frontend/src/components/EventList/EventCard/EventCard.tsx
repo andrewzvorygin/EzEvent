@@ -49,7 +49,9 @@ const EventCard: React.FC<EventCardPropsType> = ({ event }) => {
             gutterBottom
           >
             {event.city
-              ? `${event.city.substring(0, 1)}${event.city.substring(1).toLowerCase()}`
+              ? `${event.city.substring(0, 1)}${event.city
+                  .substring(1)
+                  .toLowerCase()}`
               : "Неизвестно"}
           </Typography>
           <Typography variant="body1" sx={{ textAlign: "right" }} gutterBottom>
