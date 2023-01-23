@@ -79,6 +79,10 @@ class ShortUser(BaseModel):
         orm_mode = True
 
 
+class ParticipantShort(ShortUser):
+    user_id: int
+
+
 class ProfileUser(ShortUser):
     phone: str | None = None
 

@@ -4,7 +4,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect, Header
 
-from schemes import UserFromToken, UserRead, EventRead, Key, CommentCreate, CommentRead, EventFromDB
+from schemes import UserFromToken, UserRead, EventRead, RegistryEvent, Key, CommentCreate, CommentRead, EventFromDB
 from api.auth.service import get_current_user
 from schemes.event import Navigation
 
@@ -14,7 +14,7 @@ from .websocket import manager
 event_router = APIRouter(prefix='/event', tags=['event'])
 
 
-@event_router.get('/read/{event}', response_model=EventRead)
+@event_router.get('/read/{event}', response_model=RegistryEvent)
 async def read_event(event: UUID, access_token: str | None = Header(default=None)):
     current_user = None
     if access_token:

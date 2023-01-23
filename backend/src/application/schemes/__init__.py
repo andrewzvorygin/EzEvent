@@ -4,6 +4,6 @@ from .userbase import (
 )
 from .city import City
 from .event import (
-    EventFromDB, EventRead, EventWS, EventForEditor, Key,
+    EventFromDB, EventRead, EventWS, EventForEditor, Key, ParticipantShort,
     Participant, CommentCreate, CommentRead, RegistryEvent, Navigation, FullEvent
 )

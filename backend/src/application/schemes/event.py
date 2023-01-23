@@ -4,7 +4,7 @@ from uuid import UUID
 from pydantic import BaseModel, validator, Field
 
 
-from .userbase import ShortUser
+from .userbase import ShortUser, ParticipantShort
 
 
 class Location(BaseModel):
@@ -43,12 +43,14 @@ class EventRead(EventFromDB):
     photo_cover: str | None
     responsible_id: int
     participants: list[ShortUser] | None
+    can_reg: bool | None = None
+    can_edit: bool | None = None
 
 
 class RegistryEvent(EventRead):
-    responsible_name: str | None
-    responsible_surname: str | None
-    city: str | None
+    responsible_name: str | None = None
+    responsible_surname: str | None = None
+    city: str | None = None
 
 
 class Navigation(BaseModel):

@@ -119,10 +119,23 @@ async def add_participant(event_uuid: UUID, user_id: int, is_editor: bool):
 
 
 async def read_event(event_uuid: UUID, current_user):
-    event = await st.read_event(event_uuid)
-    if current_user:
+    event = await st.get_event_for_visitor(event_uuid)
+    participants = await st.get_participants(event_uuid)
+    editors = await st.get_participants(event_uuid, True)
+    event.can_edit = True if (
+            current_user
+            and current_user.user_id in [editor['user_id'] for editor in editors]
+    ) else False
+    event.can_reg = True if (
+            not event.can_edit
+            and (
+                not current_user
+                or current_user.user_id not in [participant['user_id'] for participant in participants]
+            )
+    ) else False
 
-        pass
+    event.participants = participants
+    return event
 
 
 async def get_event(event_uuid: UUID, is_editor=False):

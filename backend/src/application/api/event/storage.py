@@ -3,12 +3,12 @@ from typing import List
 from uuid import UUID
 
 from databases.interfaces import Record
-from sqlalchemy import select, insert, update, not_, func, literal
+from sqlalchemy import select, insert, update, not_, func
 
 from schemes import (
     UserRead, RegistryEvent, UserFromToken, EventRead,
     Participant, EventForEditor, CommentCreate, CommentRead,
-    ShortUser, Navigation, EventFromDB
+    ShortUser, Navigation, ParticipantShort
 )
 from models import user_orm, event_orm, participant_orm, city_orm, comment_orm
 from core import database
@@ -20,10 +20,32 @@ async def get_event_for_editor(event_uuid: UUID) -> EventForEditor:
     return EventForEditor.from_orm(result)
 
 
-async def get_event_for_visitor(event_uuid: UUID) -> EventRead:
-    smtp = select(event_orm).where(event_orm.c.uuid == event_uuid)
+async def get_event_for_visitor(event_uuid: UUID) -> RegistryEvent:
+    smtp = (
+        select(
+            event_orm.c.event_id,
+            event_orm.c.uuid,
+            event_orm.c.uuid_edit,
+            event_orm.c.date_start,
+            event_orm.c.date_end,
+            event_orm.c.title,
+            city_orm.c.name.label('city'),
+            event_orm.c.latitude,
+            event_orm.c.longitude,
+            event_orm.c.description,
+            event_orm.c.responsible_id,
+            user_orm.c.surname.label('responsible_surname'),
+            user_orm.c.name.label('responsible_name'),
+            event_orm.c.visibility,
+            event_orm.c.photo_cover,
+            event_orm.c.key_invite
+        )
+        .join(city_orm, event_orm.c.city == city_orm.c.id)
+        .join(user_orm, user_orm.c.user_id == event_orm.c.responsible_id)
+        .where(event_orm.c.uuid == event_uuid)
+    )
     result = await database.fetch_one(smtp)
-    return EventRead.from_orm(result)
+    return RegistryEvent.from_orm(result)
 
 
 async def add_participant(participant: Participant) -> None:
@@ -247,12 +269,27 @@ async def get_comment(event_id: int) -> list[CommentRead]:
     return [CommentRead.from_orm(record) for record in record_set]
 
 
+async def get_participants(event_uuid, need_editors: bool = False) -> list[Participant]:
+    def _is_need_editors(need_editors):
+        if need_editors:
+            return participant_orm.c.is_editor
+        return not_(participant_orm.c.is_editor)
+    smtp = (
+        select(user_orm)
+        .join(participant_orm, participant_orm.c.user_id == user_orm.c.user_id)
+        .join(event_orm, event_orm.c.event_id == participant_orm.c.event_id)
+        .where(event_orm.c.uuid == event_uuid, _is_need_editors(need_editors))
+    )
+    result = await database.fetch_all(smtp)
+    return [ParticipantShort.from_orm(record).dict() for record in result]
+
+
 async def get_editors(event_uuid) -> list[ShortUser]:
     smtp = (
         select(user_orm)
-            .join(participant_orm, participant_orm.c.user_id == user_orm.c.user_id)
-            .join(event_orm, event_orm.c.event_id == participant_orm.c.event_id)
-            .where(event_orm.c.uuid_edit == event_uuid and participant_orm.c.is_editor)
+        .join(participant_orm, participant_orm.c.user_id == user_orm.c.user_id)
+        .join(event_orm, event_orm.c.event_id == participant_orm.c.event_id)
+        .where(event_orm.c.uuid_edit == event_uuid, participant_orm.c.is_editor)
     )
     rs = await database.fetch_all(smtp)
     return [ShortUser.from_orm(record).dict() for record in rs]
