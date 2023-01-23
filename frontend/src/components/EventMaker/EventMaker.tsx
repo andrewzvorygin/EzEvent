@@ -22,6 +22,8 @@ const EventMaker: React.FC<EventMakerPropsType> = (props) => {
   const [connectOpen, setConnectOpen] = useState<boolean>(false);
   const eventId = useParams().eventId;
   const [eventData, setEventData] = useState<EventType>({
+    can_edit: null,
+    can_reg: null,
     title: null,
     date_end: null,
     date_start: null,
@@ -30,7 +32,7 @@ const EventMaker: React.FC<EventMakerPropsType> = (props) => {
     visibility: null,
     latitude: null,
     longitude: null,
-    editors: [],
+    editors: []
   });
 
   useEffect(() => {
@@ -42,7 +44,7 @@ const EventMaker: React.FC<EventMakerPropsType> = (props) => {
       setWsChannel(
         new WebSocket(
           `ws://127.0.0.1:8000/event/ws/${eventId}${accessTokenQuery}`,
-        ),
+        )
       );
     }
     createChannel();
@@ -71,6 +73,7 @@ const EventMaker: React.FC<EventMakerPropsType> = (props) => {
     });
     wsChannel?.addEventListener("close", () => {
       setConnectOpen(false);
+      navigate("/events", { replace: true });
       console.log("CLOSE");
     });
   }, [wsChannel]);

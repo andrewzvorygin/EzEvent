@@ -23,6 +23,8 @@ export interface EventType {
   editors: ProfileNameType[];
   event_id?: number;
   uuid_edit?: string;
+  can_edit: boolean | null;
+  can_reg: boolean | null;
 }
 
 export interface EventCardType extends EventType {

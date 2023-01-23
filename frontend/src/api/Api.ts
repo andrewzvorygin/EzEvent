@@ -172,14 +172,12 @@ export const eventsAPI = {
   async getEvents(data: EventQueryType) {
     const location =
       data.location !== undefined ? `&location=${data.location}` : ``;
-    const dateEnd =
-      data.dateEnd !== undefined
-        ? `&date_end=${new Date(data.dateEnd).toISOString()}`
-        : ``;
-    const dateStart =
-      data.dateStart !== undefined
-        ? `&date_start=${new Date(data.dateStart).toISOString()}`
-        : ``;
+    const dateEnd = data.dateEnd
+      ? `&date_end=${new Date(data.dateEnd).toISOString()}`
+      : ``;
+    const dateStart = data.dateStart
+      ? `&date_start=${new Date(data.dateStart).toISOString()}`
+      : ``;
     const search = data.search?.length !== 0 ? `&search=${data.search}` : ``;
 
     return await fetch(
@@ -191,14 +189,12 @@ export const eventsAPI = {
   async getMyEvents(data: MyEventQueryType) {
     const location =
       data.location !== undefined ? `&location=${data.location}` : ``;
-    const dateEnd =
-      data.dateEnd !== undefined
-        ? `&date_end=${new Date(data.dateEnd).toISOString()}`
-        : ``;
-    const dateStart =
-      data.dateStart !== undefined
-        ? `&date_start=${new Date(data.dateStart).toISOString()}`
-        : ``;
+    const dateEnd = data.dateEnd
+      ? `&date_end=${new Date(data.dateEnd).toISOString()}`
+      : ``;
+    const dateStart = data.dateStart
+      ? `&date_start=${new Date(data.dateStart).toISOString()}`
+      : ``;
     const search = data.search?.length !== 0 ? `&search=${data.search}` : ``;
 
     return await fetch(
@@ -216,6 +212,9 @@ export const eventsAPI = {
   async getEvent(eventId: string) {
     return await fetch(`${baseUrl}event/read/${eventId}`, {
       method: "GET",
+      headers: {
+        "Access-Token": window.localStorage.getItem("access_token") || "",
+      },
     })
       .then((response) => response.json())
       .catch((error) => console.error(error));

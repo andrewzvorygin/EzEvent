@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import LinkIcon from "@mui/icons-material/Link";
 import IosShareIcon from "@mui/icons-material/IosShare";
-import { NavLink, useParams } from "react-router-dom";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 
 import { eventsAPI } from "../../api/Api";
@@ -25,6 +25,7 @@ import SmallTitle from "./templates/SmallTitle";
 import ButtonModalMap from "./templates/ButtonModalMap";
 
 const EventPage = () => {
+  const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"), {
     defaultMatches: true,
@@ -79,13 +80,6 @@ const EventPage = () => {
         >
           {event.title}
         </Typography>
-        {event.uuid_edit && (
-          <NavLink to={`/event/${event.uuid_edit}/edit`}>
-            <IconButton title={"Отредактировать"}>
-              <EditIcon />
-            </IconButton>
-          </NavLink>
-        )}
       </Stack>
 
       <Stack
@@ -105,14 +99,26 @@ const EventPage = () => {
             "Без места"
           )}
         </Stack>
-        <Button
-          variant="contained"
-          onClick={() => {
-            eventsAPI.registerOnEvent(eventId);
-          }}
-        >
-          Зарегистрироваться
-        </Button>
+        {event.can_edit ? (
+          <Button
+            variant="contained"
+            onClick={() => {
+              navigate(`/event/${event.uuid_edit}/edit`);
+            }}
+          >
+            Редактировать
+          </Button>
+        ) : (
+          <Button
+            variant="contained"
+            onClick={() => {
+              eventsAPI.registerOnEvent(eventId);
+            }}
+            disabled={!event.can_reg}
+          >
+            Зарегистрироваться
+          </Button>
+        )}
       </Stack>
 
       <Stack direction="row" spacing={3} mb={5} justifyContent="space-between">

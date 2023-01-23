@@ -23,7 +23,13 @@ const Visibility: React.FC<VisibilityPropsType> = ({ ws, eventData }) => {
     eventData.visibility ?? false,
   );
 
-  const skipKeys = ["key_invite", "visibility"];
+  const skipKeys = [
+    "key_invite",
+    "visibility",
+    "can_edit",
+    "can_reg",
+    "participants",
+  ];
 
   useEffect(() => {
     if (eventData.visibility !== visibility) {
@@ -35,8 +41,15 @@ const Visibility: React.FC<VisibilityPropsType> = ({ ws, eventData }) => {
         disable = true;
       }
     });
+    if (disable) {
+      setVisibility(false);
+    }
     setDisableVisibility(disable);
   }, [eventData]);
+
+  useEffect(() => {
+    ws.send(JSON.stringify({ visibility: visibility }));
+  }, [visibility]);
 
   return (
     <Box mb={2}>
@@ -60,7 +73,6 @@ const Visibility: React.FC<VisibilityPropsType> = ({ ws, eventData }) => {
         <StyledButton
           onClick={() => {
             setVisibility(false);
-            ws.send(JSON.stringify({ visibility: false }));
           }}
           sx={!visibility ? selectedStyle : undefined}
         >

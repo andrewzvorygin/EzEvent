@@ -21,7 +21,7 @@ const EventList = () => {
   const [userType, setUserType] = useState(UserType.all);
   const [cities, setCities] = useState<CityType[]>([]);
   const [events, setEvents] = useState<EventCardType[]>([]);
-  const [filter, setFilter] = useState<EventQueryType>({
+  const [offset, setOffset] = useState<EventQueryType>({
     limit: 30,
     offset: 0,
   });
@@ -37,26 +37,27 @@ const EventList = () => {
     onSubmit: (values) => {
       if (location === "/events/my") {
         eventsAPI
-          .getMyEvents({ ...values, typeUser: userType, ...filter })
+          .getMyEvents({ ...values, typeUser: userType, limit: 30, offset: 0 })
           .then((data) => {
-            setEvents((prevState) => [...prevState, ...data.Events]);
+            setEvents(data.Events);
           });
       }
       if (location === "/events") {
-        eventsAPI.getEvents({ ...values, ...filter }).then((data) => {
-          setEvents((prevState) => [...prevState, ...data.Events]);
+        eventsAPI.getEvents({ ...values, limit: 30, offset: 0 }).then((data) => {
+          setEvents(data.Events);
         });
       }
+      setOffset({ limit: 30, offset: 0 });
     },
   });
 
   useEffect(() => {
     if (location === "/events/my") {
       eventsAPI
-        .getMyEvents({ ...formik.values, typeUser: userType, ...filter })
+        .getMyEvents({ ...formik.values, typeUser: userType, ...offset })
         .then((data) => {
           setEvents((prevState) =>
-            filter.offset ? [...prevState, ...data.Events] : data.Events,
+            offset.offset ? [...prevState, ...data.Events] : data.Events,
           );
         });
     }
@@ -64,18 +65,18 @@ const EventList = () => {
       eventsAPI
         .getEvents({
           ...formik.values,
-          ...filter,
+          ...offset,
         })
         .then((data) => {
           setEvents((prevState) =>
-            filter.offset ? [...prevState, ...data.Events] : data.Events,
+            offset.offset ? [...prevState, ...data.Events] : data.Events,
           );
         });
     }
-  }, [filter]);
+  }, [offset]);
 
   useEffect(() => {
-    setFilter({ limit: 30, offset: 0 });
+    setOffset({ limit: 30, offset: 0 });
   }, [location]);
 
   const [expandedFilter, setExpandedFilter] = useState(false);
@@ -152,13 +153,13 @@ const EventList = () => {
           </Grid>
         )}
       </Grid>
-      {events.length === filter.limit * (filter.offset + 1) && (
+      {events.length === offset.limit * (offset.offset + 1) && (
         <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
           <Button
             variant="contained"
             sx={{ mt: 2 }}
             onClick={() =>
-              setFilter((prevFilter) => ({
+              setOffset((prevFilter) => ({
                 ...prevFilter,
                 offset: prevFilter.offset + 1,
               }))
