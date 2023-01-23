@@ -271,7 +271,7 @@ async def get_comment(event_id: int) -> list[CommentRead]:
     return [CommentRead.from_orm(record) for record in record_set]
 
 
-async def get_participants(event_uuid, need_editors: bool = False) -> list[Participant]:
+async def get_participants(event_uuid, need_editors: bool = False) -> list[ParticipantShort]:
     def _is_need_editors(need_editors):
         if need_editors:
             return participant_orm.c.is_editor
@@ -283,7 +283,7 @@ async def get_participants(event_uuid, need_editors: bool = False) -> list[Parti
         .where(event_orm.c.uuid == event_uuid, _is_need_editors(need_editors))
     )
     result = await database.fetch_all(smtp)
-    return [ParticipantShort.from_orm(record).dict() for record in result]
+    return [ParticipantShort.from_orm(record) for record in result]
 
 
 async def get_editors(event_uuid) -> list[ShortUser]:

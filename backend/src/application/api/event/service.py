@@ -128,17 +128,17 @@ async def read_event(event_uuid: UUID, current_user):
     editors = await st.get_participants(event_uuid, True)
     event.can_edit = True if (
             current_user
-            and current_user.user_id in [editor['user_id'] for editor in editors]
+            and current_user.user_id in [editor.user_id for editor in editors]
     ) else False
     event.can_reg = True if (
             not event.can_edit
             and (
                 not current_user
-                or current_user.user_id not in [participant['user_id'] for participant in participants]
+                or current_user.user_id not in [participant.user_id for participant in participants]
             )
     ) else False
 
-    event.participants = participants
+    event.participants = [part.dict() for part in participants]
     return event
 
 
