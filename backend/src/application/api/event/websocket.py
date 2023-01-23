@@ -26,9 +26,9 @@ class ConnectionManager:
     async def add_editor(self, event_uuid):
         event = await get_event(event_uuid, is_editor=True)
         editors = await get_editors(event_uuid)
-        result = {**event.dict(), 'editors': editors}
+        full_event = FullEvent(**event.dict(), editors=editors)
         for connection in self.active_connections[event_uuid]:
-            await connection.send_text(json.dumps(result))
+            await connection.send_text(full_event.json())
 
     async def broadcast(self, message: str, event: UUID):
         for connection in self.active_connections[event]:
