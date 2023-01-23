@@ -142,6 +142,11 @@ async def add_comment(
     await service.add_comment(comment)
 
 
+@event_router.get('/participants')
+async def get_participants(event_uuid: UUID):
+    return await service.get_visitors(event_uuid)
+
+
 @event_router.get('/event/comment/{event_id}')
 async def read_comment(event_id: int):
     return await service.get_comments(event_id)

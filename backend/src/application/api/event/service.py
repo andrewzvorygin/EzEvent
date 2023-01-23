@@ -118,6 +118,10 @@ async def add_participant(event_uuid: UUID, user_id: int, is_editor: bool):
         )
 
 
+async def get_visitors(event_uuid: UUID):
+    return await st.get_participants(event_uuid)
+
+
 async def read_event(event_uuid: UUID, current_user):
     event = await st.get_event_for_visitor(event_uuid)
     participants = await st.get_participants(event_uuid)
