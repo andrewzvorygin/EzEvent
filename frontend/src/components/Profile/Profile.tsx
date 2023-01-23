@@ -31,7 +31,7 @@ const Profile: FC<ProfilePropsType> = (props) => {
   });
   const [editMode, setEditMode] = useState(false);
   const [profile, setProfile] = useState<ProfileType | null>(null);
-  const [photo, setPhoto] = useState<any>();
+  const [photo, setPhoto] = useState<any>(null);
   const [name, setName] = useState<string>();
   const [surname, setSurname] = useState<string>();
   const [patronymic, setPatronymic] = useState<string>();
@@ -42,7 +42,7 @@ const Profile: FC<ProfilePropsType> = (props) => {
       if (response.status === 404) {
         setPhoto(null);
       } else {
-        const data = await response.json();
+        const data = await response.blob();
         setPhoto(data);
       }
     });
