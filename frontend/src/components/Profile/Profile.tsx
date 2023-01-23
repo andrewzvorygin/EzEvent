@@ -116,7 +116,7 @@ const Profile: FC<ProfilePropsType> = (props) => {
             >
               Редактирование профиля
             </Typography>
-            <Box sx={{ display: "flex" }}>
+            <Box sx={{ display: "flex", alignItems: "baseline" }}>
               <Typography>Фамилия:</Typography>
               <Input
                 sx={{ flexGrow: 1, ml: 1 }}
@@ -124,7 +124,7 @@ const Profile: FC<ProfilePropsType> = (props) => {
                 value={surname}
               />
             </Box>
-            <Box sx={{ display: "flex" }}>
+            <Box sx={{ display: "flex", alignItems: "baseline" }}>
               <Typography>Имя:</Typography>
               <Input
                 sx={{ flexGrow: 1, ml: 1 }}
@@ -132,7 +132,7 @@ const Profile: FC<ProfilePropsType> = (props) => {
                 value={name}
               />
             </Box>
-            <Box sx={{ display: "flex" }}>
+            <Box sx={{ display: "flex", alignItems: "baseline" }}>
               <Typography>Отчество:</Typography>
               <Input
                 sx={{ flexGrow: 1, ml: 1 }}
@@ -140,7 +140,7 @@ const Profile: FC<ProfilePropsType> = (props) => {
                 value={patronymic}
               />
             </Box>
-            <Box sx={{ display: "flex" }}>
+            <Box sx={{ display: "flex", alignItems: "baseline" }}>
               <Typography>Номер:</Typography>
               <Input
                 sx={{ flexGrow: 1, ml: 1 }}
