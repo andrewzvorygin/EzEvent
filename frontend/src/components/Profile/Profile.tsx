@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FC, useState, useEffect } from "react";
+import React, { FC, useEffect, useState } from "react";
 import {
   Avatar,
   Box,
@@ -15,8 +15,6 @@ import placeholder from "../../assets/placeholder.jpg";
 import { AuthContext } from "../../App";
 import { profileAPI } from "../../api/Api";
 import { ProfileType } from "../../types";
-
-import SwitchInput from "./SwitchInput";
 
 interface ProfilePropsType {
   auth: boolean;

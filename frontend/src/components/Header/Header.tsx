@@ -10,6 +10,7 @@ import {
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+import logo from "../../assets/logo.png";
 import { StyledIconButton } from "../StyledControls/StyledControls";
 import { authAPI, eventsAPI } from "../../api/Api";
 import { AuthContext, DeviceContext } from "../../App";
@@ -22,7 +23,7 @@ const Header: React.FC<AuthType & DeviceContextType> = (props) => {
     <Box component="header" sx={{ py: 3, px: 3, display: "flex" }}>
       <Avatar
         sx={{ width: 56, height: 56 }}
-        src="https://sun9-22.userapi.com/impg/Iys7Wp4VAftKbzly1TdVWFZM57Qxt3bbUrn97A/XfXfFlj5rb4.jpg?size=1367x906&quality=96&sign=51fd6e4fcd8c6768c7bb9ccb9049dca8&type=album"
+        src={logo}
       />
       <Box
         sx={{

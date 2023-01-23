@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Grid, Typography } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import Button from "@mui/material/Button";
 import { useFormik } from "formik";
@@ -8,6 +8,7 @@ import { StyledButton } from "../StyledControls/StyledControls";
 import { eventsAPI } from "../../api/Api";
 import {
   CityType,
+  EventCardType,
   EventQueryType,
   MyEventQueryType,
   UserType,
@@ -19,7 +20,7 @@ import EventCard from "./EventCard/EventCard";
 const EventList = () => {
   const [userType, setUserType] = useState(UserType.all);
   const [cities, setCities] = useState<CityType[]>([]);
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState<EventCardType[]>([]);
   const [filter, setFilter] = useState<EventQueryType>({
     limit: 30,
     offset: 0,
@@ -34,18 +35,16 @@ const EventList = () => {
       dateEnd: undefined,
     },
     onSubmit: (values) => {
-      console.log(values);
-
       if (location === "/events/my") {
         eventsAPI
           .getMyEvents({ ...values, typeUser: userType, ...filter })
           .then((data) => {
-            setEvents(data.Events);
+            setEvents((prevState) => [...prevState, ...data.Events]);
           });
       }
       if (location === "/events") {
         eventsAPI.getEvents({ ...values, ...filter }).then((data) => {
-          setEvents(data.Events);
+          setEvents((prevState) => [...prevState, ...data.Events]);
         });
       }
     },
@@ -56,7 +55,9 @@ const EventList = () => {
       eventsAPI
         .getMyEvents({ ...formik.values, typeUser: userType, ...filter })
         .then((data) => {
-          setEvents(data.Events);
+          setEvents((prevState) =>
+            filter.offset ? [...prevState, ...data.Events] : data.Events,
+          );
         });
     }
     if (location === "/events") {
@@ -66,10 +67,16 @@ const EventList = () => {
           ...filter,
         })
         .then((data) => {
-          setEvents(data.Events);
+          setEvents((prevState) =>
+            filter.offset ? [...prevState, ...data.Events] : data.Events,
+          );
         });
     }
   }, [filter]);
+
+  useEffect(() => {
+    setFilter({ limit: 30, offset: 0 });
+  }, [location]);
 
   const [expandedFilter, setExpandedFilter] = useState(false);
   const handleExpandClick = () => setExpandedFilter((e) => !e);
@@ -141,16 +148,22 @@ const EventList = () => {
           <EventCard key={index} event={event} />
         ))}
       </Grid>
-      <Button
-        onClick={() =>
-          setFilter((prevFilter) => ({
-            ...prevFilter,
-            offset: prevFilter.offset + 1,
-          }))
-        }
-      >
-        Тык
-      </Button>
+      {events.length === filter.limit * (filter.offset + 1) && (
+        <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
+          <Button
+            variant="contained"
+            sx={{ mt: 2 }}
+            onClick={() =>
+              setFilter((prevFilter) => ({
+                ...prevFilter,
+                offset: prevFilter.offset + 1,
+              }))
+            }
+          >
+            Показать ещё
+          </Button>
+        </Box>
+      )}
     </>
   );
 };
