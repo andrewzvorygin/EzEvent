@@ -42,10 +42,12 @@ class EventRead(EventFromDB):
     uuid_edit: UUID
     photo_cover: str | None
     responsible_id: int
+    participants: list[ShortUser] | None
 
 
 class RegistryEvent(EventRead):
     responsible_name: str | None
+    responsible_surname: str | None
     city: str | None
 
 

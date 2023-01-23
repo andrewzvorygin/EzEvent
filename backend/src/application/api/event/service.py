@@ -44,11 +44,13 @@ async def get_my_events(
         date_end: datetime,
         navigation: Navigation,
         type_user: int,
+        search: str,
+        location: int,
         current_user: UserFromToken
 ):
     """asdas"""
     events_id = await st.get_events_keys(current_user.user_id, type_user)
-    return await st.get_events(date_start, date_end, events_id, navigation)
+    return await st.get_events(date_start, date_end, events_id, search, location, navigation)
 
 
 async def get_registry(
@@ -117,7 +119,9 @@ async def add_participant(event_uuid: UUID, user_id: int, is_editor: bool):
 
 
 async def read_event(event_uuid: UUID, current_user):
+    event = await st.read_event(event_uuid)
     if current_user:
+
         pass
 
 

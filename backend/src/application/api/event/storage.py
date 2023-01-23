@@ -3,7 +3,7 @@ from typing import List
 from uuid import UUID
 
 from databases.interfaces import Record
-from sqlalchemy import select, insert, update, not_, func
+from sqlalchemy import select, insert, update, not_, func, literal
 
 from schemes import (
     UserRead, RegistryEvent, UserFromToken, EventRead,
@@ -77,8 +77,15 @@ async def get_events(
         date_start: datetime,
         date_end: datetime,
         events_id: List[int],
+        search: str,
+        location: int,
         navigation: Navigation
 ) -> List[EventRead]:
+    def _check_location(location: int):
+        if location:
+            return event_orm.c.city == location
+        return True
+
     def _check_dates(_date: datetime, start: bool):
         if _date:
             if start:
@@ -86,13 +93,39 @@ async def get_events(
             return func.coalesce(event_orm.c.date_end, datetime.max) <= _date
         return True
 
+    def _check_search(search: str):
+        if search:
+            return func.lower(event_orm.c.title).like(f'%{search.lower()}%')
+        return True
+
     offset = navigation.offset * navigation.limit
 
     smtp = (
-        select(event_orm)
+        select(
+            event_orm.c.event_id,
+            event_orm.c.uuid,
+            event_orm.c.uuid_edit,
+            event_orm.c.date_start,
+            event_orm.c.date_end,
+            event_orm.c.title,
+            city_orm.c.name.label('city'),
+            event_orm.c.latitude,
+            event_orm.c.longitude,
+            event_orm.c.description,
+            event_orm.c.responsible_id,
+            user_orm.c.surname.label('responsible_surname'),
+            user_orm.c.name.label('responsible_name'),
+            event_orm.c.visibility,
+            event_orm.c.photo_cover,
+            event_orm.c.key_invite,
+        )
+        .join(city_orm, event_orm.c.city == city_orm.c.id)
+        .join(user_orm, user_orm.c.user_id == event_orm.c.responsible_id)
         .where(
             _check_dates(date_start, True),
             _check_dates(date_end, False),
+            _check_location(location),
+            _check_search(search),
             event_orm.c.event_id.in_(events_id)
         )
         .limit(navigation.limit)
@@ -124,7 +157,7 @@ async def get_registry(
 
     def _check_search(search: str):
         if search:
-            return event_orm.c.title.like(f'%{search}%')
+            return func.lower(event_orm.c.title).like(f'%{search.lower()}%')
         return True
 
     offset = navigation.offset * navigation.limit
@@ -142,7 +175,7 @@ async def get_registry(
             event_orm.c.longitude,
             event_orm.c.description,
             event_orm.c.responsible_id,
-            user_orm.c.name.label('responsible_name'),
+            func.concat(user_orm.c.surname, ' ', user_orm.c.name).label('responsible_name'),
             event_orm.c.visibility,
             event_orm.c.photo_cover,
             event_orm.c.key_invite,

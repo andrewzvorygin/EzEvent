@@ -15,7 +15,7 @@ event_router = APIRouter(prefix='/event', tags=['event'])
 
 
 @event_router.get('/read/{event}', response_model=EventRead)
-async def get_event(event: UUID, access_token: str | None = Header(default=None)):
+async def read_event(event: UUID, access_token: str | None = Header(default=None)):
     current_user = None
     if access_token:
         current_user = await get_current_user(access_token)
@@ -36,6 +36,8 @@ async def get_events(
         typeUser: int,
         date_start: datetime = datetime.min,
         date_end: datetime = datetime.max,
+        search: str = None,
+        location: int = None,
         current_user: UserFromToken = Depends(get_current_user)
 ):
     """Получить список моих мероприятий """
@@ -44,6 +46,8 @@ async def get_events(
         date_end,
         Navigation(limit=limit, offset=offset),
         typeUser,
+        search,
+        location,
         current_user
     )
     return {'Events': res}
