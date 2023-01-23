@@ -144,9 +144,13 @@ const EventList = () => {
         </Grid>
       </Grid>
       <Grid component="article" container spacing={2.5}>
-        {events.map((event, index) => (
-          <EventCard key={index} event={event} />
-        ))}
+        {events.length > 0 ? (
+          events.map((event, index) => <EventCard key={index} event={event} />)
+        ) : (
+          <Grid item lg={12} md={12} sm={12} xs={12}>
+            <Typography variant={"h6"}>Пока здесь пусто...</Typography>
+          </Grid>
+        )}
       </Grid>
       {events.length === filter.limit * (filter.offset + 1) && (
         <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
