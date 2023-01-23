@@ -12,7 +12,8 @@ import {
 } from "@mui/material";
 import LinkIcon from "@mui/icons-material/Link";
 import IosShareIcon from "@mui/icons-material/IosShare";
-import { useParams } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
+import EditIcon from "@mui/icons-material/Edit";
 
 import { eventsAPI } from "../../api/Api";
 import { EventType } from "../../types";
@@ -68,16 +69,25 @@ const EventPage = () => {
           mb={5}
         />
       )}
-      <Typography
-        variant="h1"
-        component="h1"
-        mb={5}
-        sx={{
-          [theme.breakpoints.down("md")]: { fontSize: "2rem" },
-        }}
-      >
-        {event.title}
-      </Typography>
+      <Stack direction={"row"} spacing={1} alignItems={"center"} mb={5}>
+        <Typography
+          variant="h1"
+          component="h1"
+          sx={{
+            [theme.breakpoints.down("md")]: { fontSize: "2rem" },
+          }}
+        >
+          {event.title}
+        </Typography>
+        {event.uuid_edit && (
+          <NavLink to={`/event/${event.uuid_edit}/edit`}>
+            <IconButton title={"Отредактировать"}>
+              <EditIcon />
+            </IconButton>
+          </NavLink>
+        )}
+      </Stack>
+
       <Stack
         direction={isMobile ? "column" : "row"}
         spacing={isMobile ? 1.5 : 3}
@@ -95,9 +105,14 @@ const EventPage = () => {
             "Без места"
           )}
         </Stack>
-        <Button variant="contained" onClick={() => {
-          eventsAPI.registerOnEvent(eventId)
-        }}>Зарегистрироваться</Button>
+        <Button
+          variant="contained"
+          onClick={() => {
+            eventsAPI.registerOnEvent(eventId);
+          }}
+        >
+          Зарегистрироваться
+        </Button>
       </Stack>
 
       <Stack direction="row" spacing={3} mb={5} justifyContent="space-between">

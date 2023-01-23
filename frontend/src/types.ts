@@ -22,6 +22,7 @@ export interface EventType {
   longitude: number | null;
   editors: ProfileNameType[];
   event_id?: number;
+  uuid_edit?: string;
 }
 
 export interface EventCardType extends EventType {
