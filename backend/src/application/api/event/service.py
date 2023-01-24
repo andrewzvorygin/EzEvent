@@ -139,6 +139,7 @@ async def read_event(event_uuid: UUID, current_user):
     ) else False
 
     event.participants = [part.dict() for part in participants]
+    event.participants = [editor.dict() for editor in editors]
     return event
 
 
