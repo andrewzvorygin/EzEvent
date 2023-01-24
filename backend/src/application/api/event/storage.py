@@ -141,7 +141,7 @@ async def get_events(
             event_orm.c.photo_cover,
             event_orm.c.key_invite,
         )
-        .join(city_orm, event_orm.c.city == city_orm.c.id)
+        .join(city_orm, event_orm.c.city == city_orm.c.id, isouter=True)
         .join(user_orm, user_orm.c.user_id == event_orm.c.responsible_id)
         .where(
             _check_dates(date_start, True),
