@@ -1,21 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Grid, Stack, Typography } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import Button from "@mui/material/Button";
 import { useFormik } from "formik";
 
 import { StyledButton } from "../StyledControls/StyledControls";
 import { eventsAPI } from "../../api/Api";
-import {
-  CityType,
-  EventCardType,
-  EventQueryType,
-  MyEventQueryType,
-  UserType,
-} from "../../types";
+import { CityType, EventCardType, EventQueryType, UserType } from "../../types";
 
 import Filter from "./Filter/Filter";
 import EventCard from "./EventCard/EventCard";
+import Img from "./../../assets/emptyView.png";
 
 const EventList = () => {
   const [userType, setUserType] = useState(UserType.all);
@@ -43,9 +38,11 @@ const EventList = () => {
           });
       }
       if (location === "/events") {
-        eventsAPI.getEvents({ ...values, limit: 30, offset: 0 }).then((data) => {
-          setEvents(data.Events);
-        });
+        eventsAPI
+          .getEvents({ ...values, limit: 30, offset: 0 })
+          .then((data) => {
+            setEvents(data.Events);
+          });
       }
       setOffset({ limit: 30, offset: 0 });
     },
@@ -149,7 +146,12 @@ const EventList = () => {
           events.map((event, index) => <EventCard key={index} event={event} />)
         ) : (
           <Grid item lg={12} md={12} sm={12} xs={12}>
-            <Typography variant={"h6"}>Пока здесь пусто...</Typography>
+            <Stack alignItems={"center"} mt={5} spacing={2}>
+              <Typography variant={"h6"} fontWeight={"500"}>
+                Здесь пока ничего нет...
+              </Typography>
+              <Box component={"img"} src={Img} maxWidth={"40%"} />
+            </Stack>
           </Grid>
         )}
       </Grid>

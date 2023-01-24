@@ -110,6 +110,7 @@ const App = () => {
           <Route path="/" element={<AppWrapper />}>
             <Route path="events">
               <Route path="my" element={<EventList />} />
+              <Route path="map" element={<EventMap />} />
               <Route index element={<EventList />} />
             </Route>
             <Route path="event">

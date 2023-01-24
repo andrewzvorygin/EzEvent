@@ -57,7 +57,7 @@ const Comment: FC<IProps> = ({
   return (
     <Stack direction="row" spacing={2}>
       <Box paddingTop={0.5}>
-        <Avatar alt="Remy Sharp" src={photo} />
+        <Avatar alt={`${surname} ${name}`} src={photo} />
       </Box>
       <Stack spacing={0} width={"100%"}>
         <Box
