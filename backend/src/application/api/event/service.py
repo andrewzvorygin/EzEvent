@@ -125,7 +125,7 @@ async def get_visitors(event_uuid: UUID):
 async def read_event(event_uuid: UUID, current_user):
     event = await st.get_event_for_visitor(event_uuid)
     participants = await st.get_participants(event_uuid)
-    editors = await st.get_participants(event_uuid, True)
+    editors = await st.get_event_editors(event_uuid)
     event.can_edit = True if (
             current_user
             and current_user.user_id in [editor.user_id for editor in editors]

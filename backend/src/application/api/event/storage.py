@@ -8,7 +8,7 @@ from sqlalchemy import select, insert, update, not_, func
 from schemes import (
     UserRead, RegistryEvent, UserFromToken, EventRead,
     Participant, EventForEditor, CommentCreate, CommentRead,
-    ShortUser, Navigation, ParticipantShort
+    ShortUser, Navigation, ParticipantShort, EditorShort
 )
 from models import user_orm, event_orm, participant_orm, city_orm, comment_orm
 from core import database
@@ -271,19 +271,26 @@ async def get_comment(event_id: int) -> list[CommentRead]:
     return [CommentRead.from_orm(record) for record in record_set]
 
 
-async def get_participants(event_uuid, need_editors: bool = False) -> list[ParticipantShort]:
-    def _is_need_editors(need_editors):
-        if need_editors:
-            return participant_orm.c.is_editor
-        return not_(participant_orm.c.is_editor)
+async def get_participants(event_uuid) -> list[ParticipantShort]:
     smtp = (
         select(user_orm)
         .join(participant_orm, participant_orm.c.user_id == user_orm.c.user_id)
         .join(event_orm, event_orm.c.event_id == participant_orm.c.event_id)
-        .where(event_orm.c.uuid == event_uuid, _is_need_editors(need_editors))
+        .where(event_orm.c.uuid == event_uuid, not_(participant_orm.c.is_editor))
     )
     result = await database.fetch_all(smtp)
     return [ParticipantShort.from_orm(record) for record in result]
+
+
+async def get_event_editors(event_uuid) -> list[EditorShort]:
+    smtp = (
+        select(user_orm)
+        .join(participant_orm, participant_orm.c.user_id == user_orm.c.user_id)
+        .join(event_orm, event_orm.c.event_id == participant_orm.c.event_id)
+        .where(event_orm.c.uuid == event_uuid, participant_orm.c.is_editor)
+    )
+    result = await database.fetch_all(smtp)
+    return [EditorShort.from_orm(record) for record in result]
 
 
 async def get_editors(event_uuid) -> list[ShortUser]:
