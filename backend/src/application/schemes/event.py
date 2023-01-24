@@ -18,6 +18,7 @@ class Event(BaseModel):
     title: str | None = None
     description: str | None = None
     visibility: bool | None = False
+    photo_cover: str | None = None
 
 
 class EventFromDB(Event):
@@ -40,7 +41,6 @@ class EventRead(EventFromDB):
     event_id: int
     uuid: UUID
     uuid_edit: UUID
-    photo_cover: str | None
     responsible_id: int
     participants: list[ShortUser] | None
     can_reg: bool | None = None
