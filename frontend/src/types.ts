@@ -28,6 +28,12 @@ export interface EventType {
   participants?: ProfileNameType[];
 }
 
+export interface EventPageType extends EventType {
+  participants: ProfileNameType[];
+  responsible_name: string;
+  responsible_surname: string;
+}
+
 export interface EventCardType extends EventType {
   city: string;
   uuid: string;

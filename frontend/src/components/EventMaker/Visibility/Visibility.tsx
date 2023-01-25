@@ -41,15 +41,12 @@ const Visibility: React.FC<VisibilityPropsType> = ({ ws, eventData }) => {
         disable = true;
       }
     });
-    if (disable) {
+    if (disable && visibility) {
       setVisibility(false);
+      ws.send(JSON.stringify({ visibility: false }));
     }
     setDisableVisibility(disable);
   }, [eventData]);
-
-  useEffect(() => {
-    ws.send(JSON.stringify({ visibility: visibility }));
-  }, [visibility]);
 
   return (
     <Box mb={2}>
