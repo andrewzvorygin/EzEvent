@@ -1,18 +1,22 @@
 import React, { FC, useEffect, useState } from "react";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { Map, Placemark, YMaps } from "@pbe/react-yandex-maps";
+import { useNavigate } from "react-router-dom";
 
 import { eventsAPI } from "../../api/Api";
-import { UserType } from "../../types";
 
 const EventMap: FC = () => {
+  const [events, setEvents] = useState<any[]>([]);
+  const navigate = useNavigate();
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   window.onClickBalloonBtn = function (indexPoint: number) {
-    console.log(indexPoint);
+    const event = events[indexPoint];
+    if (!event) {
+      return;
+    }
+    navigate(`/event/${event.uuid}`);
   };
-
-  const [events, setEvents] = useState<any[]>([]);
 
   useEffect(() => {
     eventsAPI
@@ -24,7 +28,7 @@ const EventMap: FC = () => {
       })
       .then((data) => {
         const res = data.Events.map((e: any) => {
-          return { coords: [e.latitude, e.longitude], title: e.title };
+          return { ...e, coords: [e.latitude, e.longitude], title: e.title };
         });
         setEvents(res);
       });
@@ -32,6 +36,9 @@ const EventMap: FC = () => {
 
   return (
     <Box>
+      <Typography variant={"h1"} gutterBottom>
+        Ваши мероприятия на карте
+      </Typography>
       <YMaps
         query={{
           lang: "ru_RU",
