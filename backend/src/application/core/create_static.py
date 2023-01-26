@@ -7,7 +7,7 @@ STATIC_FILE = 'static'
 STATIC_FILE_PATH = os.path.join(ROOT_PATH, STATIC_FILE)
 
 if not os.path.exists(STATIC_FILE_PATH):
-    os.mkdir(STATIC_FILE)
+    os.mkdir(STATIC_FILE_PATH)
 
 PHOTO_PROFILE = 'profile_photo'
 PHOTO_PROFILE_PATH = os.path.join(STATIC_FILE_PATH, PHOTO_PROFILE)
