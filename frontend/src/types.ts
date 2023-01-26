@@ -25,6 +25,13 @@ export interface EventType {
   uuid_edit?: string;
   can_edit: boolean | null;
   can_reg: boolean | null;
+  participants?: ProfileNameType[];
+}
+
+export interface EventPageType extends EventType {
+  participants: ProfileNameType[];
+  responsible_name: string;
+  responsible_surname: string;
 }
 
 export interface EventCardType extends EventType {

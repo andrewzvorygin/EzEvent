@@ -8,6 +8,7 @@ import JoditEditor from "jodit-react";
 import { Typography } from "@mui/material";
 
 import styles from "./Description.module.scss";
+import "./Descriptions.css";
 
 interface DescriptionPropsType {
   ws: WebSocket;

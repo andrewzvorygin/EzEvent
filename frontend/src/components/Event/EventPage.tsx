@@ -4,16 +4,12 @@ import {
   Button,
   Divider,
   Grid,
-  IconButton,
   Stack,
   Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import LinkIcon from "@mui/icons-material/Link";
-import IosShareIcon from "@mui/icons-material/IosShare";
-import { NavLink, useNavigate, useParams } from "react-router-dom";
-import EditIcon from "@mui/icons-material/Edit";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { eventsAPI } from "../../api/Api";
 import { EventType } from "../../types";
@@ -23,6 +19,7 @@ import Description from "./templates/Description";
 import Comments from "./Comments/Comments";
 import SmallTitle from "./templates/SmallTitle";
 import ButtonModalMap from "./templates/ButtonModalMap";
+import Participants from "./templates/Participants";
 
 const EventPage = () => {
   const navigate = useNavigate();
@@ -66,7 +63,9 @@ const EventPage = () => {
             width: "100%",
             objectFit: "cover",
           }}
-          src={event.photo_cover}
+          src={
+            "https://sun9-22.userapi.com/impg/Sm3YtJ-VcQuAgZgeh_8x8jvUfNsdAMxRTMyN8Q/jNG_leCW7bg.jpg?size=479x274&quality=96&sign=748eda4dd8575ca4a4ded609c5e844c9&type=album"
+          }
           mb={5}
         />
       )}
@@ -116,44 +115,39 @@ const EventPage = () => {
             }}
             disabled={!event.can_reg}
           >
-            Зарегистрироваться
+            {event.can_reg ? "Зарегистрироваться" : "Вы уже зарегистрированы"}
           </Button>
         )}
       </Stack>
 
-      <Stack direction="row" spacing={3} mb={5} justifyContent="space-between">
-        <Box>
-          <IconButton>
-            <LinkIcon />
-          </IconButton>
-          <IconButton>
-            <IosShareIcon />
-          </IconButton>
-        </Box>
-      </Stack>
-
       <Grid container mb={5} spacing={2.5}>
-        <Grid item lg={4} md={6} sm={12} xs={12}>
-          <SmallTitle mb={1}>Организаторы</SmallTitle>
+        <Grid item lg={12} md={12} sm={12} xs={12}>
           <Stack
-            spacing={0}
-            alignItems={"flex-start"}
-            direction={isMobile ? "row" : "column"}
+            direction={isMobile ? "column" : "row"}
             justifyContent={"space-between"}
-            flexWrap={"wrap"}
           >
-            <Box mb={2} mr={2}>
-              <Person />
+            <Box>
+              <SmallTitle mb={2}>Организаторы</SmallTitle>
+              <Stack
+                spacing={0}
+                alignItems={"flex-start"}
+                direction={isMobile ? "row" : "column"}
+                justifyContent={"space-between"}
+                flexWrap={"wrap"}
+              >
+                {event.editors.map((e) => {
+                  return (
+                    <Box mb={2} mr={2} key={e.surname}>
+                      <Person item={e} />
+                    </Box>
+                  );
+                })}
+              </Stack>
             </Box>
-            <Box mb={2} mr={2}>
-              <Person />
-            </Box>
-            <Box mb={2} mr={2}>
-              <Person />
-            </Box>
-            <Box mb={2} mr={2}>
-              <Person />
-            </Box>
+
+            {event.can_edit && event.participants && (
+              <Participants participants={event.participants} />
+            )}
           </Stack>
         </Grid>
         <Grid item sm={12} xs={12}>

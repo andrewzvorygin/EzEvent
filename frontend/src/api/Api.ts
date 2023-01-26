@@ -12,8 +12,6 @@ const { fetch: originalFetch } = window;
 
 window.fetch = async (...args) => {
   const [resource, config] = args;
-  console.log(resource);
-  console.log(config);
   const response = await originalFetch(resource, config);
   if (response.status === 401 && resource !== `${baseUrl}auth/refresh_token`) {
     const accessToken = await authAPI.putRefreshToken();

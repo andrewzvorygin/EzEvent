@@ -1,6 +1,9 @@
-import React, { FC } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { Box } from "@mui/material";
 import { Map, Placemark, YMaps } from "@pbe/react-yandex-maps";
+
+import { eventsAPI } from "../../api/Api";
+import { UserType } from "../../types";
 
 const EventMap: FC = () => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -9,20 +12,23 @@ const EventMap: FC = () => {
     console.log(indexPoint);
   };
 
-  const events = [
-    {
-      title: "Меро1",
-      coords: [56.85, 60.6122],
-    },
-    {
-      title: "Меро2",
-      coords: [56.85, 60.7122],
-    },
-    {
-      title: "Меро3",
-      coords: [56.88, 60.6122],
-    },
-  ];
+  const [events, setEvents] = useState<any[]>([]);
+
+  useEffect(() => {
+    eventsAPI
+      .getMyEvents({
+        typeUser: 2,
+        limit: 30,
+        offset: 0,
+        search: "",
+      })
+      .then((data) => {
+        const res = data.Events.map((e: any) => {
+          return { coords: [e.latitude, e.longitude], title: e.title };
+        });
+        setEvents(res);
+      });
+  }, []);
 
   return (
     <Box>
@@ -36,25 +42,25 @@ const EventMap: FC = () => {
       >
         <Map
           width="100%"
-          height={435}
+          height={"70vh"}
           defaultState={{
             center: [56.85, 60.6122],
             zoom: 12,
           }}
         >
-          {events.map((e, i) => (
-            <Placemark
-              properties={{
-                item: i,
-                balloonContentHeader: e.title,
-                balloonContentBody: "Описание какое-то",
-                iconCaption: e.title,
-                balloonContentFooter: `<input type="button" onclick="window.onClickBalloonBtn(${i});"value="Подробнее"/>`,
-              }}
-              key={i}
-              geometry={e.coords}
-            />
-          ))}
+          {events &&
+            events.map((e, i) => (
+              <Placemark
+                properties={{
+                  item: i,
+                  balloonContentHeader: e.title,
+                  iconCaption: e.title,
+                  balloonContentFooter: `<input type="button" onclick="window.onClickBalloonBtn(${i});"value="Подробнее"/>`,
+                }}
+                key={i}
+                geometry={e.coords}
+              />
+            ))}
         </Map>
       </YMaps>
     </Box>

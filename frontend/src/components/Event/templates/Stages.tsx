@@ -1,8 +1,6 @@
 import React from "react";
 import { Box, Divider, Stack, Typography, useTheme } from "@mui/material";
 
-import Description from "./Description";
-
 const Stages = () => {
   const theme = useTheme();
   return (
@@ -49,7 +47,6 @@ const Stages = () => {
           </Typography>
         </Stack>
       </Stack>
-      {/* <Description /> */}
     </Box>
   );
 };

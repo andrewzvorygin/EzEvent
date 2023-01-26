@@ -9,22 +9,19 @@ import {
 } from "@mui/icons-material";
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import MapIcon from "@mui/icons-material/Map";
 
 import logo from "../../assets/logo.png";
 import { StyledIconButton } from "../StyledControls/StyledControls";
 import { authAPI, eventsAPI } from "../../api/Api";
 import { AuthContext, DeviceContext } from "../../App";
 import { AuthType, DeviceContextType, DeviceType } from "../../types";
-
 const Header: React.FC<AuthType & DeviceContextType> = (props) => {
   const navigate = useNavigate();
   const location = useLocation();
   return (
     <Box component="header" sx={{ py: 3, px: 3, display: "flex" }}>
-      <Avatar
-        sx={{ width: 56, height: 56 }}
-        src={logo}
-      />
+      <Avatar sx={{ width: 56, height: 56 }} src={logo} />
       <Box
         sx={{
           ml: "auto",
@@ -42,6 +39,14 @@ const Header: React.FC<AuthType & DeviceContextType> = (props) => {
               }}
             >
               <EventNoteOutlined />
+            </StyledIconButton>
+            <StyledIconButton
+              title="Мои мероприятия картой"
+              onClick={() => {
+                navigate(`/events/map`);
+              }}
+            >
+              <MapIcon />
             </StyledIconButton>
             {props.device !== DeviceType.mobile && (
               <StyledIconButton

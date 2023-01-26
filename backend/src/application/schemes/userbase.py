@@ -83,6 +83,10 @@ class ParticipantShort(ShortUser):
     user_id: int
 
 
+class EditorShort(ParticipantShort):
+    photo: str | None = None
+
+
 class ProfileUser(ShortUser):
     phone: str | None = None
 
