@@ -45,6 +45,10 @@ const Organizers: React.FC<OrganizersPropsType> = ({ editors, eventId }) => {
     }
   }, [open, eventId]);
 
+  if (editors.length === 0) {
+    return null;
+  }
+
   return (
     <Box>
       <Box
