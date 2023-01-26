@@ -1,18 +1,31 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Box, Grid, Stack, Typography } from "@mui/material";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Button from "@mui/material/Button";
 import { useFormik } from "formik";
 
 import { StyledButton } from "../StyledControls/StyledControls";
 import { eventsAPI } from "../../api/Api";
-import { CityType, EventCardType, EventQueryType, UserType } from "../../types";
+import {
+  CityType,
+  DeviceType,
+  EventCardType,
+  EventQueryType,
+  UserType,
+} from "../../types";
+import { AuthContext } from "../../App";
 
 import Filter from "./Filter/Filter";
 import EventCard from "./EventCard/EventCard";
 import Img from "./../../assets/emptyView.png";
 
-const EventList = () => {
+interface EventListPropsType {
+  auth: boolean;
+  initialized: boolean;
+}
+
+const EventList: React.FC<EventListPropsType> = ({ initialized, auth }) => {
+  const navigate = useNavigate();
   const [userType, setUserType] = useState(UserType.all);
   const [cities, setCities] = useState<CityType[]>([]);
   const [events, setEvents] = useState<EventCardType[]>([]);
@@ -47,6 +60,12 @@ const EventList = () => {
       setOffset({ limit: 30, offset: 0 });
     },
   });
+
+  useEffect(() => {
+    if (initialized && location === "/events/my" && !auth) {
+      navigate("/events", { replace: true });
+    }
+  }, [initialized, auth]);
 
   useEffect(() => {
     if (location === "/events/my") {
@@ -175,4 +194,14 @@ const EventList = () => {
   );
 };
 
-export default EventList;
+const EventListPage = () => {
+  return (
+    <AuthContext.Consumer>
+      {({ auth, initialized }) => (
+        <EventList auth={auth} initialized={initialized} />
+      )}
+    </AuthContext.Consumer>
+  );
+};
+
+export default EventListPage;

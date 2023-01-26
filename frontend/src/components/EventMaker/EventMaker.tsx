@@ -4,7 +4,6 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { DeviceType, EventType } from "../../types";
 import { AuthContext, DeviceContext } from "../../App";
-import { eventsAPI } from "../../api/Api";
 
 import MainForm from "./MainForm";
 import Organizers from "./Organizers";
@@ -32,7 +31,7 @@ const EventMaker: React.FC<EventMakerPropsType> = (props) => {
     visibility: null,
     latitude: null,
     longitude: null,
-    editors: []
+    editors: [],
   });
 
   useEffect(() => {
