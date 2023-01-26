@@ -63,9 +63,7 @@ const EventPage = () => {
             width: "100%",
             objectFit: "cover",
           }}
-          src={
-            "https://sun9-22.userapi.com/impg/Sm3YtJ-VcQuAgZgeh_8x8jvUfNsdAMxRTMyN8Q/jNG_leCW7bg.jpg?size=479x274&quality=96&sign=748eda4dd8575ca4a4ded609c5e844c9&type=album"
-          }
+          src={event.photo_cover}
           mb={5}
         />
       )}

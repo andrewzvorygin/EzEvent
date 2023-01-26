@@ -1,4 +1,4 @@
-import { Avatar, Box } from "@mui/material";
+import { Avatar, Box, Button, Typography } from "@mui/material";
 import {
   AccountBoxOutlined,
   ControlPointOutlined,
@@ -8,7 +8,7 @@ import {
   LogoutOutlined,
 } from "@mui/icons-material";
 import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import MapIcon from "@mui/icons-material/Map";
 
 import logo from "../../assets/logo.png";
@@ -16,12 +16,23 @@ import { StyledIconButton } from "../StyledControls/StyledControls";
 import { authAPI, eventsAPI } from "../../api/Api";
 import { AuthContext, DeviceContext } from "../../App";
 import { AuthType, DeviceContextType, DeviceType } from "../../types";
+const activeStyle = {
+  color: "#1976d2",
+  ":hover": {
+    color: "#1976d2",
+  },
+};
 const Header: React.FC<AuthType & DeviceContextType> = (props) => {
   const navigate = useNavigate();
   const location = useLocation();
   return (
     <Box component="header" sx={{ py: 3, px: 3, display: "flex" }}>
-      <Avatar sx={{ width: 56, height: 56 }} src={logo} />
+      <NavLink to={"/events"}>
+        <Avatar sx={{ width: 56, height: 56 }} src={logo} />
+      </NavLink>
+      <Typography variant={"h3"} alignSelf={"center"} ml={2}>
+        EzEvent
+      </Typography>
       <Box
         sx={{
           ml: "auto",
@@ -33,6 +44,7 @@ const Header: React.FC<AuthType & DeviceContextType> = (props) => {
         {props.auth ? (
           <>
             <StyledIconButton
+              sx={location.pathname === `/events/my` ? activeStyle : undefined}
               title="Мои мероприятия"
               onClick={() => {
                 navigate(`/events/my`);
@@ -41,6 +53,7 @@ const Header: React.FC<AuthType & DeviceContextType> = (props) => {
               <EventNoteOutlined />
             </StyledIconButton>
             <StyledIconButton
+              sx={location.pathname === `/events/map` ? activeStyle : undefined}
               title="Мои мероприятия картой"
               onClick={() => {
                 navigate(`/events/map`);
@@ -61,6 +74,7 @@ const Header: React.FC<AuthType & DeviceContextType> = (props) => {
               </StyledIconButton>
             )}
             <StyledIconButton
+              sx={location.pathname === `/events` ? activeStyle : undefined}
               title="Главная"
               onClick={() => {
                 navigate(`/events`);
@@ -69,6 +83,7 @@ const Header: React.FC<AuthType & DeviceContextType> = (props) => {
               <HomeOutlined />
             </StyledIconButton>
             <StyledIconButton
+              sx={location.pathname === `/profile` ? activeStyle : undefined}
               title="Профиль"
               onClick={() => {
                 navigate(`/profile`);
@@ -90,6 +105,7 @@ const Header: React.FC<AuthType & DeviceContextType> = (props) => {
         ) : (
           <>
             <StyledIconButton
+              sx={location.pathname === `/events` ? activeStyle : undefined}
               title="Главная"
               onClick={() => {
                 navigate(`/events`);
@@ -97,14 +113,13 @@ const Header: React.FC<AuthType & DeviceContextType> = (props) => {
             >
               <HomeOutlined />
             </StyledIconButton>
-            <StyledIconButton
-              title="Войти"
+            <Button
               onClick={() => {
                 navigate(`/auth`, { state: location });
               }}
             >
-              <LoginOutlined />
-            </StyledIconButton>
+              Войти
+            </Button>
           </>
         )}
       </Box>

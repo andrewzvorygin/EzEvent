@@ -26,6 +26,11 @@ code {
   min-width: 370px;
 }
 
+
+html {
+  overflow-y: scroll;
+}
+
 .ymaps-2-1-79-map-copyrights-promo {
 }
 
