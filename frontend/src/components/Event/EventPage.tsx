@@ -13,6 +13,8 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { eventsAPI } from "../../api/Api";
 import { EventPageType } from "../../types";
+import { TagsContext } from "../../App";
+import { StyledButton } from "../StyledControls/StyledControls";
 
 import Person from "./templates/Person";
 import Description from "./templates/Description";
@@ -66,7 +68,7 @@ const EventPage = () => {
           mb={5}
         />
       )}
-      <Stack direction={"row"} spacing={1} alignItems={"center"} mb={5}>
+      <Stack direction={"row"} spacing={1} alignItems={"center"} mb={1}>
         <Typography
           variant="h1"
           component="h1"
@@ -77,6 +79,20 @@ const EventPage = () => {
           {event.title}
         </Typography>
       </Stack>
+
+      {event.tags_id && (
+        <TagsContext.Consumer>
+          {({ tags }) => (
+            <Stack mb={4} direction={"row"} flexWrap={"wrap"} spacing={1}>
+              {event.tags_id.map((e) => (
+                <StyledButton key={e} variant="outlined">
+                  {tags[e]}
+                </StyledButton>
+              ))}
+            </Stack>
+          )}
+        </TagsContext.Consumer>
+      )}
 
       <Stack
         direction={isMobile ? "column" : "row"}
