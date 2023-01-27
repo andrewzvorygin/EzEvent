@@ -36,6 +36,7 @@ async def get_event_for_visitor(event_uuid: UUID) -> RegistryEvent:
             user_orm.c.surname.label('responsible_surname'),
             user_orm.c.name.label('responsible_name'),
             event_orm.c.visibility,
+            event_orm.c.tags_id,
             event_orm.c.photo_cover,
             event_orm.c.key_invite
         )
