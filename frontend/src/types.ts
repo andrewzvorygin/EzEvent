@@ -110,3 +110,12 @@ export interface CommentType {
   photo: string;
   nestedComments?: CommentType[];
 }
+
+export interface TagsDictionaryType {
+  [key: string]: string;
+}
+
+export interface TagsContextType {
+  tags: TagsDictionaryType;
+  setTags: (value: TagsDictionaryType) => void;
+}

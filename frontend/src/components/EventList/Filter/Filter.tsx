@@ -22,7 +22,7 @@ import {
   StyledButton,
   StyledIconButton,
 } from "../../StyledControls/StyledControls";
-import { CityType, UserType } from "../../../types";
+import { CityType, TagsDictionaryType, UserType } from "../../../types";
 import { cityAPI } from "../../../api/Api";
 
 const style = {
@@ -54,6 +54,7 @@ interface IProps {
   setCities: (cities: CityType[]) => void;
   userType: UserType | null;
   setUserType: ((userType: UserType) => void) | null;
+  tags: TagsDictionaryType;
 }
 
 const Filter: FC<IProps> = ({
@@ -64,6 +65,7 @@ const Filter: FC<IProps> = ({
   setCities,
   userType,
   setUserType,
+  tags,
 }) => {
   const theme = useTheme();
   const [searchText, setSearchText] = useState("");
@@ -153,6 +155,29 @@ const Filter: FC<IProps> = ({
               {cities.map(({ name, id }) => (
                 <MenuItem value={id} key={id}>
                   {name}
+                </MenuItem>
+              ))}
+            </Select>
+
+            <Typography variant="body1" gutterBottom>
+              Теги
+            </Typography>
+            <Select
+              id="tags"
+              name="tags"
+              sx={{
+                minWidth: "250px",
+                maxWidth: "100%",
+              }}
+              multiple={true}
+              value={formik.values.tags}
+              onChange={(e) => {
+                formik.handleChange(e);
+              }}
+            >
+              {Object.entries(tags).map(([key, value]) => (
+                <MenuItem value={key} key={key}>
+                  {value}
                 </MenuItem>
               ))}
             </Select>
