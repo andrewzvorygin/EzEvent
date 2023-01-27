@@ -31,6 +31,7 @@ const EventPage = () => {
   const eventId = useParams().eventId;
 
   const [event, setEvent] = useState<EventPageType | null>(null);
+  const [canReg, setCanReg] = useState<boolean>(true);
 
   useEffect(() => {
     if (eventId) {
@@ -44,6 +45,7 @@ const EventPage = () => {
             ? new Date(data.date_end).toLocaleDateString()
             : "неизвестно",
         });
+        setCanReg(data.can_reg);
       });
     }
   }, []);
@@ -108,11 +110,11 @@ const EventPage = () => {
           <Button
             variant="contained"
             onClick={() => {
-              eventsAPI.registerOnEvent(eventId);
+              eventsAPI.registerOnEvent(eventId).then(() => setCanReg(false));
             }}
-            disabled={!event.can_reg}
+            disabled={canReg}
           >
-            {event.can_reg ? "Зарегистрироваться" : "Вы уже зарегистрированы"}
+            {canReg ? "Зарегистрироваться" : "Вы уже зарегистрированы"}
           </Button>
         )}
       </Stack>
