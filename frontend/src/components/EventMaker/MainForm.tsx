@@ -106,7 +106,11 @@ const MainForm: React.FC<MainFormPropsType> = ({ ws, eventData }) => {
           {({ tags }) => <Tags tags={tags} ws={ws} />}
         </TagsContext.Consumer>
       </Grid>
-      <Grid item maxWidth={"100%"} overflow={"hidden"}>
+      <Grid
+        item
+        overflow={"hidden"}
+        sx={{ maxWidth: "100% !important", overflow: "hidden", minWidth: 0 }}
+      >
         <Description ws={ws} description={eventData.description} />
       </Grid>
       <Grid item>
