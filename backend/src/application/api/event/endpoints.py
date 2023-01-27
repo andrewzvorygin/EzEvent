@@ -58,6 +58,7 @@ async def get_registry(
         limit: int,
         offset: int,
         search: str = None,
+        tags: list[int] = None,
         date_start: datetime = None,
         date_end: datetime = None,
         location: int = None
