@@ -321,3 +321,8 @@ async def get_tag():
     smtp = select(tag_orm)
     result = await database.fetch_all(smtp)
     return [Tag.from_orm(record) for record in result]
+
+
+async def set_tags(tags: list[str]):
+    smtp = tag_orm.insert()
+    await database.execute_many(smtp, values=tags)

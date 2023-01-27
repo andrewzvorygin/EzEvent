@@ -186,3 +186,8 @@ async def get_editors(event_uuid):
 
 async def get_tags():
     return await st.get_tag()
+
+
+async def set_tags(tags):
+    data = [{'name': tag} for tag in tags]
+    await st.set_tags(data)

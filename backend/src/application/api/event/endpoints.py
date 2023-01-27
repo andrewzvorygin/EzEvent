@@ -158,3 +158,8 @@ async def read_comment(event_id: int):
 @event_router.get('/tags')
 async def get_tags():
     return await service.get_tags()
+
+
+@event_router.post('/tags')
+async def set_tags(tags: list[str]):
+    await service.set_tags(tags)
