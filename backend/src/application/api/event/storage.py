@@ -72,7 +72,7 @@ async def update_key_invite(event_uuid: UUID, new_key: str) -> None:
 async def create_event(current_user: UserFromToken) -> Record:
     smtp = (
         insert(event_orm)
-        .values(responsible_id=current_user.user_id)
+        .values(responsible_id=current_user.user_id, tags_id=[])
         .returning(event_orm.c.uuid_edit, event_orm.c.event_id)
     )
     return await database.fetch_one(smtp)
