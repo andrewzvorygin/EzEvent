@@ -64,6 +64,7 @@ const Visibility: React.FC<VisibilityPropsType> = ({ ws, eventData }) => {
         <StyledButton
           onClick={() => {
             setVisibility(false);
+            ws.send(JSON.stringify({ visibility: false }));
           }}
           sx={!visibility ? selectedStyle : undefined}
         >
