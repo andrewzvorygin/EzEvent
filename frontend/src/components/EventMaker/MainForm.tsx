@@ -45,7 +45,15 @@ const MainForm: React.FC<MainFormPropsType> = ({ ws, eventData }) => {
   }, [eventData]);
 
   return (
-    <Grid direction="column" container spacing={5}>
+    <Grid
+      direction="column"
+      container
+      spacing={5}
+      maxWidth={"100%"}
+      sx={{
+        overflow: "hidden",
+      }}
+    >
       <Grid item>
         <Typography variant="h3" gutterBottom>
           Название мероприятия
