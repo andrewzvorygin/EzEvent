@@ -135,7 +135,7 @@ async def read_event(event_uuid: UUID, current_user):
             not event.can_edit
             and (
                 not current_user
-                or current_user.user_id not in [participant.user_id for participant in participants]
+                or (current_user and current_user.user_id not in [participant.user_id for participant in participants])
             )
     ) else False
 
