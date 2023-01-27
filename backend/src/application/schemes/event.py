@@ -7,6 +7,13 @@ from pydantic import BaseModel, validator, Field
 from .userbase import ShortUser, ParticipantShort, EditorShort
 
 
+class TagId(BaseModel):
+    tag_id: str | None = None
+
+    class Config:
+        orm_mode = True
+
+
 class Location(BaseModel):
     latitude: float | None
     longitude: float | None
@@ -19,6 +26,7 @@ class Event(BaseModel):
     description: str | None = None
     visibility: bool | None = False
     photo_cover: str | None = None
+    tags_id: [TagId] = []
 
 
 class EventFromDB(Event):
@@ -37,15 +45,8 @@ class EventFromDB(Event):
     #     return location
 
 
-class TagId(BaseModel):
-    tag_id: str | None = None
-
-    class Config:
-        orm_mode = True
-
-
 class Tag(TagId):
-    name: str
+    name: str | None = None
 
 
 class EventRead(EventFromDB):

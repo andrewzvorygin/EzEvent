@@ -150,3 +150,8 @@ async def get_participants(event_uuid: UUID):
 @event_router.get('/event/comment/{event_id}')
 async def read_comment(event_id: int):
     return await service.get_comments(event_id)
+
+
+@event_router.get('/tags')
+async def get_tags():
+    return await service.get_tags()

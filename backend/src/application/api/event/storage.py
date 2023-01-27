@@ -8,9 +8,9 @@ from sqlalchemy import select, insert, update, not_, func
 from schemes import (
     UserRead, RegistryEvent, UserFromToken, EventRead,
     Participant, EventForEditor, CommentCreate, CommentRead,
-    ShortUser, Navigation, ParticipantShort, EditorShort
+    ShortUser, Navigation, ParticipantShort, EditorShort, Tag
 )
-from models import user_orm, event_orm, participant_orm, city_orm, comment_orm
+from models import user_orm, event_orm, participant_orm, city_orm, comment_orm, tag_orm
 from core import database
 
 
@@ -302,3 +302,9 @@ async def get_editors(event_uuid) -> list[ShortUser]:
     )
     rs = await database.fetch_all(smtp)
     return [ShortUser.from_orm(record).dict() for record in rs]
+
+
+async def get_tag():
+    smtp = select(tag_orm)
+    result = await database.fetch_all(smtp)
+    return [Tag.from_orm(record) for record in result]

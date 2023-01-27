@@ -181,3 +181,7 @@ async def get_comments(event_id: int):
 
 async def get_editors(event_uuid):
     return await st.get_editors(event_uuid)
+
+
+async def get_tags():
+    return await st.get_tag()
