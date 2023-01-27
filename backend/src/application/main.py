@@ -21,12 +21,16 @@ app.include_router(event_router)
 origins = [
     "http://localhost",
     "https://localhost",
-    "http://localhost:3000",
+    "http://localhost:777",
     "https://localhost:3000",
     "http://127.0.0.1",
     "https://127.0.0.1",
     "http://127.0.0.1:3000",
     "https://127.0.0.1:3000",
+    "http://192.168.0.101",
+    "http://192.168.0.101:777",
+    "http://46.48.59.66",
+    "http://46.48.59.66:777"
 ]
 app.add_middleware(
     CORSMiddleware,
