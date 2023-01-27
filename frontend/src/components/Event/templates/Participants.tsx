@@ -57,11 +57,15 @@ const Participants: React.FC<DescriptionPropsType> = ({ participants }) => {
             Участники
           </Typography>
           <Stack spacing={1}>
-            {participants.map(({ name, surname }, i) => (
-              <Typography key={name}>{`${
-                i + 1
-              }. ${surname} ${name}`}</Typography>
-            ))}
+            {participants.length !== 0 ? (
+              participants.map(({ name, surname }, i) => (
+                <Typography key={name}>{`${
+                  i + 1
+                }. ${surname} ${name}`}</Typography>
+              ))
+            ) : (
+              <Typography>Пока участников нет</Typography>
+            )}
           </Stack>
         </Box>
       </Modal>

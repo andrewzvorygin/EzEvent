@@ -6,14 +6,8 @@ import { useFormik } from "formik";
 
 import { StyledButton } from "../StyledControls/StyledControls";
 import { eventsAPI } from "../../api/Api";
-import {
-  CityType,
-  DeviceType,
-  EventCardType,
-  EventQueryType,
-  UserType,
-} from "../../types";
-import { AuthContext } from "../../App";
+import { CityType, EventCardType, EventQueryType, UserType } from "../../types";
+import { AuthContext, TagsContext } from "../../App";
 
 import Filter from "./Filter/Filter";
 import EventCard from "./EventCard/EventCard";
@@ -41,6 +35,7 @@ const EventList: React.FC<EventListPropsType> = ({ initialized, auth }) => {
       search: "",
       dateStart: undefined,
       dateEnd: undefined,
+      tags: [],
     },
     onSubmit: (values) => {
       if (location === "/events/my") {
@@ -121,15 +116,20 @@ const EventList: React.FC<EventListPropsType> = ({ initialized, auth }) => {
           xs={12}
           sx={{ display: "flex", alignItems: "flex-end" }}
         >
-          <Filter
-            formik={formik}
-            expanded={expandedFilter}
-            handleExpandClick={handleExpandClick}
-            cities={cities}
-            setCities={setCities}
-            userType={location === "/events/my" ? userType : null}
-            setUserType={location === "/events/my" ? setUserType : null}
-          />
+          <TagsContext.Consumer>
+            {({ tags }) => (
+              <Filter
+                formik={formik}
+                tags={tags}
+                expanded={expandedFilter}
+                handleExpandClick={handleExpandClick}
+                cities={cities}
+                setCities={setCities}
+                userType={location === "/events/my" ? userType : null}
+                setUserType={location === "/events/my" ? setUserType : null}
+              />
+            )}
+          </TagsContext.Consumer>
         </Grid>
         <Grid
           item

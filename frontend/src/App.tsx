@@ -16,8 +16,14 @@ import EventMap from "./components/EventsMap/EventMap";
 import Auth from "./components/Auth/Auth";
 import EventPage from "./components/Event/EventPage";
 import Profile from "./components/Profile/Profile";
-import { authAPI } from "./api/Api";
-import { AuthContextType, DeviceContextType, DeviceType } from "./types";
+import { authAPI, eventsAPI } from "./api/Api";
+import {
+  AuthContextType,
+  DeviceContextType,
+  DeviceType,
+  TagsContextType,
+  TagsDictionaryType,
+} from "./types";
 import styles from "./App.module.scss";
 import Invite from "./components/InvitePage/Invite";
 
@@ -31,6 +37,11 @@ export const AuthContext = React.createContext<AuthContextType>({
   setInitialized: (initialized) => {},
   auth: false,
   setAuth: (auth) => {},
+});
+
+export const TagsContext = React.createContext<TagsContextType>({
+  tags: {},
+  setTags: (tags) => {},
 });
 
 const AppWrapper = () => (
@@ -50,6 +61,7 @@ const App = () => {
   const location = useLocation().pathname;
   const [initialized, setInitialized] = useState(false);
   const [auth, setAuth] = useState<boolean>(false);
+  const [tags, setTags] = useState<TagsDictionaryType>({});
   const [device, setDevice] = useState<DeviceType>(
     window.innerWidth < 1000 ? DeviceType.mobile : DeviceType.computer,
   );
@@ -97,6 +109,20 @@ const App = () => {
     deviceRef.current = device;
   }, [device]);
 
+  useEffect(() => {
+    const getSetTags = () => {
+      eventsAPI.getTags().then((data: any[]) => {
+        setTags(
+          data.reduce((dict, item) => {
+            dict[item.tag_id] = item.name;
+            return dict;
+          }, {})
+        );
+      });
+    };
+    getSetTags();
+  }, []);
+
   if (!initialized) {
     return null;
   }
@@ -106,22 +132,24 @@ const App = () => {
       <AuthContext.Provider
         value={{ auth, setAuth, initialized, setInitialized }}
       >
-        <Routes>
-          <Route path="/" element={<AppWrapper />}>
-            <Route path="events">
-              <Route path="my" element={<EventList />} />
-              <Route path="map" element={<EventMap />} />
-              <Route index element={<EventList />} />
+        <TagsContext.Provider value={{ tags, setTags }}>
+          <Routes>
+            <Route path="/" element={<AppWrapper />}>
+              <Route path="events">
+                <Route path="my" element={<EventList />} />
+                <Route path="map" element={<EventMap />} />
+                <Route index element={<EventList />} />
+              </Route>
+              <Route path="event">
+                <Route path=":eventId" element={<EventPage />} />
+                <Route path=":eventId/edit" element={<EventMaker />} />
+                <Route path=":eventId/invite/:key" element={<Invite />} />
+              </Route>
+              <Route path="profile" element={<Profile />} />
             </Route>
-            <Route path="event">
-              <Route path=":eventId" element={<EventPage />} />
-              <Route path=":eventId/edit" element={<EventMaker />} />
-              <Route path=":eventId/invite/:key" element={<Invite />} />
-            </Route>
-            <Route path="profile" element={<Profile />} />
-          </Route>
-          <Route path="auth" element={<Auth />} />
-        </Routes>
+            <Route path="auth" element={<Auth />} />
+          </Routes>
+        </TagsContext.Provider>
       </AuthContext.Provider>
     </DeviceContext.Provider>
   );
