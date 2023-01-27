@@ -88,6 +88,7 @@ export interface EventQueryType {
   location?: number;
   search?: string;
   city?: number;
+  tags?: string[];
 }
 
 export interface CityType {
