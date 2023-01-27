@@ -24,7 +24,7 @@ class Event(BaseModel):
     date_end: datetime | None = None
     title: str | None = None
     description: str | None = None
-    visibility: bool | None = False
+    visibility: bool | None = None
     photo_cover: str | None = None
     tags_id: list[int] | None = []
 
