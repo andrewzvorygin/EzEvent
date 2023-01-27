@@ -26,7 +26,6 @@ const MainForm: React.FC<MainFormPropsType> = ({ ws, eventData }) => {
       setTitle(eventData.title);
     }
     if (eventData.date_start !== dateStart) {
-      eventData.date_start && console.log(new Date(eventData.date_start));
       setDateStart(
         eventData.date_start ? new Date(eventData.date_start) : null,
       );
