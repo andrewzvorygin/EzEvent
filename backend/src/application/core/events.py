@@ -9,7 +9,7 @@ def get_cities():
     cities_name = []
     path = os.path.join(APPLICATION_PATH, 'city_name.txt')
 
-    with open(path, 'r', encoding='utf-8') as file:
+    with open(path, 'r', encoding='LATIN1') as file:
         for city in file.readlines():
             cities_name.append({'name': city.strip()})
 
