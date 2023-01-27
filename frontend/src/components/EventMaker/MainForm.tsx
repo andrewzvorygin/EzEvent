@@ -103,7 +103,10 @@ const MainForm: React.FC<MainFormPropsType> = ({ ws, eventData }) => {
         />
         {photo && <Box component="img" sx={{ maxWidth: "100%" }} src={photo} />}
       </Grid>
-      <Grid item>
+      <Grid
+        item
+        sx={{ maxWidth: "100% !important", overflow: "hidden", minWidth: 0 }}
+      >
         <TagsContext.Consumer>
           {({ tags }) => <Tags tags={tags} ws={ws} />}
         </TagsContext.Consumer>
