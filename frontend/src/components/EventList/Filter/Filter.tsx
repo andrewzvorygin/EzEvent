@@ -159,7 +159,7 @@ const Filter: FC<IProps> = ({
               ))}
             </Select>
 
-            <Typography variant="h3" gutterBottom>
+            <Typography variant="body1" gutterBottom>
               Теги
             </Typography>
             <Select
