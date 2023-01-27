@@ -42,16 +42,16 @@ class EventRead(EventFromDB):
     uuid: UUID
     uuid_edit: UUID
     responsible_id: int
-    participants: list[ShortUser] | None
-    editors: list[EditorShort] | None
-    can_reg: bool | None = None
-    can_edit: bool | None = None
 
 
 class RegistryEvent(EventRead):
     responsible_name: str | None = None
     responsible_surname: str | None = None
     city: str | None = None
+    participants: list[ShortUser] | None
+    editors: list[EditorShort] | None
+    can_reg: bool | None = None
+    can_edit: bool | None = None
 
 
 class Navigation(BaseModel):
