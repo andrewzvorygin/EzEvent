@@ -26,7 +26,7 @@ class Event(BaseModel):
     description: str | None = None
     visibility: bool | None = False
     photo_cover: str | None = None
-    tags_id: list[TagId] = []
+    tags_id: list[int] | None = []
 
 
 class EventFromDB(Event):
