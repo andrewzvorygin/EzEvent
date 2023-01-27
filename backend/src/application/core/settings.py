@@ -1,4 +1,8 @@
+import os
 from pydantic import BaseSettings
+
+dr = os.path.dirname
+path_to_env = os.path.join(dr(dr(dr(dr(__file__)))), '.env')
 
 
 class DataBaseSettings(BaseSettings):
@@ -9,7 +13,7 @@ class DataBaseSettings(BaseSettings):
     db_user: str
 
     class Config:
-        env_file = ".env"
+        env_file = path_to_env
 
 
 class AppSettings(BaseSettings):
@@ -19,7 +23,7 @@ class AppSettings(BaseSettings):
     PORT: int = 8000
 
     class Config:
-        env_file = ".env"
+        env_file = path_to_env
 
 
 class Settings(BaseSettings):
@@ -28,7 +32,7 @@ class Settings(BaseSettings):
     testing: bool | None
 
     class Config:
-        env_file = ".env"
+        env_file = path_to_env
 
 
 settings = Settings()
