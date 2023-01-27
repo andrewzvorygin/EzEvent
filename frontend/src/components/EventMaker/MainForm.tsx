@@ -20,11 +20,6 @@ const MainForm: React.FC<MainFormPropsType> = ({ ws, eventData }) => {
   const [title, setTitle] = useState<string | null>(null);
   const [dateStart, setDateStart] = useState<Date | null>(null);
   const [dateEnd, setDateEnd] = useState<Date | null>(null);
-  function onPhotoChange(event: ChangeEvent<HTMLInputElement>): void {
-    if (event.target.files) {
-      setPhoto(URL.createObjectURL(event?.target?.files[0]));
-    }
-  }
 
   useEffect(() => {
     if (eventData.title !== title) {
@@ -111,7 +106,11 @@ const MainForm: React.FC<MainFormPropsType> = ({ ws, eventData }) => {
           {({ tags }) => <Tags tags={tags} ws={ws} />}
         </TagsContext.Consumer>
       </Grid>
-      <Grid item maxWidth={"100%"} overflow={"hidden"}>
+      <Grid
+        item
+        overflow={"hidden"}
+        sx={{ maxWidth: "100% !important", overflow: "hidden", minWidth: 0 }}
+      >
         <Description ws={ws} description={eventData.description} />
       </Grid>
       <Grid item>

@@ -23,21 +23,22 @@ export interface EventType {
   editors: ProfileNameType[];
   event_id?: number;
   uuid_edit?: string;
-  can_edit: boolean | null;
-  can_reg: boolean | null;
-  participants?: ProfileNameType[];
 }
 
 export interface EventPageType extends EventType {
   participants: ProfileNameType[];
   responsible_name: string;
   responsible_surname: string;
+  can_edit?: boolean | null;
+  can_reg?: boolean | null;
 }
 
 export interface EventCardType extends EventType {
   city: string;
   uuid: string;
   uuid_edit: string;
+  responsible_name: string;
+  responsible_surname: string;
 }
 
 export enum DeviceType {

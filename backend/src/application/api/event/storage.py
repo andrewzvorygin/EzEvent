@@ -1,9 +1,8 @@
 from datetime import datetime
-from typing import List
 from uuid import UUID
 
 from databases.interfaces import Record
-from sqlalchemy import select, insert, update, not_, func
+from sqlalchemy import select, insert, update, not_, func, text
 
 from schemes import (
     UserRead, RegistryEvent, UserFromToken, EventRead,
@@ -40,7 +39,7 @@ async def get_event_for_visitor(event_uuid: UUID) -> RegistryEvent:
             event_orm.c.photo_cover,
             event_orm.c.key_invite
         )
-        .join(city_orm, event_orm.c.city == city_orm.c.id)
+        .join(city_orm, event_orm.c.city == city_orm.c.id, isouter=True)
         .join(user_orm, user_orm.c.user_id == event_orm.c.responsible_id)
         .where(event_orm.c.uuid == event_uuid)
     )
@@ -78,7 +77,7 @@ async def create_event(current_user: UserFromToken) -> Record:
     return await database.fetch_one(smtp)
 
 
-async def get_events_keys(user_id: int, user_type: int) -> List[int]:
+async def get_events_keys(user_id: int, user_type: int) -> list[int]:
     def _check_type(user_type: int):
         if user_type == 1:
             return participant_orm.c.is_editor
@@ -98,11 +97,11 @@ async def get_events_keys(user_id: int, user_type: int) -> List[int]:
 async def get_events(
         date_start: datetime,
         date_end: datetime,
-        events_id: List[int],
+        events_id: list[int],
         search: str,
         location: int,
         navigation: Navigation
-) -> List[EventRead]:
+) -> list[EventRead]:
     def _check_location(location: int):
         if location:
             return event_orm.c.city == location
@@ -162,6 +161,7 @@ async def get_events(
 async def get_registry(
         navigation: Navigation,
         search: str,
+        tags: list[int],
         date_start: datetime,
         date_end: datetime,
         location: int
@@ -183,6 +183,13 @@ async def get_registry(
             return func.lower(event_orm.c.title).like(f'%{search.lower()}%')
         return True
 
+    def _check_tags(tags: list[int]):
+        if tags:
+            return text(
+                '''case when cast(:tags as int[]) is not null then cast(:tags as int[]) && "Event".tags_id else true end
+                ''')
+        return True
+
     offset = navigation.offset * navigation.limit
 
     smtp = (
@@ -201,6 +208,7 @@ async def get_registry(
             user_orm.c.surname.label('responsible_surname'),
             user_orm.c.name.label('responsible_name'),
             event_orm.c.visibility,
+            event_orm.c.tags_id,
             event_orm.c.photo_cover,
             event_orm.c.key_invite,
         )
@@ -211,14 +219,18 @@ async def get_registry(
             _check_dates(date_start, True),
             _check_dates(date_end, False),
             _check_location(location),
-            _check_search(search)
+            _check_search(search),
+            _check_tags(tags)
         )
         .limit(navigation.limit)
         .offset(offset)
         .order_by(event_orm.c.event_id.desc())
     )
 
-    result = await database.fetch_all(smtp)
+    # порнография с tags потому что хуеормки по-пидорски работают с блядским intersect, хуепуталы
+    values = {'tags': tags} if tags else None
+
+    result = await database.fetch_all(str(smtp), values)
     return [RegistryEvent.from_orm(event) for event in result]
 
 
@@ -252,7 +264,7 @@ async def get_editors_id(event_uuid: UUID):
         .join(event_orm, event_orm.c.event_id == participant_orm.c.event_id)
         .where(event_orm.c.uuid_edit == event_uuid).where(participant_orm.c.is_editor)
     )
-    print(smtp)
+
     result = await database.fetch_all(smtp)
     return [record['user_id'] for record in result]
 

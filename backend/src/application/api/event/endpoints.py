@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect, Header
+from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect, Header, Query
 
 from schemes import UserFromToken, UserRead, EventRead, RegistryEvent, Key, CommentCreate, CommentRead, EventFromDB
 from api.auth.service import get_current_user
@@ -58,13 +58,15 @@ async def get_registry(
         limit: int,
         offset: int,
         search: str = None,
-        tags: list[int] = None,
+        tags: list[int] = Query(None),
         date_start: datetime = None,
         date_end: datetime = None,
         location: int = None
 ):
     """Получить реестр мероприятий"""
-    res = await service.get_registry(Navigation(limit=limit, offset=offset), search, date_start, date_end, location)
+    res = await service.get_registry(
+        Navigation(limit=limit, offset=offset),
+        search, tags, date_start, date_end, location)
     return {'Events': res}
 
 
