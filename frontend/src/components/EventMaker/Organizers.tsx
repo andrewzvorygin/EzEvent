@@ -35,7 +35,12 @@ const Organizers: React.FC<OrganizersPropsType> = ({ editors, eventId }) => {
         }
       })
       .then((data) => {
-        setLink(`http://localhost:3000/event/${eventId}/invite/${data.key}`);
+        const dev = process.env.NODE_ENV === "development";
+        setLink(
+          `${
+            dev ? "http://localhost:3000" : "http://46.48.59.66:777"
+          }/event/${eventId}/invite/${data.key}`,
+        );
       });
   };
 

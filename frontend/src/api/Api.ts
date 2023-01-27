@@ -6,7 +6,10 @@ import {
   RegisterType,
 } from "../types";
 
-const baseUrl = "http://localhost:8000/";
+const baseUrl =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:8000/"
+    : "http://192.168.0.101:7777";
 
 const { fetch: originalFetch } = window;
 
