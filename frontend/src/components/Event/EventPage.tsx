@@ -112,7 +112,7 @@ const EventPage = () => {
             onClick={() => {
               eventsAPI.registerOnEvent(eventId).then(() => setCanReg(false));
             }}
-            disabled={canReg}
+            disabled={!canReg}
           >
             {canReg ? "Зарегистрироваться" : "Вы уже зарегистрированы"}
           </Button>
