@@ -157,7 +157,7 @@ async def get_events(
             _check_dates(date_end, False),
             _check_location(location),
             _check_search(search),
-            _check_tags,
+            _check_tags(tags),
             event_orm.c.event_id.in_(events_id)
         )
         .limit(navigation.limit)
