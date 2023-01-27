@@ -180,9 +180,10 @@ export const eventsAPI = {
       ? `&date_start=${new Date(data.dateStart).toISOString()}`
       : ``;
     const search = data.search?.length !== 0 ? `&search=${data.search}` : ``;
+    const tags = data.tags?.map((e) => `&tags=${e}`).join("") || "";
 
     return await fetch(
-      `${baseUrl}event/events_registry?limit=${data.limit}&offset=${data.offset}${dateStart}${dateEnd}${location}${search}`,
+      `${baseUrl}event/events_registry?limit=${data.limit}&offset=${data.offset}${dateStart}${dateEnd}${location}${search}${tags}`,
     )
       .then((response) => response.json())
       .catch((error) => console.error(error));
@@ -196,10 +197,11 @@ export const eventsAPI = {
     const dateStart = data.dateStart
       ? `&date_start=${new Date(data.dateStart).toISOString()}`
       : ``;
+    const tags = data.tags?.map((e) => `&tags=${e}`).join("") || "";
     const search = data.search?.length !== 0 ? `&search=${data.search}` : ``;
 
     return await fetch(
-      `${baseUrl}event/my_events?limit=${data.limit}&offset=${data.offset}&typeUser=${data.typeUser}${dateStart}${dateEnd}${location}${search}`,
+      `${baseUrl}event/my_events?limit=${data.limit}&offset=${data.offset}&typeUser=${data.typeUser}${dateStart}${dateEnd}${location}${search}${tags}`,
       {
         method: "GET",
         headers: {
