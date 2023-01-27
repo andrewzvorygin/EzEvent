@@ -37,6 +37,17 @@ class EventFromDB(Event):
     #     return location
 
 
+class TagId(BaseModel):
+    tag_id: str | None = None
+
+    class Config:
+        orm_mode = True
+
+
+class Tag(TagId):
+    name: str
+
+
 class EventRead(EventFromDB):
     event_id: int
     uuid: UUID

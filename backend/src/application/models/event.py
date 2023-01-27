@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, UniqueConstraint, Float, Date
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, UniqueConstraint, Float, Date, ARRAY
 from sqlalchemy import text
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -28,6 +28,7 @@ class Event(Base):
     visibility = Column(Boolean, default=False)
     photo_cover = Column(String)
     key_invite = Column(String(10))
+    tags_id = Column(ARRAY(Integer))
 
 
 event_orm = Event.__table__
@@ -73,3 +74,12 @@ class Comment(Base):
 
 
 comment_orm = Comment.__table__
+
+
+class Tag(Base):
+    __tablename__ = 'Tag'
+    tag_id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String)
+
+
+tag_orm = Tag.__table__
