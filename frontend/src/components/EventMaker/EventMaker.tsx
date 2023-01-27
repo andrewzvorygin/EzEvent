@@ -21,8 +21,6 @@ const EventMaker: React.FC<EventMakerPropsType> = (props) => {
   const [connectOpen, setConnectOpen] = useState<boolean>(false);
   const eventId = useParams().eventId;
   const [eventData, setEventData] = useState<EventType>({
-    can_edit: null,
-    can_reg: null,
     title: null,
     date_end: null,
     date_start: null,
@@ -77,7 +75,7 @@ const EventMaker: React.FC<EventMakerPropsType> = (props) => {
     });
   }, [wsChannel]);
 
-  if (!connectOpen) {
+  if (!connectOpen || !props.initialized) {
     return null;
   }
 

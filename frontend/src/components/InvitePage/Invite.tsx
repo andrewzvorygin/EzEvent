@@ -2,7 +2,6 @@ import React, { FC, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { AuthContext } from "../../App";
-import { DeviceType } from "../../types";
 import { eventsAPI } from "../../api/Api";
 
 interface InvitePropsType {

@@ -31,18 +31,5 @@
 }
 
 .company {
-  display: grid;
-  column-gap: 8px;
-  grid-template-columns: 45px 1fr;
-  align-items: center;
-  height: 50px;
   width: 100%;
-
-  .avatar {
-    margin: 2px;
-    width: 41px;
-    height: 41px;
-    border-radius: 18px;
-    box-shadow: black 0 0 0 2px;
-  }
 }

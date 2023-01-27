@@ -12,7 +12,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 
 import { eventsAPI } from "../../api/Api";
-import { EventType } from "../../types";
+import { EventPageType } from "../../types";
 
 import Person from "./templates/Person";
 import Description from "./templates/Description";
@@ -30,12 +30,11 @@ const EventPage = () => {
 
   const eventId = useParams().eventId;
 
-  const [event, setEvent] = useState<EventType | null>(null);
+  const [event, setEvent] = useState<EventPageType | null>(null);
 
   useEffect(() => {
     if (eventId) {
       eventsAPI.getEvent(eventId).then((data) => {
-        console.log(data);
         setEvent({
           ...data,
           date_start: data.date_start

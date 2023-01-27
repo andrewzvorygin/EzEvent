@@ -33,11 +33,9 @@ const EventCard: React.FC<EventCardPropsType> = ({ event }) => {
             {event.title || "Без названия"}
           </Typography>
           <div className={styles.company}>
-            <Avatar
-              className={styles.avatar}
-              src="https://sun3-11.userapi.com/impg/ky8437PNHYlH4yTRgJh2pPNSFKGbWjA8-dqaLw/jGVuPxkf_6s.jpg?size=650x925&quality=96&sign=fecf2fabbc55d170634f67222f9acf33&type=album"
-            />
-            <Typography variant="body1">Серёга Чел</Typography>
+            <Typography variant="body1">
+              {event.responsible_name} {event.responsible_surname}
+            </Typography>
           </div>
           <Typography
             variant="body1"
