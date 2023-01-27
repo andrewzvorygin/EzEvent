@@ -45,12 +45,13 @@ async def get_my_events(
         navigation: Navigation,
         type_user: int,
         search: str,
+        tags: list[int],
         location: int,
         current_user: UserFromToken
 ):
     """asdas"""
     events_id = await st.get_events_keys(current_user.user_id, type_user)
-    return await st.get_events(date_start, date_end, events_id, search, location, navigation)
+    return await st.get_events(date_start, date_end, events_id, search, tags, location, navigation)
 
 
 async def get_registry(

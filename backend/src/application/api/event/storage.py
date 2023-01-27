@@ -100,6 +100,7 @@ async def get_events(
         date_end: datetime,
         events_id: list[int],
         search: str,
+        tags: list[int],
         location: int,
         navigation: Navigation
 ) -> list[EventRead]:
@@ -118,6 +119,13 @@ async def get_events(
     def _check_search(search: str):
         if search:
             return func.lower(event_orm.c.title).like(f'%{search.lower()}%')
+        return True
+
+    def _check_tags(tags: list[int]):
+        if tags:
+            return text(
+                '''case when cast(:tags as int[]) is not null then cast(:tags as int[]) && "Event".tags_id else true end
+                ''')
         return True
 
     offset = navigation.offset * navigation.limit
@@ -149,13 +157,17 @@ async def get_events(
             _check_dates(date_end, False),
             _check_location(location),
             _check_search(search),
+            _check_tags,
             event_orm.c.event_id.in_(events_id)
         )
         .limit(navigation.limit)
         .offset(offset)
         .order_by(event_orm.c.event_id.desc())
     )
-    result = await database.fetch_all(smtp)
+    # порнография с tags потому что хуеормки по-пидорски работают с блядским intersect, хуепуталы
+    values = {'tags': tags} if tags else None
+
+    result = await database.fetch_all(str(smtp), values)
     return [RegistryEvent.from_orm(event) for event in result]
 
 

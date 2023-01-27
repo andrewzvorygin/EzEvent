@@ -36,6 +36,7 @@ async def get_events(
         typeUser: int,
         date_start: datetime = datetime.min,
         date_end: datetime = datetime.max,
+        tags: list[int] = Query(None),
         search: str = None,
         location: int = None,
         current_user: UserFromToken = Depends(get_current_user)
@@ -47,6 +48,7 @@ async def get_events(
         Navigation(limit=limit, offset=offset),
         typeUser,
         search,
+        tags,
         location,
         current_user
     )
