@@ -8,7 +8,7 @@ from .userbase import ShortUser, ParticipantShort, EditorShort
 
 
 class TagId(BaseModel):
-    tag_id: str | None = None
+    tag_id: int | None = None
 
     class Config:
         orm_mode = True
@@ -26,7 +26,7 @@ class Event(BaseModel):
     description: str | None = None
     visibility: bool | None = False
     photo_cover: str | None = None
-    tags_id: [TagId] = []
+    tags_id: list[TagId] = []
 
 
 class EventFromDB(Event):
