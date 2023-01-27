@@ -30,6 +30,7 @@ const EventMaker: React.FC<EventMakerPropsType> = (props) => {
     latitude: null,
     longitude: null,
     editors: [],
+    tags_id: [],
   });
 
   useEffect(() => {

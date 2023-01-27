@@ -21,6 +21,7 @@ export interface EventType {
   latitude: number | null;
   longitude: number | null;
   editors: ProfileNameType[];
+  tags_id: number[];
   event_id?: number;
   uuid_edit?: string;
 }

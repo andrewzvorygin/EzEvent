@@ -26,7 +26,6 @@ const MainForm: React.FC<MainFormPropsType> = ({ ws, eventData }) => {
       setTitle(eventData.title);
     }
     if (eventData.date_start !== dateStart) {
-      eventData.date_start && console.log(new Date(eventData.date_start));
       setDateStart(
         eventData.date_start ? new Date(eventData.date_start) : null,
       );
@@ -103,7 +102,7 @@ const MainForm: React.FC<MainFormPropsType> = ({ ws, eventData }) => {
         sx={{ maxWidth: "100% !important", overflow: "hidden", minWidth: 0 }}
       >
         <TagsContext.Consumer>
-          {({ tags }) => <Tags tags={tags} ws={ws} />}
+          {({ tags }) => <Tags tags={tags} ws={ws} tagsId={eventData.tags_id} />}
         </TagsContext.Consumer>
       </Grid>
       <Grid

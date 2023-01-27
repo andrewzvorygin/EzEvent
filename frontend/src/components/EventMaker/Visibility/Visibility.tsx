@@ -23,7 +23,7 @@ const Visibility: React.FC<VisibilityPropsType> = ({ ws, eventData }) => {
     eventData.visibility ?? false,
   );
 
-  const skipKeys = ["key_invite", "visibility"];
+  const skipKeys = ["key_invite", "visibility", "tags_id"];
 
   useEffect(() => {
     if (eventData.visibility !== visibility) {
