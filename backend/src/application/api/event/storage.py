@@ -113,7 +113,7 @@ async def get_events(
         if _date:
             if start:
                 return text('''coalesce("Event".date_start, cast('-infinity' as date)) >= cast(:date_start as date)''')
-            return text('''coalesce("Event".date_start, cast('infinity' as date)) >= cast(:date_end as date)''')
+            return text('''coalesce("Event".date_end, cast('infinity' as date)) <= cast(:date_end as date)''')
         return True
 
     def _check_tags(tags: list[int]):
@@ -129,7 +129,6 @@ async def get_events(
     def _check_search(search: str):
         if search:
             return text('''lower("Event".title) like cast(:search as text)''')
-                #func.lower(event_orm.c.title).like(f'%{search.lower()}%')
         return True
 
     offset = navigation.offset * navigation.limit
@@ -210,7 +209,7 @@ async def get_registry(
         if _date:
             if start:
                 return text('''"Event".date_start >= cast(:date_start as date)''')
-            return text('''"Event".date_start >= cast(:date_end as date)''')
+            return text('''"Event".date_end <= cast(:date_end as date)''')
         return True
 
     def _check_search(search: str):
