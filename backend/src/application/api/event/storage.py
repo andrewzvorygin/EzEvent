@@ -215,7 +215,6 @@ async def get_registry(
     def _check_search(search: str):
         if search:
             return text('''lower("Event".title) like cast(:search as text)''')
-                #func.lower(event_orm.c.title).like(f'%{search.lower()}%')
         return True
 
     def _check_tags(tags: list[int]):
