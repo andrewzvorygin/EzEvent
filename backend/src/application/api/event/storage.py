@@ -112,8 +112,8 @@ async def get_events(
     def _check_dates(_date: datetime, start: bool):
         if _date:
             if start:
-                return func.coalesce(event_orm.c.date_start, datetime.min) >= _date
-            return func.coalesce(event_orm.c.date_end, datetime.max) <= _date
+                return text('''coalesce("Event".date_start, cast('-infinity' as date)) >= cast(:date_start as date)''')
+            return text('''coalesce("Event".date_start, cast('infinity' as date)) >= cast(:date_end as date)''')
         return True
 
     def _check_search(search: str):
@@ -123,15 +123,12 @@ async def get_events(
 
     def _check_tags(tags: list[int]):
         if tags:
-            return text(
-                '''
-                  case when cast(:tags as int[]) is not null then cast(:tags as int[]) && "Event".tags_id else true end ''')
+            return text('''cast(:tags as int[]) && "Event".tags_id''')
         return True
 
     def _check_is_my(events: list[int]):
         if events:
-            return text(
-                ''' case when cast(:events as int[]) is not null  then "Event".event_id = any(cast(:events as int[])) else true end ''')
+            return text('''"Event".event_id = any(cast(:events as int[]))''')
         return False
 
     offset = navigation.offset * navigation.limit
@@ -172,12 +169,19 @@ async def get_events(
     )
     # порнография с tags потому что хуеормки по-пидорски работают с блядским intersect, хуепуталы
     values = {}
+    if date_start:
+        values.update({'date_start': date_start})
+
+    if date_end:
+        values.update({'date_end': date_end})
+
     if tags:
         values.update({'tags': tags})
 
     if events_id:
         values.update({'events': events_id})
 
+    print(smtp)
     result = await database.fetch_all(str(smtp), values)
     return [RegistryEvent.from_orm(event) for event in result]
 
@@ -192,26 +196,26 @@ async def get_registry(
 ):
     def _check_location(location: int):
         if location:
-            return event_orm.c.city == location
+            return text('''"Event".city = cast(:location as int)''')
         return True
 
     def _check_dates(_date: datetime, start: bool):
         if _date:
             if start:
-                return event_orm.c.date_start >= _date
-            return event_orm.c.date_end <= _date
+                return text('''"Event".date_start >= cast(:date_start as date)''')
+            return text('''"Event".date_start >= cast(:date_end as date)''')
         return True
 
     def _check_search(search: str):
         if search:
-            return func.lower(event_orm.c.title).like(f'%{search.lower()}%')
+            return text('''lower("Event".title) like cast(:search as text)''')
+                #func.lower(event_orm.c.title).like(f'%{search.lower()}%')
         return True
 
     def _check_tags(tags: list[int]):
         if tags:
             return text(
-                '''case when cast(:tags as int[]) is not null then cast(:tags as int[]) && "Event".tags_id else true end
-                ''')
+                '''cast(:tags as int[]) && "Event".tags_id''')
         return True
 
     offset = navigation.offset * navigation.limit
@@ -250,9 +254,23 @@ async def get_registry(
         .offset(offset)
         .order_by(event_orm.c.event_id.desc())
     )
-
+    print(smtp)
     # порнография с tags потому что хуеормки по-пидорски работают с блядским intersect, хуепуталы
-    values = {'tags': tags} if tags else None
+    values = {}
+    if date_start:
+        values.update({'date_start': date_start})
+
+    if date_end:
+        values.update({'date_end': date_end})
+
+    if tags:
+        values.update({'tags': tags})
+
+    if location:
+        values.update({'location': location})
+
+    if search:
+        values.update({'search': f'%{search.lower()}%'})
 
     result = await database.fetch_all(str(smtp), values)
     return [RegistryEvent.from_orm(event) for event in result]
