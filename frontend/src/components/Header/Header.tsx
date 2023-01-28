@@ -1,4 +1,11 @@
-import { Avatar, Box, Button, Typography } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Button,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import {
   AccountBoxOutlined,
   ControlPointOutlined,
@@ -25,20 +32,26 @@ const activeStyle = {
 const Header: React.FC<AuthType & DeviceContextType> = (props) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"), {
+    defaultMatches: true,
+  });
   return (
     <Box component="header" sx={{ py: 3, px: 3, display: "flex" }}>
       <NavLink to={"/events"}>
         <Avatar sx={{ width: 56, height: 56 }} src={logo} />
       </NavLink>
-      <Typography variant={"h3"} alignSelf={"center"} ml={2}>
-        EzEvent
-      </Typography>
+      {!isMobile && (
+        <Typography variant={"h3"} alignSelf={"center"} ml={2}>
+          EzEvent
+        </Typography>
+      )}
       <Box
         sx={{
           ml: "auto",
           display: "flex",
           alignItems: "center",
-          gap: 2.5,
+          gap: !isMobile ? 2.5 : 1.5,
         }}
       >
         {props.auth ? (

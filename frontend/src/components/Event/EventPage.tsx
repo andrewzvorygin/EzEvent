@@ -85,7 +85,7 @@ const EventPage = () => {
       {event.tags_id && (
         <TagsContext.Consumer>
           {({ tags }) => (
-            <Stack mb={4} direction={"row"} flexWrap={"wrap"} spacing={1}>
+            <Stack mb={4} direction={"row"} flexWrap={"wrap"} sx={{ gap: 1 }}>
               {event.tags_id.map((e) => (
                 <StyledButton key={e} variant="outlined">
                   {tags[e]}
@@ -113,7 +113,7 @@ const EventPage = () => {
             "Без места"
           )}
         </Stack>
-        {event.can_edit ? (
+        {event.can_edit && !isMobile ? (
           <Button
             variant="contained"
             onClick={() => {
