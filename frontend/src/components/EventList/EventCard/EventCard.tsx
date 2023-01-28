@@ -40,7 +40,12 @@ const EventCard: React.FC<EventCardPropsType> = ({ event }) => {
                 <Stack
                   direction={"row"}
                   flexWrap={"wrap"}
-                  sx={{ gap: 1, mb: 0.4 }}
+                  sx={{
+                    gap: 1,
+                    mb: 0.4,
+                    overflow: "hidden",
+                    maxHeight: "32px",
+                  }}
                 >
                   {event.tags_id.map((e) => (
                     <StyledButton
