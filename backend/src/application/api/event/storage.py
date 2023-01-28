@@ -106,7 +106,7 @@ async def get_events(
 ) -> list[EventRead]:
     def _check_location(location: int):
         if location:
-            return event_orm.c.city == location
+            return text('''"Event".city = cast(:location as int)''')
         return True
 
     def _check_dates(_date: datetime, start: bool):
@@ -114,11 +114,6 @@ async def get_events(
             if start:
                 return text('''coalesce("Event".date_start, cast('-infinity' as date)) >= cast(:date_start as date)''')
             return text('''coalesce("Event".date_start, cast('infinity' as date)) >= cast(:date_end as date)''')
-        return True
-
-    def _check_search(search: str):
-        if search:
-            return func.lower(event_orm.c.title).like(f'%{search.lower()}%')
         return True
 
     def _check_tags(tags: list[int]):
@@ -130,6 +125,12 @@ async def get_events(
         if events:
             return text('''"Event".event_id = any(cast(:events as int[]))''')
         return False
+
+    def _check_search(search: str):
+        if search:
+            return text('''lower("Event".title) like cast(:search as text)''')
+                #func.lower(event_orm.c.title).like(f'%{search.lower()}%')
+        return True
 
     offset = navigation.offset * navigation.limit
 
@@ -177,6 +178,12 @@ async def get_events(
 
     if tags:
         values.update({'tags': tags})
+
+    if location:
+        values.update({'location': location})
+
+    if search:
+        values.update({'search': f'%{search.lower()}%'})
 
     if events_id:
         values.update({'events': events_id})
